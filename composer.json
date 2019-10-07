@@ -9,9 +9,14 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "ezyang/htmlpurifier": "^4.11",
         "fideloper/proxy": "^4.0",
+        "indieweb/date-formatter": "^0.3.1",
         "laravel/framework": "^6.0",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "michelf/php-markdown": "^1.8",
+        "mnabialek/laravel-sql-logger": "^2.2",
+        "p3k/utils": "^1.2"
     },
     "require-dev": {
         "facade/ignition": "^1.4",

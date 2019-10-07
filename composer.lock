@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3a81ea5a73ebc29fdd013d76177a616e",
+    "content-hash": "85aa11081339d7ce9f8e87b2b9618091",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -327,6 +327,53 @@
             "time": "2019-03-17T18:48:37+00:00"
         },
         {
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezyang/htmlpurifier.git",
+                "reference": "83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7",
+                "reference": "83ab08bc1af7d808a9e0fbf024f1c24bfd73c0a7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "simpletest/simpletest": "dev-master#72de02a7b80c6bb8864ef9bf66d41d2f58f826bd"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
+                "files": [
+                    "library/HTMLPurifier.composer.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Edward Z. Yang",
+                    "email": "admin@htmlpurifier.org",
+                    "homepage": "http://ezyang.com"
+                }
+            ],
+            "description": "Standards compliant HTML filter written in PHP",
+            "homepage": "http://htmlpurifier.org/",
+            "keywords": [
+                "html"
+            ],
+            "time": "2019-07-14T18:58:38+00:00"
+        },
+        {
             "name": "fideloper/proxy",
             "version": "4.2.1",
             "source": {
@@ -379,6 +426,53 @@
                 "trusted proxy"
             ],
             "time": "2019-09-03T16:45:42+00:00"
+        },
+        {
+            "name": "indieweb/date-formatter",
+            "version": "0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/indieweb/date-formatter-php.git",
+                "reference": "282946ebae0efa5f9c00be88553d76d7a39824ab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/indieweb/date-formatter-php/zipball/282946ebae0efa5f9c00be88553d76d7a39824ab",
+                "reference": "282946ebae0efa5f9c00be88553d76d7a39824ab",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "mf2/mf2": ">=0.2.12",
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "IndieWeb": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Parecki",
+                    "homepage": "http://aaronparecki.com"
+                }
+            ],
+            "description": "Render dates and date ranges in a human-readable format, including proper microformats-2 markup",
+            "homepage": "https://github.com/indieweb/date-formatter-php",
+            "keywords": [
+                "date",
+                "format",
+                "microformats",
+                "microformats2"
+            ],
+            "time": "2016-04-05T15:13:00+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -761,6 +855,172 @@
             "time": "2019-08-24T11:17:19+00:00"
         },
         {
+            "name": "michelf/php-markdown",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michelf/php-markdown.git",
+                "reference": "01ab082b355bf188d907b9929cd99b2923053495"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/01ab082b355bf188d907b9929cd99b2923053495",
+                "reference": "01ab082b355bf188d907b9929cd99b2923053495",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Michelf\\": "Michelf/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Michel Fortin",
+                    "email": "michel.fortin@michelf.ca",
+                    "homepage": "https://michelf.ca/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "John Gruber",
+                    "homepage": "https://daringfireball.net/"
+                }
+            ],
+            "description": "PHP Markdown",
+            "homepage": "https://michelf.ca/projects/php-markdown/",
+            "keywords": [
+                "markdown"
+            ],
+            "time": "2018-01-15T00:49:33+00:00"
+        },
+        {
+            "name": "mnabialek/laravel-sql-logger",
+            "version": "v2.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mnabialek/laravel-sql-logger.git",
+                "reference": "68d7b828e796fc19f65fab49c6c3245a6353c5ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mnabialek/laravel-sql-logger/zipball/68d7b828e796fc19f65fab49c6c3245a6353c5ef",
+                "reference": "68d7b828e796fc19f65fab49c6c3245a6353c5ef",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/container": "5.*|6.*",
+                "illuminate/filesystem": "5.*|6.*",
+                "illuminate/support": "5.*|6.*",
+                "mnabialek/laravel-version": "^1.0.2",
+                "nesbot/carbon": "~1.0 || ^2.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~2.5",
+                "laravel/framework": "^6.0",
+                "mockery/mockery": "^1.0",
+                "php-coveralls/php-coveralls": "^2.0",
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Mnabialek\\LaravelSqlLogger\\Providers\\ServiceProvider"
+                    ]
+                },
+                "thanks": {
+                    "name": "mnabialek/laravel-version",
+                    "url": "https://github.com/mnabialek/laravel-version"
+                },
+                "suggest": {
+                    "symfony/thanks": "Star packages you use running 'composer thanks' command"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Mnabialek\\LaravelSqlLogger\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcin Nabiałek",
+                    "email": "dev@nabialek.org"
+                }
+            ],
+            "description": "Log SQL queries in Laravel/Lumen framework",
+            "keywords": [
+                "laravel",
+                "log",
+                "log sql",
+                "log sql queries",
+                "logger",
+                "lumen",
+                "sql",
+                "sql log",
+                "sql logger"
+            ],
+            "time": "2019-09-04T17:04:27+00:00"
+        },
+        {
+            "name": "mnabialek/laravel-version",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mnabialek/laravel-version.git",
+                "reference": "a1685dc0868a4faebc01000f86ff24c7922403f5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mnabialek/laravel-version/zipball/a1685dc0868a4faebc01000f86ff24c7922403f5",
+                "reference": "a1685dc0868a4faebc01000f86ff24c7922403f5",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/container": "5.*|6.*"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "mockery/mockery": "^1.0",
+                "php-coveralls/php-coveralls": "^2.0",
+                "phpunit/phpunit": "^6.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mnabialek\\LaravelVersion\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcin Nabiałek",
+                    "email": "dev@nabialek.org"
+                }
+            ],
+            "description": "Get Laravel/Lumen version",
+            "keywords": [
+                "laravel",
+                "laravel version",
+                "lumen",
+                "lumen version"
+            ],
+            "time": "2019-09-03T18:09:48+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "2.0.0",
             "source": {
@@ -1019,6 +1279,52 @@
                 "serialize"
             ],
             "time": "2019-09-02T21:07:33+00:00"
+        },
+        {
+            "name": "p3k/utils",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aaronpk/p3k-utils.git",
+                "reference": "ecd0ba1afca8e586f09792f7be5052e142d3cbde"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aaronpk/p3k-utils/zipball/ecd0ba1afca8e586f09792f7be5052e142d3cbde",
+                "reference": "ecd0ba1afca8e586f09792f7be5052e142d3cbde",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.13",
+                "predis/predis": "1.1.*"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/global.php",
+                    "src/url.php",
+                    "src/utils.php",
+                    "src/date.php",
+                    "src/cache.php",
+                    "src/geo.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Aaron Parecki",
+                    "homepage": "https://aaronparecki.com"
+                }
+            ],
+            "description": "Some helpful functions used by https://p3k.io projects",
+            "homepage": "https://github.com/aaronpk/p3k-utils",
+            "time": "2018-03-28T13:44:56+00:00"
         },
         {
             "name": "paragonie/random_compat",

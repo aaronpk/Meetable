@@ -23,7 +23,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Route::pattern('year', '[0-9]{4}');
+        Route::pattern('month', '[0-9]{2}');
+        Route::pattern('key', '[0-9a-zA-Z]+');
+        Route::pattern('slug', '[0-9a-zA-Z\-]+');
 
         parent::boot();
     }

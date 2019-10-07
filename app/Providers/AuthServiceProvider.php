@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Services\Auth\VouchGuard;
+use Auth;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,8 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Auth::extend('vouch', function($app, $name, array $config) {
+            return new VouchGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
+        });
     }
 }

@@ -37,7 +37,7 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'session',
+            'driver' => 'vouch',
             'provider' => 'users',
         ],
 
@@ -46,6 +46,7 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
     ],
 
     /*
