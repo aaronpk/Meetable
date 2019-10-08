@@ -30,13 +30,20 @@ class VouchGuard implements Guard {
     }
 
     public function user() {
+        static $cached = false;
+
         $url = $this->request->server->get('HTTP_REMOTE_USER');
+
+        if($cached && $cached->url == $url)
+            return $cached;
+
         $user = User::where('url', $url)->first();
         if(!$user) {
             $user = new User();
             $user->url = $url;
             $user->save();
         }
+        $cached = $user;
         return $user;
     }
 
