@@ -1,0 +1,21 @@
+
+.event .segment {
+    margin-bottom: 1em;
+}
+
+.event .event-name {
+    font-size: 2.5rem;
+}
+
+.event .date, .event .location {
+    font-size: 1.5em;
+    line-height: 1.2em;
+}
+
+.event .description {
+    max-width: 75ch;
+}
+
+.event .description img {
+    max-width: 100%;
+}

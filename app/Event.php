@@ -1,5 +1,4 @@
 <?php
-
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +13,13 @@ class Event extends Model
 
     public function tags() {
         return $this->belongsToMany('\App\Tag');
+    }
+
+    public function tags_string() {
+        $tags = [];
+        foreach($this->tags as $t)
+            $tags[] = $t->tag;
+        return implode(' ', $tags);
     }
 
     public function has_rsvps() {

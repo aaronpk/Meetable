@@ -21,6 +21,9 @@ Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 Route::middleware('auth')->group(function(){
 
     Route::get('/new', 'EventController@new_event');
-    Route::post('/create', 'EventController@create_event')->name('create_event');
+    Route::post('/create', 'EventController@create_event')->name('create-event');
+    Route::get('/edit/{event}', 'EventController@edit_event')->name('edit-event');
+    Route::post('/edit/{event}/save', 'EventController@save_event')->name('save-event');
+    Route::get('/history/{event}', 'EventController@event_history')->name('event-history');
 
 });

@@ -1,33 +1,46 @@
 @extends('layouts/main')
 
 @section('content')
+<div class="ui container">
 
-<article class="h-event">
+@if(Auth::user())
+    <div class="ui buttons right floated">
+      <a class="ui button" href="{{ route('edit-event', $event) }}"><i class="edit icon"></i> Edit</a>
+      <div class="ui floating dropdown icon button">
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          <a class="item" href="{{ route('event-history', $event) }}"><i class="clock icon"></i> View Revision History</a>
+        </div>
+      </div>
+    </div>
+@endif
 
-    <h1 class="p-name">{{ $event->name }}</h1>
+<article class="h-event event">
 
-    <div>
+    <h1 class="p-name event-name">{{ $event->name }}</h1>
+
+    <div class="date segment">
         🕘
         {{ $event->date_summary() }}
     </div>
 
-    <div>
+    <div class="location segment">
         📍
         {{ $event->location_name }}<br>
         {{ $event->location_summary() }}
     </div>
 
     @if($event->website)
-        <div>
+        <div class="segment">
             <a href="{{ $event->website }}" class="u-url">{{ \p3k\url\display_url($event->website) }}</a>
         </div>
     @endif
 
-    <div class="e-content">
+    <div class="e-content description segment">
         {!! $event->html() !!}
     </div>
 
-    <div class="tags">
+    <div class="tags segment">
         @foreach($event->tags as $tag)
           <a href="{{ $tag->url() }}">#{{ $tag->tag }}</a>
         @endforeach
@@ -77,12 +90,7 @@
         </div>
     @endif
 
-
-<pre>Year: {{ $year }}
-Month: {{ $month }}
-Key: {{ $key }}
-Slug: {{ $slug }}</pre>
-
 </article>
 
+</div>
 @endsection

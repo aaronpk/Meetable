@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event;
+use DateTime;
 
 class Controller extends BaseController
 {
@@ -37,7 +38,10 @@ class Controller extends BaseController
         }
 
         // Redirect to the canonical URL
-        if($event->slug && $event->slug != $slug) {
+        $date = new DateTime($event->start_date);
+        if($event->slug && $event->slug != $slug
+           || $year != $date->format('Y')
+           || $month != $date->format('m')) {
             return redirect($event->permalink(), 301);
         }
 
