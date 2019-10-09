@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "doctrine/dbal": "^2.9",
         "ezyang/htmlpurifier": "^4.11",
         "fideloper/proxy": "^4.0",
         "indieweb/date-formatter": "^0.3.1",
