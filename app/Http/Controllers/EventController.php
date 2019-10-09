@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\EventRevision;
+use App\Event, App\EventRevision, App\Tag;
 use Illuminate\Support\Str;
 use Auth;
 
@@ -81,6 +81,13 @@ class EventController extends BaseController
 
         $event->last_modified_by = Auth::user()->id;
         $event->save();
+
+        // Delete related tags
+        $event->tags()->detach();
+        // Add all the tags back
+        foreach(explode(' ', request('tags')) as $t) {
+            $event->tags()->attach(Tag::get($t));
+        }
 
         return redirect($event->permalink());
     }
