@@ -13,8 +13,16 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function index() {
-        $events = Event::all();
+    public function index($year=false, $month=false) {
+
+        if($year) {
+            $events = Event::whereYear('start_date', $year);
+            if($month)
+                $events = $events->whereMonth('start_date', $month);
+            $events = $events->get();
+        } else {
+            $events = Event::all();
+        }
 
         return view('index', [
             'events' => $events,

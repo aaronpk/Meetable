@@ -16,6 +16,9 @@ Route::get('/', 'Controller@index')->name('index');
 Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
 Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event');
 
+Route::get('/{year}/{month}', 'Controller@index');
+Route::get('/{year}', 'Controller@index');
+
 Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 
 Route::middleware('auth')->group(function(){
