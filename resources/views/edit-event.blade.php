@@ -4,9 +4,9 @@
 
 <div class="ui container">
 
-<h1>{{ $event->id ? 'Editing '.$event->name : 'Add an Event' }}</h1>
+<h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
 
-<form action="{{ $event->id ? route('save-event', $event) : route('create-event') }}" method="post" class="ui form">
+<form action="{{ $form_action }}" method="post" class="ui form">
 
     <div class="field">
         <label>Name</label>
@@ -63,12 +63,12 @@
     <div class="two fields">
         <div class="field">
             <label>Start Time (optional)</label>
-            <input type="time" name="start_time" autocomplete="off" value="{{ $event->start_time }}">
+            <input type="time" name="start_time" autocomplete="off" value="{{ $event->start_time ?: '' }}">
         </div>
 
         <div class="field">
             <label>End Time (optional)</label>
-            <input type="time" name="end_time" autocomplete="off" value="{{ $event->end_time }}">
+            <input type="time" name="end_time" autocomplete="off" value="{{ $event->end_time ?: '' }}">
         </div>
     </div>
 

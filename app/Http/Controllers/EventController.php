@@ -18,7 +18,9 @@ class EventController extends BaseController
     public function new_event() {
         $event = new Event;
         return view('edit-event', [
-            'event' => $event
+            'event' => $event,
+            'mode' => 'create',
+            'form_action' => route('create-event'),
         ]);
     }
 
@@ -56,7 +58,17 @@ class EventController extends BaseController
 
     public function edit_event(Event $event) {
         return view('edit-event', [
-            'event' => $event
+            'event' => $event,
+            'mode' => 'edit',
+            'form_action' => route('save-event', $event),
+        ]);
+    }
+
+    public function clone_event(Event $event) {
+        return view('edit-event', [
+            'event' => $event,
+            'mode' => 'clone',
+            'form_action' => route('create-event'),
         ]);
     }
 
@@ -70,13 +82,13 @@ class EventController extends BaseController
         // Save a snapshot of the previous state
         $revision = new EventRevision;
         foreach(array_merge($properties, ['key','slug','created_by','last_modified_by']) as $p) {
-            $revision->{$p} = $event->{$p} ?: '';
+            $revision->{$p} = $event->{$p} ?: null;
         }
         $revision->save();
 
         // Update the properties on the event
         foreach($properties as $p) {
-            $event->{$p} = request($p) ?: '';
+            $event->{$p} = request($p) ?: null;
         }
 
         $event->last_modified_by = Auth::user()->id;
