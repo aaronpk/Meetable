@@ -29,13 +29,15 @@ class EventController extends BaseController
         $event->name = request('name');
 
         $event->key = Str::random(12);
-        $event->slug = preg_replace('/[^a-z]/', '-', strtolower($event->name));
+        $event->slug = Event::slug_from_name($event->name);
 
-        $event->location_name = request('location');
-        $event->location_address = '';
-        $event->location_locality = '';
-        $event->location_region = '';
-        $event->location_country = '';
+        $event->location_name = request('location_name') ?: '';
+
+        // When cloning an event, the address details will be provided
+        $event->location_address = request('location_address') ?: '';
+        $event->location_locality = request('location_locality') ?: '';
+        $event->location_region = request('location_region') ?: '';
+        $event->location_country = request('location_country') ?: '';
 
         $event->start_date = date('Y-m-d', strtotime(request('start_date')));
         if(request('end_date'))
@@ -52,6 +54,10 @@ class EventController extends BaseController
         $event->last_modified_by = Auth::user()->id;
 
         $event->save();
+
+        foreach(explode(' ', request('tags')) as $t) {
+            $event->tags()->attach(Tag::get($t));
+        }
 
         return redirect($event->permalink());
     }
@@ -90,6 +96,9 @@ class EventController extends BaseController
         foreach($properties as $p) {
             $event->{$p} = request($p) ?: null;
         }
+
+        // Generate a new slug
+        $event->slug = Event::slug_from_name($event->name);
 
         $event->last_modified_by = Auth::user()->id;
         $event->save();

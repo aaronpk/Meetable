@@ -7,6 +7,10 @@ use DateTime, DateTimeZone;
 class Event extends Model
 {
 
+    public static function slug_from_name($name) {
+        return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9]+/', '-', strtolower($name)));
+    }
+
     public function responses() {
         return $this->hasMany('\App\Response');
     }

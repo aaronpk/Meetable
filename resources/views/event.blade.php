@@ -25,11 +25,13 @@
         {{ $event->date_summary() }}
     </div>
 
+    @if( $event->location_name || $event->location_summary() )
     <div class="location segment">
         📍
         {{ $event->location_name }}<br>
         {{ $event->location_summary() }}
     </div>
+    @endif
 
     @if($event->website)
         <div class="segment">
