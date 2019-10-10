@@ -4,6 +4,16 @@
 
 <div class="ui container">
 
+<div class="ui buttons right floated">
+  <span class="ui button disabled">Actions</span>
+  <div class="ui floating dropdown icon button">
+    <i class="dropdown icon"></i>
+    <div class="menu">
+      <a class="item delete-event" href="{{ route('delete-event', $event) }}"><i class="delete icon"></i> Delete Event</a>
+    </div>
+  </div>
+</div>
+
 <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
 
 <form action="{{ $form_action }}" method="post" class="ui form">

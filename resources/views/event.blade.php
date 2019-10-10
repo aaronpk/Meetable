@@ -9,7 +9,7 @@
       <div class="ui floating dropdown icon button">
         <i class="dropdown icon"></i>
         <div class="menu">
-          <a class="item" href="{{ route('event-history', $event) }}"><i class="clock icon"></i> View Revision History</a>
+          <!-- <a class="item" href="{{ route('event-history', $event) }}"><i class="clock icon"></i> View Revision History</a> -->
           <a class="item" href="{{ route('clone-event', $event) }}"><i class="copy icon"></i> Clone Event</a>
         </div>
       </div>

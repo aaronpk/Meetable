@@ -26,5 +26,6 @@ Route::middleware('auth')->group(function(){
     Route::post('/event/{event}/save', 'EventController@save_event')->name('save-event');
     Route::get('/event/{event}/history', 'EventController@event_history')->name('event-history');
     Route::get('/event/{event}/clone', 'EventController@clone_event')->name('clone-event');
+    Route::post('/event/{event}/delete', 'EventController@delete_event')->name('delete-event');
 
 });

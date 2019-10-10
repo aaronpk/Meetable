@@ -2,10 +2,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use DateTime, DateTimeZone;
 
 class Event extends Model
 {
+    use SoftDeletes;
 
     public static function slug_from_name($name) {
         return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9]+/', '-', strtolower($name)));

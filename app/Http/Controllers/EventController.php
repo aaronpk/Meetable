@@ -62,6 +62,11 @@ class EventController extends BaseController
         return redirect($event->permalink());
     }
 
+    public function delete_event(Event $event) {
+        $event->delete();
+        return redirect('/');
+    }
+
     public function edit_event(Event $event) {
         return view('edit-event', [
             'event' => $event,
