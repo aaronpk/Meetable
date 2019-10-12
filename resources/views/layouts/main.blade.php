@@ -38,9 +38,10 @@
 
     <div id="navbarBasicExample" class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="/">
-          Home
-        </a>
+        <a class="navbar-item" href="/">Home</a>
+        @if(Auth::user())
+          <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
+        @endif
       </div>
     </div>
   </nav>

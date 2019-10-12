@@ -23,7 +23,7 @@ Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 
 Route::middleware('auth')->group(function(){
 
-    Route::get('/new', 'EventController@new_event');
+    Route::get('/new', 'EventController@new_event')->name('new-event');
     Route::post('/create', 'EventController@create_event')->name('create-event');
     Route::get('/event/{event}', 'EventController@edit_event')->name('edit-event');
     Route::post('/event/{event}/save', 'EventController@save_event')->name('save-event');

@@ -4,6 +4,7 @@
 
 <section class="section">
 
+@if($event->id)
 <div class="level">
   <div class="level-left"></div>
   <div class="level-right">
@@ -28,6 +29,7 @@
 
   </div>
 </div>
+@endif
 
 <div class="content">
   <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
