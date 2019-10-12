@@ -34,6 +34,9 @@ class VouchGuard implements Guard {
 
         $url = $this->request->server->get('HTTP_REMOTE_USER');
 
+        if(!$url)
+          return null;
+
         if($cached && $cached->url == $url)
             return $cached;
 
