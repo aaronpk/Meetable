@@ -16,17 +16,17 @@
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"></script>
-    <script src="/semantic-ui-2.4/semantic.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="/semantic-ui-2.4/semantic.min.css">
+    <link href="/bulma-0.7.5/bulma.min.css" rel="stylesheet">
+
     <link href="/assets/style.css" rel="stylesheet">
 </head>
 <body>
 
-    @yield('content')
+  @yield('content')
 
-    <script src="/assets/script.js"></script>
-    @yield('scripts')
+  <script src="/assets/script.js"></script>
+  @yield('scripts')
 
 </body>
 </html>

@@ -1,5 +1,9 @@
-$('.ui.dropdown')
-  .dropdown();
+
+$(function(){
+
+$(".dropdown-trigger").click(function(){
+    $(this).parents(".dropdown").toggleClass("is-active");
+});
 
 $(".delete-event").click(function(evt){
     evt.preventDefault();
@@ -9,3 +13,6 @@ $(".delete-event").click(function(evt){
         window.location = '/';
     });
 });
+
+});
+

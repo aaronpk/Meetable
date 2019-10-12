@@ -1,20 +1,45 @@
 @extends('layouts/main')
 
 @section('content')
-<div class="ui container">
+<section class="section">
 
 @if(Auth::user())
-    <div class="ui buttons right floated">
-      <a class="ui button" href="{{ route('edit-event', $event) }}"><i class="edit icon"></i> Edit</a>
-      <div class="ui floating dropdown icon button">
-        <i class="dropdown icon"></i>
-        <div class="menu">
-          <!-- <a class="item" href="{{ route('event-history', $event) }}"><i class="clock icon"></i> View Revision History</a> -->
-          <a class="item" href="{{ route('clone-event', $event) }}"><i class="copy icon"></i> Clone Event</a>
+
+<div class="level">
+  <div class="level-left"></div>
+  <div class="level-right">
+
+    <div class="buttons has-addons with-dropdown">
+
+      <a href="{{ route('edit-event', $event) }}" class="button">
+        <span class="icon">@icon(edit)</span>
+        <span>Edit</span>
+      </a>
+
+      <div class="dropdown is-right">
+        <div class="dropdown-trigger">
+          <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+            <span class="icon is-small">@icon(angle-down)</span>
+          </button>
+        </div>
+
+        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+          <div class="dropdown-content">
+            <a class="dropdown-item" href="{{ route('clone-event', $event) }}">
+              <span class="icon">@icon(copy)</span>
+              <span>Clone Event</span>
+            </a>
+          </div>
         </div>
       </div>
+
     </div>
+
+  </div>
+</div>
+
 @endif
+
 
 <article class="h-event event">
 
@@ -39,13 +64,13 @@
         </div>
     @endif
 
-    <div class="e-content description segment">
+    <div class="e-content description segment content">
         {!! $event->html() !!}
     </div>
 
-    <div class="tags segment">
+    <div class="segment tags are-medium">
         @foreach($event->tags as $tag)
-          <a href="{{ $tag->url() }}">#{{ $tag->tag }}</a>
+          <a href="{{ $tag->url() }}" class="tag is-rounded">#{{ $tag->tag }}</a>
         @endforeach
     </div>
 
@@ -95,5 +120,5 @@
 
 </article>
 
-</div>
+</section>
 @endsection

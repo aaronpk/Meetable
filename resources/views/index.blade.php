@@ -1,7 +1,7 @@
 @extends('layouts/main')
 
 @section('content')
-<div class="ui container">
+<section class="section">
 
 <h1>{{ env('APP_NAME') }}</h1>
 
@@ -16,5 +16,5 @@
 </ul>
 
 
-</div>
+</section>
 @endsection

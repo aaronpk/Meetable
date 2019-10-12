@@ -1,4 +1,21 @@
 
+.icon svg, svg.svg-icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+/* lets dropdown triggers stack in a row of buttons on the right side */
+.buttons.has-addons .dropdown:not(:first-child) .button {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+}
+
+.buttons.has-addons.with-dropdown .button {
+    margin-bottom: 0;
+}
+
+
 .event .segment {
     margin-bottom: 1em;
 }
