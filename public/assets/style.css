@@ -15,6 +15,7 @@
     margin-bottom: 0;
 }
 
+/* event permalinks */
 
 .event .segment {
     margin-bottom: 1em;
@@ -22,11 +23,25 @@
 
 .event .event-name {
     font-size: 2.5rem;
+    margin-bottom: 1rem;
 }
 
-.event .date, .event .location {
+.event .date.segment, .event .location.segment, .event .website.segment {
     font-size: 1.5em;
     line-height: 1.2em;
+}
+
+.event .segment.with-icon {
+    display: grid;
+    grid-template-columns: 40px auto;
+}
+
+.event .segment.with-icon .icon {
+    align-self: center;
+}
+
+.event .date .time {
+    font-weight: 300;
 }
 
 .event .description {
@@ -36,3 +51,16 @@
 .event .description img {
     max-width: 100%;
 }
+
+/* event list */
+
+.event-list .event {
+    margin-bottom: 1em;
+}
+
+.event-list .event h3 {
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+

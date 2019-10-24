@@ -45,22 +45,28 @@
 
     <h1 class="p-name event-name">{{ $event->name }}</h1>
 
-    <div class="date segment">
-        🕘
-        {{ $event->date_summary() }}
+    <div class="date segment with-icon">
+        <span class="icon">@icon(clock)</span>
+        <span>
+          {!! $event->display_date() !!}
+          @if(!$event->is_multiday())
+            <br><span class="time">{!! $event->display_time() !!}</span>
+          @endif
+        </span>
     </div>
 
     @if( $event->location_name || $event->location_summary() )
-    <div class="location segment">
-        📍
-        {{ $event->location_name }}<br>
-        {{ $event->location_summary() }}
+    <div class="location segment with-icon">
+        <span class="icon">@icon(map-pin)</span>
+        <span>{{ $event->location_name }}<br>
+              {{ $event->location_summary() }}</span>
     </div>
     @endif
 
     @if($event->website)
-        <div class="segment">
-            <a href="{{ $event->website }}" class="u-url">{{ \p3k\url\display_url($event->website) }}</a>
+        <div class="website segment with-icon">
+            <span class="icon">@icon(link)</span>
+            <span><a href="{{ $event->website }}" class="u-url">{{ \p3k\url\display_url($event->website) }}</a></span>
         </div>
     @endif
 

@@ -25,6 +25,8 @@ class Controller extends BaseController
         }
 
         return view('index', [
+            'year' => $year,
+            'month' => $month,
             'events' => $events,
         ]);
     }
@@ -72,6 +74,7 @@ class Controller extends BaseController
         }
 
         return view('index', [
+            'tag' => $tag,
             'events' => $events,
         ]);
     }
