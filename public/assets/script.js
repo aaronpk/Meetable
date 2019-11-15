@@ -21,5 +21,16 @@ $(function(){
     });
   });
 
+  $("#rsvp-button").click(function(evt){
+    evt.preventDefault();
+    $.post($(this).data('action'), {
+        _token: $("input[name=_token]").val(),
+        rsvp: $(this).hasClass('is-primary') ? 0 : 1
+    }, function(response){
+        window.location = response.redirect;
+    });
+  });
+
+
 });
 

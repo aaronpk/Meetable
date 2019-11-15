@@ -17,6 +17,18 @@ class Event extends Model
         return $this->hasMany('\App\Response');
     }
 
+    public function rsvp_for_user(User $user) {
+        return $this->responses()->where([
+            'type' => 'rsvp',
+            'rsvp_user_id' => $user->id
+        ])->first();
+    }
+
+    public function rsvp_string_for_user(User $user) {
+        $rsvp = $this->rsvp_for_user($user);
+        return $rsvp ? $rsvp->rsvp : null;
+    }
+
     public function tags() {
         return $this->belongsToMany('\App\Tag');
     }

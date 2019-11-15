@@ -115,8 +115,8 @@
 
     <div class="field">
         <label class="label">Tags</label>
-        <input class="input" type="text" name="tags" value="{{ $event->tags_string() }}">
-        <div class="help">space separated</div>
+        <input class="input" type="text" name="tags" value="{{ $event->tags_string() }}" autocomplete="off">
+        <div class="help">space separated, lowercase</div>
     </div>
 
     <button class="button is-primary" type="submit">Submit</button>

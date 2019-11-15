@@ -74,25 +74,36 @@
         {!! $event->html() !!}
     </div>
 
-    <div class="segment tags are-medium">
+    <div class="segment tags are-medium" id="tags">
         @foreach($event->tags as $tag)
           <a href="{{ $tag->url() }}" class="tag is-rounded">#{{ $tag->tag }}</a>
         @endforeach
     </div>
 
-    @if($event->has_rsvps())
-        <div class="responses rsvps">
-            <h2>RSVPs</h2>
+    @if($event->has_rsvps() || Auth::user())
+        <div class="responses rsvps" id="rsvps">
+            <h2 class="subtitle">RSVPs</h2>
+
+            @if(Auth::user())
+              <button id="rsvp-button" class="button {{ $event->rsvp_string_for_user(Auth::user()) == 'yes' ? 'is-primary' : '' }}" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
+              <br><br>
+            @endif
+
             <ul>
                 @foreach($event->rsvps as $rsvp)
-                    <li>{{ $rsvp->id }}</li>
+                    @if($rsvp->rsvp == 'yes')
+                    <li class="avatar">
+                      <img src="{{ $rsvp->author()['photo'] }}" width="48">
+                      <a href="{{ $rsvp->author()['url'] }}">{{ $rsvp->author()['name'] ?? p3k\url\display_url($rsvp->author()['url']) }}</a>
+                    </li>
+                    @endif
                 @endforeach
             </ul>
         </div>
     @endif
 
     @if($event->has_photos())
-        <div class="responses photos">
+        <div class="responses photos" id="photos">
             <h2>Photos</h2>
             <ul>
                 @foreach($event->photos as $photo)
@@ -103,7 +114,7 @@
     @endif
 
     @if($event->has_posts())
-        <div class="responses posts">
+        <div class="responses posts" id="posts">
             <h2>Blog Posts</h2>
             <ul>
                 @foreach($event->posts as $post)
@@ -114,7 +125,7 @@
     @endif
 
     @if($event->has_comments())
-        <div class="responses comments">
+        <div class="responses comments" id="comments">
             <h2>Comments</h2>
             <ul>
                 @foreach($event->comments as $comment)
@@ -123,6 +134,8 @@
             </ul>
         </div>
     @endif
+
+    {{ csrf_field() }}
 
 </article>
 

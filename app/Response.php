@@ -16,4 +16,21 @@ class Response extends Model
 
         return json_decode($this->photos, true);
     }
+
+    public function author() {
+        if($this->rsvp_user_id) {
+            $user = User::where('id', $this->rsvp_user_id)->first();
+            return [
+                'name' => $user->name,
+                'photo' => $user->photo,
+                'url' => $user->url,
+            ];
+        } else {
+            return [
+                'name' => $this->author_name,
+                'photo' => $this->author_photo,
+                'url' => $this->author_url,
+            ];
+        }
+    }
 }
