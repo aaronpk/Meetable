@@ -16,7 +16,7 @@ class Tag extends Model
 
     public static function get($tag_name) {
         $tag_name = strtolower(trim($tag_name));
-        $tag_name = preg_replace('/[^a-z]/', '-', $tag_name);
+        $tag_name = preg_replace('/[^a-z0-9]/', '-', $tag_name);
 
         $tag = Tag::where('tag', $tag_name)->first();
         if(!$tag) {
