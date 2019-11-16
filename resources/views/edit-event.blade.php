@@ -10,21 +10,21 @@
   <div class="level-right">
 
     <div class="dropdown is-right">
-      <div class="dropdown-trigger">
-        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-          <span>Actions</span>
-          <span class="icon is-small">@icon(angle-down)</span>
-        </button>
-      </div>
-
-      <div class="dropdown-menu" id="dropdown-menu" role="menu">
-        <div class="dropdown-content">
-          <a class="dropdown-item delete-event" href="{{ route('delete-event', $event) }}">
-            <span class="icon">@icon(trash)</span>
-            <span>Delete Event</span>
-          </a>
+        <div class="dropdown-trigger">
+            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                <span>Actions</span>
+                <span class="icon is-small">@icon(angle-down)</span>
+            </button>
         </div>
-      </div>
+
+        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+                <a class="dropdown-item delete-event" href="{{ route('delete-event', $event) }}">
+                    <span class="icon">@icon(trash)</span>
+                    <span>Delete Event</span>
+                </a>
+            </div>
+        </div>
     </div>
 
   </div>
@@ -32,7 +32,7 @@
 @endif
 
 <div class="content">
-  <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
+    <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
 </div>
 
 <form action="{{ $form_action }}" method="post">
