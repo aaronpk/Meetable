@@ -44,12 +44,26 @@
     font-weight: 300;
 }
 
-.event .description {
+.event .responses, .event .description {
     max-width: 75ch;
+    border-top: 1px #ddd solid;
+    padding-top: 20px;
 }
 
 .event .description img {
     max-width: 100%;
+}
+
+.event .rsvps li.avatar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5em;
+}
+
+.event .rsvps li.avatar img {
+    width: 48px;
+    border-radius: 4px;
+    margin-right: 0.5em;
 }
 
 /* event list */
