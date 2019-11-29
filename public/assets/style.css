@@ -1,4 +1,8 @@
 
+.hidden {
+    display: none;
+}
+
 .icon svg, svg.svg-icon {
   width: 1em;
   height: 1em;
@@ -13,6 +17,10 @@
 
 .buttons.has-addons.with-dropdown .button {
     margin-bottom: 0;
+}
+
+.event-form {
+    max-width: 800px;
 }
 
 /* event permalinks */

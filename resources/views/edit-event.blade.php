@@ -1,5 +1,14 @@
 @extends('layouts/main')
 
+@section('scripts')
+@if(env('GOOGLEMAPS_API_KEY'))
+<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLEMAPS_API_KEY') }}&libraries=places"></script>
+<script src="/assets/bulmahead.js"></script>
+<script src="/assets/mapsearch.js"></script>
+@endif
+
+@endsection
+
 @section('content')
 
 <section class="section">
@@ -35,47 +44,56 @@
     <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
 </div>
 
-<form action="{{ $form_action }}" method="post">
+<form action="{{ $form_action }}" method="post" class="event-form">
 
     <div class="field">
         <label class="label">Name</label>
         <input class="input" type="text" autocomplete="off" name="name" value="{{ $event->name }}">
     </div>
 
-    @if($event->id)
-        <div class="field is-grouped">
-            <div class="control is-expanded">
-                <label class="label">Venue</label>
-                <input class="input" type="text" autocomplete="off" name="location_name" value="{{ $event->location_name }}">
-            </div>
-            <div class="control is-expanded">
-                <label class="label">Address</label>
-                <input class="input" type="text" autocomplete="off" name="location_address" value="{{ $event->location_address }}">
-            </div>
-        </div>
-        <div class="field is-grouped">
-            <div class="control is-expanded">
-                <label class="label">City</label>
-                <input class="input" type="text" autocomplete="off" name="location_locality" value="{{ $event->location_locality }}">
-            </div>
-            <div class="control is-expanded">
-                <label class="label">State</label>
-                <input class="input" type="text" autocomplete="off" name="location_region" value="{{ $event->location_region }}">
-            </div>
-            <div class="control is-expanded">
-                <label class="label">Country</label>
-                <input class="input" type="text" autocomplete="off" name="location_country" value="{{ $event->location_country }}">
-            </div>
-        </div>
-    @else
+    @if(!$event->id && env('GOOGLEMAPS_API_KEY'))
         <div class="field">
             <label class="label">Location</label>
-            <input class="input" type="text" autocomplete="off" name="location" id="location_search">
+            <div class="dropdown" style="display: block;">
+                <div class="dropdown-trigger" style="">
+                    <div class="control has-icons-left">
+                        <input class="input" type="text" autocomplete="off" name="location" id="location_search" aria-haspopup="true" aria-controls="location_menu" placeholder="Search for a location">
+                        <span class="icon is-left">@icon(search)</span>
+                    </div>
+                </div>
+                <div class="dropdown-menu" id="location_menu" role="menu"></div>
+            </div>
         </div>
 
         <div class="ui message hidden" id="location_preview">
+            <div id="map" style="width: 100%; height: 180px; border-radius: 4px; border: 1px #ccc solid;"></div>
         </div>
     @endif
+
+    <div class="field is-grouped">
+        <div class="control is-expanded">
+            <label class="label">Venue</label>
+            <input class="input" type="text" autocomplete="off" name="location_name" value="{{ $event->location_name }}">
+        </div>
+        <div class="control is-expanded">
+            <label class="label">Address</label>
+            <input class="input" type="text" autocomplete="off" name="location_address" value="{{ $event->location_address }}">
+        </div>
+    </div>
+    <div class="field is-grouped">
+        <div class="control is-expanded">
+            <label class="label">City</label>
+            <input class="input" type="text" autocomplete="off" name="location_locality" value="{{ $event->location_locality }}">
+        </div>
+        <div class="control is-expanded">
+            <label class="label">State</label>
+            <input class="input" type="text" autocomplete="off" name="location_region" value="{{ $event->location_region }}">
+        </div>
+        <div class="control is-expanded">
+            <label class="label">Country</label>
+            <input class="input" type="text" autocomplete="off" name="location_country" value="{{ $event->location_country }}">
+        </div>
+    </div>
 
     <div class="field is-grouped">
         <div class="control is-expanded">
