@@ -55,7 +55,6 @@ form h2.subtitle {
     <h2 class="subtitle">What's the name of the event?</h2>
 
     <div class="field">
-        <label class="label">Name</label>
         <input class="input" type="text" autocomplete="off" name="name" value="{{ $event->name }}">
     </div>
 
@@ -63,7 +62,6 @@ form h2.subtitle {
 
     @if(!$event->id && env('GOOGLEMAPS_API_KEY'))
         <div class="field">
-            <label class="label">Location</label>
             <div class="dropdown" style="display: block;">
                 <div class="dropdown-trigger" style="">
                     <div class="control has-icons-left">
