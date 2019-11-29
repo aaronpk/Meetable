@@ -164,7 +164,7 @@ class Event extends Model
 
         $html = \Michelf\MarkdownExtra::defaultTransform($markdown);
 
-        $html = Utils\HTML::sanitizeHTML($html);
+        $html = \p3k\HTML::sanitize($html);
 
         return $html;
     }
