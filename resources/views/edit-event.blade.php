@@ -44,12 +44,22 @@
     <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
 </div>
 
+<style>
+form h2.subtitle {
+    margin-top: 3em;
+}
+</style>
+
 <form action="{{ $form_action }}" method="post" class="event-form">
+
+    <h2 class="subtitle">What's the name of the event?</h2>
 
     <div class="field">
         <label class="label">Name</label>
         <input class="input" type="text" autocomplete="off" name="name" value="{{ $event->name }}">
     </div>
+
+    <h2 class="subtitle">Where will the event take place?</h2>
 
     @if(!$event->id && env('GOOGLEMAPS_API_KEY'))
         <div class="field">
@@ -95,6 +105,8 @@
         </div>
     </div>
 
+    <h2 class="subtitle">When is the event?</h2>
+
     <div class="field is-grouped">
         <div class="control is-expanded">
             <label class="label">Start Date</label>
@@ -102,9 +114,9 @@
         </div>
 
         <div class="control is-expanded">
-            <label class="label">End Date</label>
+            <label class="label">End Date (optional)</label>
             <input class="input" type="date" name="end_date" autocomplete="off" value="{{ $event->end_date }}">
-            <div class="help">optional, for multi-day events</div>
+            <div class="help">for multi-day events</div>
         </div>
     </div>
 
@@ -120,9 +132,12 @@
         </div>
     </div>
 
+    <h2 class="subtitle">Details</h2>
+
     <div class="field">
         <label class="label">Website</label>
         <input class="input" type="url" autocomplete="off" name="website" value="{{ $event->website }}">
+        <div class="help">provide a link to the event's main website if any</div>
     </div>
 
     <div class="field">
@@ -137,7 +152,7 @@
         <div class="help">space separated, lowercase</div>
     </div>
 
-    <button class="button is-primary" type="submit">Submit</button>
+    <button class="button is-primary" type="submit">Save</button>
 
     {{ csrf_field() }}
 </form>
