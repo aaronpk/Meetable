@@ -21,6 +21,9 @@ Route::get('/{year}', 'Controller@index');
 
 Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 
+Route::get('/webmention', 'WebmentionController@get');
+Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
+
 Route::middleware('auth')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');

@@ -1,7 +1,9 @@
 @extends('layouts/main')
 
 @section('headtags')
-<link rel="webmention" href="/webmention">
+<link rel="webmention" href="{{ route('webmention') }}">
+@endsection
+
 @section('scripts')
 <script src="/assets/justified-layout.js"></script>
 <script src="/assets/photo-layout.js"></script>
