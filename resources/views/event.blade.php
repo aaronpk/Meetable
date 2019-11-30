@@ -154,7 +154,10 @@
                             @if($comment->author()['photo'])
                                 <img src="{{ $comment->author()['photo'] }}" width="48" class="u-photo">
                             @endif
-                            <a href="{{ $comment->author()['url'] }}" class="u-url p-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
+                            <span class="author-details">
+                                <a href="{{ $comment->author()['url'] }}" class="p-name author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
+                                <a href="{{ $comment->author()['url'] }}" class="u-url author-url">{{ p3k\url\display_url($comment->author()['url']) }}</a>
+                            </span>
                         </span>
                         <span class="p-content comment-content">{{ $comment->content_text }}</span>
                         <span class="meta">

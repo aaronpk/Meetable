@@ -98,9 +98,28 @@
     display: block;
 }
 
+.event .comments .author-details {
+    line-height: 1em;
+}
+.event .comments a.author-name {
+    display: block;
+}
+.event .comments a.author-url {
+    color: #888;
+    font-size: 0.8em;
+}
+
 .event .comments .meta {
     display: block;
     font-size: 0.8em;
+    margin-top: 0.5em;
+}
+
+.event .comments .meta a {
+    color: #888;
+}
+.event .comments .meta a:hover {
+    text-decoration: underline;
 }
 
 /* event list */
