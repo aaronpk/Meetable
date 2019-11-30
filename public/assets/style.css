@@ -102,6 +102,7 @@
 .event .comments .comment-content {
     display: block;
     font-size: 1.1em;
+    white-space: pre-wrap;
 }
 
 .event .comments .author-details {
