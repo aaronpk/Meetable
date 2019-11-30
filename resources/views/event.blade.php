@@ -2,6 +2,9 @@
 
 @section('headtags')
 <link rel="webmention" href="/webmention">
+@section('scripts')
+<script src="/assets/justified-layout.js"></script>
+<script src="/assets/photo-layout.js"></script>
 @endsection
 
 @section('content')
@@ -96,11 +99,14 @@
             <ul>
                 @foreach($event->rsvps as $rsvp)
                     @if($rsvp->rsvp == 'yes')
-                    <li class="avatar">
-                        @if($rsvp->author()['photo'])
-                            <img src="{{ $rsvp->author()['photo'] }}" width="48">
-                        @endif
-                        <a href="{{ $rsvp->author()['url'] }}">{{ $rsvp->author()['name'] ?? p3k\url\display_url($rsvp->author()['url']) }}</a>
+                    <li class="h-entry">
+                        <span class="u-author h-card avatar">
+                            @if($rsvp->author()['photo'])
+                                <img src="{{ $rsvp->author()['photo'] }}" width="48" class="u-photo">
+                            @endif
+                            <a href="{{ $rsvp->source_url ?: $rsvp->author()['url'] }}" class="u-url p-name">{{ $rsvp->author()['name'] ?? p3k\url\display_url($rsvp->author()['url']) }}</a>
+                        </span>
+                        <data class="p-rsvp" value="{{ $rsvp->rsvp }}"></data>
                     </li>
                     @endif
                 @endforeach
@@ -110,21 +116,27 @@
 
     @if($event->has_photos())
         <div class="responses photos" id="photos">
-            <h2>Photos</h2>
-            <ul>
-                @foreach($event->photos as $photo)
-                    <li>{{ $photo->id }}</li>
-                @endforeach
+            <ul class="photo-album">
+                @foreach($event->photos()->get() as $photo)
+                    @foreach($photo->photos() as $p)
+                        <li class="h-entry">
+                            <a href="{{ $photo->url }}" class="u-url"><img src="{{ $p }}" height="180" alt="{{ $photo->name }}" class="u-photo p-name"></a>
+                        </li>
+                    @endforeach
+                 @endforeach
             </ul>
         </div>
     @endif
 
-    @if($event->has_posts())
-        <div class="responses posts" id="posts">
-            <h2>Blog Posts</h2>
+    @if($event->has_blog_posts())
+        <div class="responses blog_posts" id="blog_posts">
+            <h2 class="subtitle">Blog Posts</h2>
             <ul>
-                @foreach($event->posts as $post)
-                    <li>{{ $post->id }}</li>
+                @foreach($event->blog_posts as $post)
+                    <li class="h-entry">
+                        <p><b><a href="{{ $post->url ?: $post->source_url }}" class="u-url p-name">{{ $post->name }}</a></b></p>
+                        <p>by <a href="{{ $post->author()['url'] }}" class="u-author h-card">{{ $post->author()['name'] }}</a> on {{ date('M j, Y', strtotime($post->published)) }}</p>
+                    </li>
                 @endforeach
             </ul>
         </div>
@@ -132,10 +144,25 @@
 
     @if($event->has_comments())
         <div class="responses comments" id="comments">
-            <h2>Comments</h2>
+            <h2 class="subtitle">Comments</h2>
             <ul>
                 @foreach($event->comments as $comment)
-                    <li>{{ $comment->id }}</li>
+                    <li class="h-entry">
+                        <span class="u-author h-card avatar">
+                            @if($comment->author()['photo'])
+                                <img src="{{ $comment->author()['photo'] }}" width="48" class="u-photo">
+                            @endif
+                            <a href="{{ $comment->author()['url'] }}" class="u-url p-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
+                        </span>
+                        <span class="p-content comment-content">{{ $comment->content_text }}</span>
+                        <span class="meta">
+                            <a href="{{ $comment->url }}" class="u-url">
+                                <time class="dt-published" datetime="{{ date('c', strtotime($comment->published)) }}">
+                                    {{ date('M j, Y', strtotime($comment->published)) }}
+                                </time>
+                            </a>
+                        </span>
+                    </li>
                 @endforeach
             </ul>
         </div>

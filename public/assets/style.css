@@ -20,7 +20,7 @@
 }
 
 .event-form {
-    max-width: 800px;
+    max-width: 75ch;
 }
 
 /* event permalinks */
@@ -53,25 +53,54 @@
 }
 
 .event .responses, .event .description {
-    max-width: 75ch;
+    max-width: 710px;
     border-top: 1px #ddd solid;
     padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .event .description img {
     max-width: 100%;
 }
 
-.event .rsvps li.avatar {
+.event .rsvps ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media(max-width: 420px) {
+    .event .rsvps ul {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.event .responses li .avatar {
     display: flex;
     align-items: center;
     margin-bottom: 0.5em;
 }
 
-.event .rsvps li.avatar img {
+.event .responses li .avatar img {
     width: 48px;
     border-radius: 4px;
     margin-right: 0.5em;
+}
+
+.event .responses li {
+    margin-bottom: 0.5em;
+}
+
+.event .comments li {
+    margin-top: 1em;
+}
+
+.event .comments .comment-content {
+    display: block;
+}
+
+.event .comments .meta {
+    display: block;
+    font-size: 0.8em;
 }
 
 /* event list */
@@ -83,6 +112,40 @@
 .event-list .event h3 {
     font-weight: bold;
     font-size: 1.2em;
+}
+
+
+/**
+ * Photo Albums
+ */
+
+.photo-album {
+  background: #fff;
+  /*border-left: 1px #ccc solid;*/
+  /*border-right: 1px #ccc solid;*/
+  /* max-width: 617px; */
+  margin: 0 auto;
+  padding: 2px;
+  font-size: 0;
+}
+ul.photo-album {
+  list-style-type: none;
+  /* display: grid is for fallback if the JS doesn't load.
+     the JS will change the display mode to remove the grid */
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 4px;
+}
+ul.photo-album li {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+.photo-album img {
+  vertical-align: bottom;
+  margin: 2px; /* 2px on each img makes a 4px gap between images */
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline-offset: -1px;
 }
 
 

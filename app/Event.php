@@ -48,8 +48,8 @@ class Event extends Model
         return $this->responses->where('type', 'photo')->count();
     }
 
-    public function has_posts() {
-        return $this->responses->where('type', 'post')->count();
+    public function has_blog_posts() {
+        return $this->responses->where('type', 'blog_post')->count();
     }
 
     public function has_comments() {
@@ -64,8 +64,8 @@ class Event extends Model
         return $this->hasMany('\App\Response')->where('type', 'photo');
     }
 
-    public function posts() {
-        return $this->hasMany('\App\Response')->where('type', 'post');
+    public function blog_posts() {
+        return $this->hasMany('\App\Response')->where('type', 'blog_post');
     }
 
     public function comments() {
