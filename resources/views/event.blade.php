@@ -136,7 +136,7 @@
             <ul>
                 @foreach($event->blog_posts as $post)
                     <li class="h-entry">
-                        <p><b><a href="{{ $post->url ?: $post->source_url }}" class="u-url p-name">{{ $post->name }}</a></b></p>
+                        <p class="post-name"><a href="{{ $post->url ?: $post->source_url }}" class="u-url p-name">{{ $post->name }}</a></p>
                         <p>by <a href="{{ $post->author()['url'] }}" class="u-author h-card">{{ $post->author()['name'] }}</a> on {{ date('M j, Y', strtotime($post->published)) }}</p>
                     </li>
                 @endforeach

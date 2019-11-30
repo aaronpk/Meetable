@@ -90,6 +90,11 @@
     margin-bottom: 0.5em;
 }
 
+.event .blog_posts .post-name {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
 .event .comments li {
     margin-top: 1em;
 }
