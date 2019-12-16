@@ -38,7 +38,7 @@ class Controller extends BaseController
             $m = (int)date('m', strtotime($event->start_date));
 
             if(!isset($data[$y]))
-                $data[$year] = [];
+                $data[$y] = [];
 
             if(!isset($data[$y][$m]))
                 $data[$y][$m] = [];
@@ -49,7 +49,6 @@ class Controller extends BaseController
         return view('index', [
             'year' => $year,
             'month' => $month,
-            'events' => $events,
             'data' => $data,
         ]);
     }
@@ -120,9 +119,24 @@ class Controller extends BaseController
             abort(404);
         }
 
+        $data = [];
+
+        foreach($events as $event) {
+            $y = date('Y', strtotime($event->start_date));
+            $m = (int)date('m', strtotime($event->start_date));
+
+            if(!isset($data[$y]))
+                $data[$y] = [];
+
+            if(!isset($data[$y][$m]))
+                $data[$y][$m] = [];
+
+            $data[$y][$m][] = $event;
+        }
+
         return view('index', [
             'tag' => $tag,
-            'events' => $events,
+            'data' => $data,
         ]);
     }
 }
