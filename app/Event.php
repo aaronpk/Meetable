@@ -10,7 +10,7 @@ class Event extends Model
     use SoftDeletes;
 
     public static function slug_from_name($name) {
-        return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9]+/', '-', strtolower($name)));
+        return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+/', '-', strtolower($name)));
     }
 
     public static function find_from_url($url) {
