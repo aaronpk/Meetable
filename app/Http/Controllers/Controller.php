@@ -55,7 +55,7 @@ class Controller extends BaseController
 
     public function archive() {
 
-        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'slug', 'key', 'name')
+        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name')
             ->where('start_date', '<', date('Y-m-d'))
             ->orderBy('start_date', 'desc')
             ->get();
