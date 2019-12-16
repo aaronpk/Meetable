@@ -131,7 +131,10 @@ class Event extends Model
         if($this->is_multiday()) {
             $end_date = new DateTime($this->end_date);
 
-            return $start_date->format('F j') . ' - ' . $end_date->format('F j, Y') . '</time>';
+            if($start_date->format('F') == $end_date->format('F'))
+                return $start_date->format('F j') . ' - ' . $end_date->format('j, Y');
+            else
+                return $start_date->format('F j') . ' - ' . $end_date->format('F j, Y');
 
         } else {
             return $start_date->format('F j, Y');
@@ -157,12 +160,50 @@ class Event extends Model
         return $start_date->format('l');
     }
 
+    public function mf2_date_html() {
+        $start = false;
+        $end = false;
+
+        if($this->start_date && !$this->start_time && !$this->end_date && !$this->end_time) {
+            $start = (new DateTime($this->start_date))->format('Y-m-d');
+        }
+        elseif($this->start_date && !$this->start_time && $this->end_date && !$this->end_time) {
+            $start = (new DateTime($this->start_date))->format('Y-m-d');
+            $end = (new DateTime($this->end_date))->format('Y-m-d');
+        }
+        elseif($this->start_date && $this->start_time && !$this->end_date && !$this->end_time) {
+            $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+        }
+        elseif($this->start_date && $this->start_time && !$this->end_date && $this->end_time) {
+            $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+            $end = (new DateTime($this->start_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
+        }
+        elseif($this->start_date && $this->start_time && $this->end_date && $this->end_time) {
+            $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+            $end = (new DateTime($this->end_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
+        }
+
+        $start_html = '<data class="dt-start" value="' . $start . '"></data>';
+        $end_html = $end ? '<data class="dt-end" value="' . $end . '"></data>' : '';
+
+        return $start_html . $end_html;
+    }
+
     public function location_summary() {
         $str = [];
         if($this->location_address) $str[] = $this->location_address;
         if($this->location_locality) $str[] = $this->location_locality;
         if($this->location_region) $str[] = $this->location_region;
         if($this->location_country) $str[] = $this->location_country;
+        return implode(', ', $str);
+    }
+
+    public function location_summary_with_mf2() {
+        $str = [];
+        if($this->location_address) $str[] = '<span class="p-street-address">'.e($this->location_address).'</span>';
+        if($this->location_locality) $str[] = '<span class="p-locality">'.e($this->location_locality).'</span>';
+        if($this->location_region) $str[] ='<span class="p-region">'.e($this->location_region).'</span>';
+        if($this->location_country) $str[] = '<span class="p-country-name">'.e($this->location_country).'</span>';
         return implode(', ', $str);
     }
 

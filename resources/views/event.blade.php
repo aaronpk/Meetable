@@ -61,6 +61,7 @@
             @if(!$event->is_multiday() && $event->display_time())
                 <div class="time">{!! $event->weekday() !!} {!! $event->display_time() !!}</div>
             @endif
+            {!! $event->mf2_date_html() !!}
             <div class="add-to-calendar">
                 <div class="dropdown">
                     <div class="dropdown-trigger">
@@ -86,10 +87,14 @@
     @if( $event->location_name || $event->location_summary() )
     <div class="location segment with-icon">
         <span class="icon">@icon(map-pin)</span>
-        <span>{{ $event->location_name }}<br>
-              {{ $event->location_summary() }}</span>
+        <div class="p-location h-card">
+            <div class="p-name">{{ $event->location_name }}</div>
+            <div>{!! $event->location_summary_with_mf2() !!}</div>
+        </div>
     </div>
     @endif
+
+    <a href="" class="u-url"></a>
 
     @if($event->website)
         <div class="website segment with-icon">
