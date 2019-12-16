@@ -16,7 +16,7 @@ Route::get('/', 'Controller@index')->name('index');
 Route::get('/archive', 'Controller@archive')->name('archive');
 
 Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
-Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event');
+Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event-short');
 
 Route::get('/{year}/{month}', 'Controller@index')->name('month');
 Route::get('/{year}', 'Controller@index')->name('year');

@@ -40,7 +40,7 @@ a.title:hover, a.subtitle:hover {
                             <li class="event">
                                 {{ date('M j', strtotime($event->start_date)) }}
                                 &bull;
-                                <a href="{{ route('event', [$event->year, $event->month, $event->slug, $event->key]) }}">
+                                <a href="{{ route('event', [$event->year, sprintf('%02d', $event->month), $event->slug, $event->key]) }}">
                                     {{ $event->name }}
                                 </a>
                             </li>
