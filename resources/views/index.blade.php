@@ -27,7 +27,7 @@
             @foreach($months as $m => $events)
                 <li>
                     @if(empty($month))
-                        <span class="subtitle month">{{ date('F', mktime(0,0,0, $m, 1, $y)) }}</span>
+                        <span class="subtitle month">{{ date('F'.(isset($tag)?' Y':''), mktime(0,0,0, $m, 1, $y)) }}</span>
                     @endif
                     <ul>
                     @foreach($events as $event)
