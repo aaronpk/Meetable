@@ -23,7 +23,7 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <span class="navbar-item">
-                {{ env('APP_NAME') }}
+                <a href="{{ route('index') }}">{{ env('APP_NAME') }}</a>
             </span>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -35,7 +35,7 @@
 
         <div id="navbarBasicExample" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="/">Home</a>
+                <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
                 @if(Auth::user())
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endif

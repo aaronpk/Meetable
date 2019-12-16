@@ -8,6 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event;
 use DateTime;
+use DB;
 
 class Controller extends BaseController
 {
@@ -15,19 +16,65 @@ class Controller extends BaseController
 
     public function index($year=false, $month=false) {
 
-        if($year) {
-            $events = Event::whereYear('start_date', $year);
-            if($month)
-                $events = $events->whereMonth('start_date', $month);
-            $events = $events->get();
+        if($year && $month) {
+            $events = Event::whereYear('start_date', $year)
+                ->whereMonth('start_date', $month)
+                ->orderBy('start_date')
+                ->get();
+        } elseif($year) {
+            $events = Event::whereYear('start_date', $year)
+                ->orderBy('start_date', 'desc')
+                ->get();
         } else {
-            $events = Event::all();
+            $events = Event::where('start_date', '>=', date('Y-m-d'))
+                ->orderBy('start_date')
+                ->get();
+        }
+
+        $data = [];
+
+        foreach($events as $event) {
+            $y = date('Y', strtotime($event->start_date));
+            $m = (int)date('m', strtotime($event->start_date));
+
+            if(!isset($data[$y]))
+                $data[$year] = [];
+
+            if(!isset($data[$y][$m]))
+                $data[$y][$m] = [];
+
+            $data[$y][$m][] = $event;
         }
 
         return view('index', [
             'year' => $year,
             'month' => $month,
             'events' => $events,
+            'data' => $data,
+        ]);
+    }
+
+    public function archive() {
+
+        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'slug', 'key', 'name')
+            ->where('start_date', '<', date('Y-m-d'))
+            ->orderBy('start_date', 'desc')
+            ->get();
+
+        $data = [];
+
+        foreach($events as $event) {
+            if(!isset($data[$event->year]))
+                $data[$event->year] = [];
+
+            if(!isset($data[$event->year][$event->month]))
+                $data[$event->year][$event->month] = [];
+
+            $data[$event->year][$event->month][] = $event;
+        }
+
+        return view('archive', [
+            'data' => $data,
         ]);
     }
 

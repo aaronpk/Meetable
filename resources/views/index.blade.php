@@ -1,6 +1,14 @@
 @extends('layouts/main')
 
 @section('content')
+<style>
+.event-list .subtitle.month {
+    font-size: 1.5em;
+}
+.event-list .event {
+    margin-left: 2em;
+}
+</style>
 <section class="section">
 
     @if(isset($tag))
@@ -13,22 +21,35 @@
         <h1 class="title">{{ env('APP_NAME') }}</h1>
     @endif
 
-    <ul class="event-list h-feed">
-    @foreach($events as $event)
+    @if(count($data))
+        <ul class="event-list h-feed">
+        @foreach($data as $y => $months)
+            @foreach($months as $m => $events)
+                <li>
+                    @if(empty($month))
+                        <span class="subtitle month">{{ date('F', mktime(0,0,0, $m, 1, $y)) }}</span>
+                    @endif
+                    <ul>
+                    @foreach($events as $event)
+                        <li class="event h-event">
+                            <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{{ $event->name }}</a></h3>
 
-        <li class="event h-event">
-            <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{{ $event->name }}</a></h3>
+                            <p>{!! $event->date_summary(true) !!}</p>
 
-            <p>{!! $event->date_summary(true) !!}</p>
+                            @if($event->location_city())
+                                <p>{{ $event->location_city() }}</p>
+                            @endif
 
-            @if($event->location_city())
-                <p>{{ $event->location_city() }}</p>
-            @endif
-
-        </li>
-
-    @endforeach
-    </ul>
+                        </li>
+                    @endforeach
+                    </ul>
+                </li>
+            @endforeach
+        @endforeach
+        </ul>
+    @else
+        <p>No events</p>
+    @endif
 
 </section>
 @endsection
