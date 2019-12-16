@@ -6,6 +6,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Response, App\User;
+use App\Events\WebmentionReceived;
 use Illuminate\Support\Str;
 use Auth;
 use p3k\XRay;
@@ -77,6 +78,7 @@ class WebmentionController extends BaseController
         }
 
         if(isset($source['photo'])) {
+            // A background job will be queued to download these photos
             $response->photos = $source['photo'];
         }
 
@@ -99,7 +101,9 @@ class WebmentionController extends BaseController
 
         $response->save();
 
-        return redirect($event->permalink().'#'.$type.'s');
+        event(new WebmentionReceived($response));
+
+        return redirect($event->permalink().'#rsvps');
     }
 
     public function get() {

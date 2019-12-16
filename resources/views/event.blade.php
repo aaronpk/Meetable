@@ -135,14 +135,7 @@
 
             <ul>
                 @foreach($event->rsvps_yes as $rsvp)
-                    <li>
-                        <span class="avatar">
-                            @if($rsvp->author()['photo'])
-                                <img src="@image_proxy($rsvp->author()['photo'], '96x96,sc')" width="48">
-                            @endif
-                            <a href="{{ $rsvp->source_url ?: $rsvp->author()['url'] }}">{{ $rsvp->author()['name'] ?? p3k\url\display_url($rsvp->author()['url']) }}</a>
-                        </span>
-                    </li>
+                    <li>@include('components/rsvp-avatar', ['rsvp' => $rsvp])</li>
                 @endforeach
             </ul>
 
@@ -182,7 +175,7 @@
                 @foreach($event->photos()->get() as $photo)
                     @foreach($photo->photos as $p)
                         <li>
-                            <a href="{{ $photo->url }}"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}" class="u-photo"></a>
+                            <a href="{{ $p }}"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}" class="u-photo"></a>
                         </li>
                     @endforeach
                  @endforeach

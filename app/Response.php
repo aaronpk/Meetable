@@ -67,7 +67,8 @@ class Response extends Model
     }
 
     public function setRsvpAttribute($value) {
-        $this->attributes['rsvp'] = in_array(strtolower($value), ['yes','no','maybe','remote']) ?: null;
+        $value = strtolower($value);
+        $this->attributes['rsvp'] = in_array($value, ['yes','no','maybe','remote']) ? $value : null;
     }
 
 }
