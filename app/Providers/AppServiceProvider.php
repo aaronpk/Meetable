@@ -31,5 +31,9 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('brand_icon', function ($expression) {
             return '<svg class="svg-icon"><use xlink:href="/font-awesome-5.11.2/sprites/brands.svg#<?php echo "'.$expression.'" ?>"></use></svg>';
         });
+
+        Blade::directive('image_proxy', function ($expression) {
+            return '<?php echo \App\Event::image_proxy('.$expression.') ?>';
+        });
     }
 }

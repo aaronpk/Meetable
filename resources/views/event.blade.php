@@ -182,7 +182,7 @@
                 @foreach($event->photos()->get() as $photo)
                     @foreach($photo->photos as $p)
                         <li>
-                            <a href="{{ $photo->url }}"><img src="{{ $p }}" height="180" alt="{{ $photo->name }}" class="u-photo"></a>
+                            <a href="{{ $photo->url }}"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}" class="u-photo"></a>
                         </li>
                     @endforeach
                  @endforeach
