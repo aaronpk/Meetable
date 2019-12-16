@@ -109,7 +109,7 @@
 
     <div class="segment tags are-medium" id="tags">
         @foreach($event->tags as $tag)
-            <a href="{{ $tag->url() }}" class="tag is-rounded">#{{ $tag->tag }}</a>
+            <a href="{{ $tag->url() }}" class="tag is-rounded">#<span class="p-category">{{ $tag->tag }}</span></a>
         @endforeach
     </div>
 
@@ -181,8 +181,8 @@
             <ul class="photo-album">
                 @foreach($event->photos()->get() as $photo)
                     @foreach($photo->photos as $p)
-                        <li class="h-entry">
-                            <a href="{{ $photo->url }}" class="u-url"><img src="{{ $p }}" height="180" alt="{{ $photo->name }}" class="u-photo p-name"></a>
+                        <li>
+                            <a href="{{ $photo->url }}"><img src="{{ $p }}" height="180" alt="{{ $photo->name }}" class="u-photo"></a>
                         </li>
                     @endforeach
                  @endforeach
@@ -195,9 +195,13 @@
             <h2 class="subtitle">Blog Posts</h2>
             <ul>
                 @foreach($event->blog_posts as $post)
-                    <li class="h-entry">
-                        <p class="post-name"><a href="{{ $post->url ?: $post->source_url }}" class="u-url p-name">{{ $post->name }}</a></p>
-                        <p>by <a href="{{ $post->author()['url'] }}" class="u-author h-card">{{ $post->author()['name'] }}</a> on {{ date('M j, Y', strtotime($post->published)) }}</p>
+                    <li>
+                        <p class="post-name"><a href="{{ $post->url ?: $post->source_url }}">{{ $post->name }}</a></p>
+                        <p>by <a href="{{ $post->author()['url'] }}">{{ $post->author()['name'] }}</a>
+                            @if($post->published)
+                                on {{ date('M j, Y', strtotime($post->published)) }}
+                            @endif
+                        </p>
                     </li>
                 @endforeach
             </ul>
@@ -209,20 +213,20 @@
             <h2 class="subtitle">Comments</h2>
             <ul>
                 @foreach($event->comments as $comment)
-                    <li class="h-entry">
-                        <span class="u-author h-card avatar">
+                    <li>
+                        <span class="avatar">
                             @if($comment->author()['photo'])
-                                <img src="{{ $comment->author()['photo'] }}" width="48" class="u-photo">
+                                <img src="{{ $comment->author()['photo'] }}" width="48">
                             @endif
                             <span class="author-details">
-                                <a href="{{ $comment->author()['url'] }}" class="p-name author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
-                                <a href="{{ $comment->author()['url'] }}" class="u-url author-url">{{ p3k\url\display_url($comment->author()['url']) }}</a>
+                                <a href="{{ $comment->author()['url'] }}" class="author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
+                                <a href="{{ $comment->author()['url'] }}" class="author-url">{{ p3k\url\display_url($comment->author()['url']) }}</a>
                             </span>
                         </span>
-                        <span class="p-content comment-content">{{ $comment->content_text }}</span>
+                        <span class="comment-content">{{ $comment->content_text }}</span>
                         <span class="meta">
-                            <a href="{{ $comment->url }}" class="u-url">
-                                <time class="dt-published" datetime="{{ date('c', strtotime($comment->published)) }}">
+                            <a href="{{ $comment->url }}">
+                                <time datetime="{{ date('c', strtotime($comment->published)) }}">
                                     {{ date('M j, Y', strtotime($comment->published)) }}
                                 </time>
                             </a>
