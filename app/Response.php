@@ -11,6 +11,13 @@ class Response extends Model
         'photos' => 'array',
     ];
 
+    public static function image_proxy($url, $opts) {
+        // https://github.com/willnorris/imageproxy
+        $urlToSign = $url.'#'.$opts;
+        $sig = strtr(base64_encode(hash_hmac('sha256', $urlToSign, env('IMAGE_PROXY_KEY'), 1)), '/+' , '_-');
+        return env('IMAGE_PROXY_BASE').$opts.',s'.$sig.'/'.$url;
+    }
+
     public function event() {
         return $this->belongsTo('\App\Event');
     }

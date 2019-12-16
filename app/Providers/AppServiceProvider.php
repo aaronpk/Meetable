@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Blade::directive('image_proxy', function ($expression) {
-            return '<?php echo \App\Event::image_proxy('.$expression.') ?>';
+            return '<?php echo \App\Response::image_proxy('.$expression.') ?>';
         });
     }
 }
