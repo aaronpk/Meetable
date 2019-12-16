@@ -51,7 +51,7 @@ class ICSController extends BaseController
         $vEvent->setSummary($event->name);
 
         $description = $event->absolute_permalink() . "\n\n"
-            . $event->description;
+            . strip_tags($event->html());
         if($event->website) {
             $description .= "\n\n" . $event->website;
         }
