@@ -57,10 +57,29 @@
     <div class="date segment with-icon">
         <span class="icon">@icon(clock)</span>
         <span>
-          {!! $event->display_date() !!}
-          @if(!$event->is_multiday())
-              <br><span class="time">{!! $event->display_time() !!}</span>
-          @endif
+            <div>{!! $event->display_date() !!}</div>
+            @if(!$event->is_multiday() && $event->display_time())
+                <div class="time">{!! $event->weekday() !!} {!! $event->display_time() !!}</div>
+            @endif
+            <div class="add-to-calendar">
+                <div class="dropdown">
+                    <div class="dropdown-trigger">
+                        <a aria-haspopup="true" aria-controls="add-to-calendar-menu">
+                            <span>Add to Calendar</span>
+                        </a>
+                    </div>
+                    <div class="dropdown-menu" role="menu" id="add-to-calendar-menu">
+                        <div class="dropdown-content">
+                            <a href="{{ $event->ics_permalink() }}" class="dropdown-item" target="_blank">
+                                @icon(calendar) iCal
+                            </a>
+                            <a href="{{ route('add-to-google', $event->key) }}" class="dropdown-item" target="_blank">
+                                @brand_icon(google) Google Calendar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </span>
     </div>
 

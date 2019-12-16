@@ -105,4 +105,40 @@ class ICSController extends BaseController
         ]);
     }
 
+    public function event($year, $month, $key_or_slug, $key2=false) {
+
+        if($key2) {
+            $key = $key2;
+            $slug = $key_or_slug;
+        } else {
+            $key = $key_or_slug;
+            $slug = false;
+        }
+
+        $event = Event::where('key', $key)->first();
+
+        if(!$event) {
+            abort(404);
+        }
+
+        // Redirect to the canonical URL
+        $date = new DateTime($event->start_date);
+        if($event->slug && $event->slug != $slug
+           || $year != $date->format('Y')
+           || $month != $date->format('m')) {
+            return redirect($event->ics_permalink(), 301);
+        }
+
+        $vCalendar = new \Eluceo\iCal\Component\Calendar(parse_url(env('APP_URL'), PHP_URL_HOST).$event->permalink());
+
+        $this->_addEventToCal($vCalendar, $event);
+
+        $ics = $vCalendar->render();
+
+        return response($ics)->withHeaders([
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="event.ics"'
+        ]);
+    }
+
 }

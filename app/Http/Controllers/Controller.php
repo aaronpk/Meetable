@@ -110,6 +110,47 @@ class Controller extends BaseController
         ]);
     }
 
+    public function add_to_google($key) {
+        $event = Event::where('key', $key)->first();
+
+        if(!$event) {
+            abort(404);
+        }
+
+        $params = ['action' => 'TEMPLATE'];
+
+        $params['text'] = $event->name;
+        $params['details'] = $event->absolute_permalink();
+        $params['location'] = $event->location_summary_with_name();
+
+        $start = false;
+        $end = false;
+        if($event->start_date && !$event->start_time && !$event->end_date && !$event->end_time) {
+            $start = (new DateTime($event->start_date))->format('Ymd');
+        }
+        elseif($event->start_date && !$event->start_time && $event->end_date && !$event->end_time) {
+            $start = (new DateTime($event->start_date))->format('Ymd');
+            $end = (new DateTime($event->end_date))->format('Ymd');
+        }
+        elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
+            $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
+        }
+        elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
+            $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
+            $end = (new DateTime($event->start_date.' '.$event->end_time))->format('Ymd\THis');
+        }
+        elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
+            $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
+            $end = (new DateTime($event->end_date.' '.$event->end_time))->format('Ymd\THis');
+        }
+
+        $params['dates'] = $start . ($end ? '/' . $end : '');
+
+        $url = 'http://www.google.com/calendar/render?' . http_build_query($params);
+
+        return redirect($url, 302);
+    }
+
     public function tag($tag) {
         $tag = Tag::normalize($tag);
 

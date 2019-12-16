@@ -122,11 +122,13 @@ form h2.subtitle {
         <div class="control is-expanded">
             <label class="label">Start Time (optional)</label>
             <input class="input" type="time" name="start_time" autocomplete="off" value="{{ $event->start_time ?: '' }}">
+            <div class="help">leave start time blank for multi-day events</div>
         </div>
 
         <div class="control is-expanded">
             <label class="label">End Time (optional)</label>
             <input class="input" type="time" name="end_time" autocomplete="off" value="{{ $event->end_time ?: '' }}">
+            <div class="help">leave end time blank for multi-day events</div>
         </div>
     </div>
 

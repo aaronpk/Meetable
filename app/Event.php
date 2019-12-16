@@ -86,6 +86,10 @@ class Event extends Model
         return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? $this->slug.'-' : '') . $this->key;
     }
 
+    public function ics_permalink() {
+        return '/ics' . $this->permalink() . '.ics';
+    }
+
     public function absolute_permalink() {
         return env('APP_URL').$this->permalink();
     }
@@ -146,6 +150,11 @@ class Event extends Model
         } else {
             return $start_time->format('g:ia');
         }
+    }
+
+    public function weekday() {
+        $start_date = new DateTime($this->start_date);
+        return $start_date->format('l');
     }
 
     public function location_summary() {

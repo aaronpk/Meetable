@@ -26,6 +26,8 @@ Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 Route::get('/webmention', 'WebmentionController@get');
 Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
 
+Route::get('/add-to-google/{event}', 'Controller@add_to_google')->name('add-to-google');
+
 Route::middleware('auth')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');

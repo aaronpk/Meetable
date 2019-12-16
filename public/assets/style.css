@@ -63,6 +63,10 @@
     max-width: 100%;
 }
 
+.event .add-to-calendar {
+    font-size: 0.75em;
+}
+
 .event .rsvps ul {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;

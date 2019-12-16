@@ -53,11 +53,11 @@
 
     @if(isset($tag))
         <div class="subscribe-ics">
-            <a href="{{ route('ics_tag', $tag) }}">iCalendar Feed</a>
+            <a href="{{ route('ics-tag', $tag) }}">iCalendar Feed</a>
         </div>
     @elseif(empty($month) && empty($year))
         <div class="subscribe-ics">
-            <a href="{{ route('ics_index') }}">iCalendar Feed</a>
+            <a href="{{ route('ics-index') }}">iCalendar Feed</a>
         </div>
     @endif
 
