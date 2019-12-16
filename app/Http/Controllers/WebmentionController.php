@@ -77,7 +77,7 @@ class WebmentionController extends BaseController
         }
 
         if(isset($source['photo'])) {
-            $response->photo = json_encode($source['photo'], JSON_UNESCAPED_SLASHES);
+            $response->photos = $source['photo'];
         }
 
         foreach(['name', 'photo', 'url'] as $prop) {
@@ -96,17 +96,6 @@ class WebmentionController extends BaseController
                 }
             }
         }
-
-        if(!empty($source['rsvp']))
-            $type = 'rsvp';
-        elseif(!empty($source['photo']))
-            $type = 'photo';
-        elseif(!empty($source['name']))
-            $type = 'blog_post';
-        else
-            $type = 'comment';
-
-        $response->type = $type;
 
         $response->save();
 

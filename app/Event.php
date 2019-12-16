@@ -27,10 +27,7 @@ class Event extends Model
     }
 
     public function rsvp_for_user(User $user) {
-        return $this->responses()->where([
-            'type' => 'rsvp',
-            'rsvp_user_id' => $user->id
-        ])->first();
+        return $this->rsvps()->where('rsvp_user_id', $user->id)->first();
     }
 
     public function rsvp_string_for_user(User $user) {
@@ -50,51 +47,51 @@ class Event extends Model
     }
 
     public function has_rsvps() {
-        return $this->responses->where('type', 'rsvp')->count();
+        return $this->rsvps->count();
     }
 
     public function has_photos() {
-        return $this->responses->where('type', 'photo')->count();
+        return $this->photos->count();
     }
 
     public function has_blog_posts() {
-        return $this->responses->where('type', 'blog_post')->count();
+        return $this->blog_posts->count();
     }
 
     public function has_comments() {
-        return $this->responses->where('type', 'comment')->count();
+        return $this->comments->count();
     }
 
     public function rsvps() {
-        return $this->hasMany('\App\Response')->where('type', 'rsvp');
+        return $this->responses()->whereIn('rsvp', ['yes','no','maybe','remote']);
     }
 
     public function rsvps_yes() {
-        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'yes');
+        return $this->responses()->where('rsvp', 'yes');
     }
 
     public function rsvps_no() {
-        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'no');
+        return $this->responses()->where('rsvp', 'no');
     }
 
     public function rsvps_maybe() {
-        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'maybe');
+        return $this->responses()->where('rsvp', 'maybe');
     }
 
     public function rsvps_remote() {
-        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'remote');
+        return $this->responses()->where('rsvp', 'remote');
     }
 
     public function photos() {
-        return $this->hasMany('\App\Response')->where('type', 'photo');
+        return $this->responses()->whereNotNull('photos');
     }
 
     public function blog_posts() {
-        return $this->hasMany('\App\Response')->where('type', 'blog_post');
+        return $this->responses()->whereNotNull('name');
     }
 
     public function comments() {
-        return $this->hasMany('\App\Response')->where('type', 'comment');
+        return $this->responses()->whereNull('name')->whereNotNull('content_text');
     }
 
     public function permalink() {

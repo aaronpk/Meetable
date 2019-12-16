@@ -180,7 +180,7 @@
         <div class="responses photos" id="photos">
             <ul class="photo-album">
                 @foreach($event->photos()->get() as $photo)
-                    @foreach($photo->photos() as $p)
+                    @foreach($photo->photos as $p)
                         <li class="h-entry">
                             <a href="{{ $photo->url }}" class="u-url"><img src="{{ $p }}" height="180" alt="{{ $photo->name }}" class="u-photo p-name"></a>
                         </li>
