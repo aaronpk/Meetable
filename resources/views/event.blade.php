@@ -94,7 +94,7 @@
     </div>
     @endif
 
-    <a href="" class="u-url"></a>
+    <a href="{{ $event->absolute_permalink() }}" class="u-url"></a>
 
     @if($event->website)
         <div class="website segment with-icon">
@@ -118,7 +118,19 @@
             <h2 class="subtitle">RSVPs</h2>
 
             @if(Auth::user())
-                <button id="rsvp-button" class="button {{ $event->rsvp_string_for_user(Auth::user()) == 'yes' ? 'is-primary' : '' }}" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
+                @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
+                    <div class="buttons has-addons">
+                        <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
+                        <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(trash)</button>
+                    </div>
+                @else
+                    <div class="buttons has-addons">
+                        <button id="rsvp-button" class="button is-light" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
+                        @if($event->rsvp_string_for_user(Auth::user()) == 'no')
+                            <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(trash)</button>
+                        @endif
+                    </div>
+                @endif
                 <br><br>
             @endif
 

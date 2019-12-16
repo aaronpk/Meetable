@@ -40,5 +40,6 @@ Route::middleware('auth')->group(function(){
     Route::post('/event/{event}/delete', 'EventController@delete_event')->name('delete-event');
 
     Route::post('/event/{event}/rsvp', 'EventResponseController@save_rsvp')->name('event-rsvp');
+    Route::post('/event/{event}/rsvp_delete', 'EventResponseController@delete_rsvp')->name('event-rsvp-delete');
 
 });

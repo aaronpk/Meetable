@@ -36,4 +36,18 @@ class EventResponseController extends BaseController
         ]);
     }
 
+    public function delete_rsvp(Event $event) {
+
+        # Load existing RSVP for this user if there is one already
+        $rsvp = $event->rsvp_for_user(Auth::user());
+
+        if($rsvp) {
+            $rsvp->delete();
+        }
+
+        return response()->json([
+            'redirect' => $event->permalink()
+        ]);
+    }
+
 }

@@ -25,7 +25,16 @@ $(function(){
     evt.preventDefault();
     $.post($(this).data('action'), {
         _token: $("input[name=_token]").val(),
-        rsvp: $(this).hasClass('is-primary') ? 0 : 1
+        rsvp: $(this).hasClass('is-pressed') ? 0 : 1
+    }, function(response){
+        window.location = response.redirect;
+    });
+  });
+
+  $("#rsvp-delete").click(function(evt){
+    evt.preventDefault();
+    $.post($(this).data('action'), {
+        _token: $("input[name=_token]").val()
     }, function(response){
         window.location = response.redirect;
     });
