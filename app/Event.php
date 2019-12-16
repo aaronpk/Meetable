@@ -69,6 +69,22 @@ class Event extends Model
         return $this->hasMany('\App\Response')->where('type', 'rsvp');
     }
 
+    public function rsvps_yes() {
+        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'yes');
+    }
+
+    public function rsvps_no() {
+        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'no');
+    }
+
+    public function rsvps_maybe() {
+        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'maybe');
+    }
+
+    public function rsvps_remote() {
+        return $this->hasMany('\App\Response')->where('type', 'rsvp')->where('rsvp', 'remote');
+    }
+
     public function photos() {
         return $this->hasMany('\App\Response')->where('type', 'photo');
     }

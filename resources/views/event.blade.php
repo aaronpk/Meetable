@@ -134,20 +134,45 @@
             @endif
 
             <ul>
-                @foreach($event->rsvps as $rsvp)
-                    @if($rsvp->rsvp == 'yes')
-                    <li class="h-entry">
-                        <span class="u-author h-card avatar">
+                @foreach($event->rsvps_yes as $rsvp)
+                    <li>
+                        <span class="avatar">
                             @if($rsvp->author()['photo'])
-                                <img src="{{ $rsvp->author()['photo'] }}" width="48" class="u-photo">
+                                <img src="{{ $rsvp->author()['photo'] }}" width="48">
                             @endif
-                            <a href="{{ $rsvp->source_url ?: $rsvp->author()['url'] }}" class="u-url p-name">{{ $rsvp->author()['name'] ?? p3k\url\display_url($rsvp->author()['url']) }}</a>
+                            <a href="{{ $rsvp->source_url ?: $rsvp->author()['url'] }}">{{ $rsvp->author()['name'] ?? p3k\url\display_url($rsvp->author()['url']) }}</a>
                         </span>
-                        <data class="p-rsvp" value="{{ $rsvp->rsvp }}"></data>
                     </li>
-                    @endif
                 @endforeach
             </ul>
+
+            @if(count($event->rsvps_remote))
+                <h3 class="subtitle">Remote Attendees</h3>
+                <ul>
+                    @foreach($event->rsvps_remote as $rsvp)
+                        <li>@include('components/rsvp-avatar', ['rsvp' => $rsvp])</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if(count($event->rsvps_maybe))
+                <h3 class="subtitle">Maybe</h3>
+                <ul>
+                    @foreach($event->rsvps_maybe as $rsvp)
+                        <li>@include('components/rsvp-avatar', ['rsvp' => $rsvp])</li>
+                    @endforeach
+                </ul>
+            @endif
+
+            @if(count($event->rsvps_no))
+                <h3 class="subtitle">Can't Go</h3>
+                <ul>
+                    @foreach($event->rsvps_no as $rsvp)
+                        <li>@include('components/rsvp-avatar', ['rsvp' => $rsvp])</li>
+                    @endforeach
+                </ul>
+            @endif
+
         </div>
     @endif
 
