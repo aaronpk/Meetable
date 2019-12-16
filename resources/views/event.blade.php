@@ -131,7 +131,6 @@
                         @endif
                     </div>
                 @endif
-                <br><br>
             @endif
 
             <ul>
