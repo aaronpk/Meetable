@@ -100,7 +100,7 @@ class Event extends Model
                     . $start_date->format('M j')
                     . '</time> - '
                     . '<time datetime="'.$end_date->format('Y-m-d').'" class="dt-end">'
-                    . $end_date->format('M j, Y')
+                    . ($end_date->format('m') == $start_date->format('m') ? $end_date->format('j, Y') : $end_date->format('M j, Y'))
                     . '</time>';
 
         } else {
