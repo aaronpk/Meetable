@@ -34,11 +34,19 @@
                         <li class="event h-event">
                             <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{{ $event->name }}</a></h3>
 
-                            <p>{!! $event->date_summary(true) !!}</p>
+                            <p>{!! $event->date_summary() !!}</p>
 
                             @if($event->location_city())
                                 <p>{{ $event->location_city() }}</p>
                             @endif
+
+                            <data style="display: none;">
+                                {!! $event->mf2_date_html() !!}
+                                <div class="p-location h-card">
+                                    <div class="p-name">{{ $event->location_name }}</div>
+                                    <div>{!! $event->location_summary_with_mf2() !!}</div>
+                                </div>
+                            </data>
 
                         </li>
                     @endforeach

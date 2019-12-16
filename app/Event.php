@@ -104,21 +104,21 @@ class Event extends Model
         if($this->is_multiday()) {
             $end_date = new DateTime($this->end_date);
 
-            return '<time datetime="'.$start_date->format('Y-m-d').'" class="dt-start">'
+            return '<time datetime="'.$start_date->format('Y-m-d').'">'
                     . $start_date->format('M j')
                     . '</time> - '
-                    . '<time datetime="'.$end_date->format('Y-m-d').'" class="dt-end">'
+                    . '<time datetime="'.$end_date->format('Y-m-d').'">'
                     . ($end_date->format('m') == $start_date->format('m') ? $end_date->format('j, Y') : $end_date->format('M j, Y'))
                     . '</time>';
 
         } else {
             if($this->start_time) {
                 $start = new DateTime($this->start_date.' '.$this->start_time);
-                return '<time datetime="'.$start_date->format('Y-m-d H:i').'" class="dt-start">'
+                return '<time datetime="'.$start_date->format('Y-m-d H:i').'">'
                         . $start->format('M j, Y g:ia')
                         . '</time>';
             } else {
-                return '<time datetime="'.$start_date->format('Y-m-d').'" class="dt-start">'
+                return '<time datetime="'.$start_date->format('Y-m-d').'">'
                         . $start_date->format('M j, Y')
                         . '</time>';
             }

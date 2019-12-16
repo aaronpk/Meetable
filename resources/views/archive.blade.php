@@ -37,12 +37,17 @@ a.title:hover, a.subtitle:hover {
                     @else
                         <ul>
                         @foreach($events as $event)
-                            <li class="event">
+                            <li class="event h-event">
                                 {{ date('M j', strtotime($event->start_date)) }}
                                 &bull;
-                                <a href="{{ $event->permalink() }}">
+                                <a href="{{ $event->permalink() }}" class="u-url p-name">
                                     {{ $event->name }}
                                 </a>
+
+                                <data style="display: none;">
+                                    {!! $event->mf2_date_html() !!}
+                                </data>
+
                             </li>
                         @endforeach
                         </ul>
