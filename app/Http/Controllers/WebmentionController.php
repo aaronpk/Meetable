@@ -62,29 +62,41 @@ class WebmentionController extends BaseController
         foreach(['url', 'name'] as $prop) {
             if(isset($source[$prop])) {
                 $response->{$prop} = $source[$prop];
+            } else {
+                $response->{$prop} = null;
             }
         }
 
         if(isset($source['rsvp'])) {
             $response->rsvp = strtolower($source['rsvp']);
+        } else {
+            $response->rsvp = null;
         }
 
         if(isset($source['content']['text'])) {
             $response->content_text = $source['content']['text'];
+        } else {
+            $response->content_text = null;
         }
 
         if(isset($source['content']['html'])) {
             $response->content_html = $source['content']['html'];
+        } else {
+            $response->content_html = null;
         }
 
         if(isset($source['photo'])) {
             // A background job will be queued to download these photos
             $response->photos = $source['photo'];
+        } else {
+            $response->photos = null;
         }
 
         foreach(['name', 'photo', 'url'] as $prop) {
             if(isset($source['author'][$prop])) {
                 $response->{'author_'.$prop} = $source['author'][$prop];
+            } else {
+                $response->{'author_'.$prop} = null;
             }
         }
 
