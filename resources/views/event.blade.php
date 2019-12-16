@@ -175,11 +175,22 @@
                 @foreach($event->photos()->get() as $photo)
                     @foreach($photo->photos as $p)
                         <li>
-                            <a href="{{ (substr($p,0,4) == 'http' ? '' : '/') . $p }}" class="u-photo"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}"></a>
+                            <a href="@image_proxy($p, '1600x0')" class="u-photo photo-popup" data-original-url="{{ $photo->url ?: $photo->source_url }}" data-author-name="{{ $photo->author_name ?: parse_url($photo->url ?: $photo->source_url, PHP_URL_HOST) }}"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}"></a>
                         </li>
                     @endforeach
                  @endforeach
             </ul>
+        </div>
+
+        <div class="modal" id="photo-preview">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <div class="modal-card-body">
+                    <p class="image"><img src="" alt=""></p>
+                    <p class="original-source">via <a href=""></a></p>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close"></button>
         </div>
     @endif
 

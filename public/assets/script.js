@@ -40,6 +40,28 @@ $(function(){
     });
   });
 
+  $(".photo-popup").click(function(evt){
+    var src = $(evt.currentTarget).attr("href");
+    var source_url = $(evt.currentTarget).data("original-url");
+    var author_name = $(evt.currentTarget).data("author-name");
+    console.log(src);
+    evt.preventDefault();
+    $("#photo-preview img").attr("src", src);
+    $("#photo-preview .original-source a").attr("href", source_url);
+    $("#photo-preview .original-source a").text(author_name);
+    $("#photo-preview").addClass("is-active");
+  });
+
+  $("#photo-preview .modal-close").click(function(){
+    $("#photo-preview-img").attr("src", "");
+    $("#photo-preview").removeClass("is-active");
+  });
+
+  $(document).keyup(function(e){
+    if(e.key == 'Escape') {
+        $(".modal").removeClass("is-active");
+    }
+  });
 
 });
 
