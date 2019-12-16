@@ -51,5 +51,15 @@
         <p>No events</p>
     @endif
 
+    @if(isset($tag))
+        <div class="subscribe-ics">
+            <a href="{{ route('ics_tag', $tag) }}">iCalendar Feed</a>
+        </div>
+    @elseif(empty($month) && empty($year))
+        <div class="subscribe-ics">
+            <a href="{{ route('ics_index') }}">iCalendar Feed</a>
+        </div>
+    @endif
+
 </section>
 @endsection

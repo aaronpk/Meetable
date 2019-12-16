@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event;
+use App\Event, App\Tag;
 use DateTime;
 use DB;
 
@@ -111,6 +111,8 @@ class Controller extends BaseController
     }
 
     public function tag($tag) {
+        $tag = Tag::normalize($tag);
+
         $events = Event::whereHas('tags', function($query) use ($tag){
             $query->where('tag', $tag);
         })->orderBy('events.start_date', 'desc')->get();

@@ -10,6 +10,7 @@
     "require": {
         "php": "^7.2",
         "doctrine/dbal": "^2.9",
+        "eluceo/ical": "^0.15.1",
         "fideloper/proxy": "^4.0",
         "indieweb/date-formatter": "^0.3.1",
         "laravel/framework": "^6.0",

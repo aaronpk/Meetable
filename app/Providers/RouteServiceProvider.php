@@ -42,7 +42,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
-        //
+        $this->mapICSRoutes();
     }
 
     /**
@@ -72,5 +72,12 @@ class RouteServiceProvider extends ServiceProvider
              ->middleware('api')
              ->namespace($this->namespace)
              ->group(base_path('routes/api.php'));
+    }
+
+    protected function mapICSRoutes()
+    {
+        Route::middleware('ics')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/ics.php'));
     }
 }

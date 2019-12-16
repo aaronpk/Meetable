@@ -86,6 +86,10 @@ class Event extends Model
         return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? $this->slug.'-' : '') . $this->key;
     }
 
+    public function absolute_permalink() {
+        return env('APP_URL').$this->permalink();
+    }
+
     public function is_multiday() {
         return $this->end_date && $this->end_date != $this->start_date;
     }
@@ -153,10 +157,20 @@ class Event extends Model
         return implode(', ', $str);
     }
 
+    public function location_summary_with_name() {
+        $str = [];
+        if($this->location_name) $str[] = $this->location_name;
+        if($this->location_address) $str[] = $this->location_address;
+        if($this->location_locality) $str[] = $this->location_locality;
+        if($this->location_region) $str[] = $this->location_region;
+        if($this->location_country) $str[] = $this->location_country;
+        return implode(', ', $str);
+    }
+
     public function location_city() {
         $str = [];
         if($this->location_locality) $str[] = $this->location_locality;
-        if($this->location_country == 'USA' || $this->location_country == 'United States') {
+        if(in_array($this->location_country, ['US', 'USA', 'United States'])) {
             if($this->location_region) $str[] = $this->location_region;
         } else {
             if($this->location_country) $str[] = $this->location_country;
