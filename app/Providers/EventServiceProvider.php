@@ -20,8 +20,12 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         'App\Events\WebmentionReceived' => [
-            \App\Listeners\WebmentionReceivedListener::class
-        ]
+            \App\Listeners\WebmentionReceivedListener::class,
+        ],
+
+        'App\Events\UserCreated' => [
+            \App\Listeners\UserCreatedListener::class,
+        ],
     ];
 
     /**

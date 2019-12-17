@@ -30,7 +30,7 @@ class FetchUserDetails extends Command {
 
     private function download($user, $url) {
         // Already downloaded
-        if(\p3k\url\host_matches($url, env('APP_URL')))
+        if(!parse_url($url, PHP_URL_HOST))
             return $url;
 
         $filename = 'users/'.$user->id.'-'.md5($url);

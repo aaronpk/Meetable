@@ -36,8 +36,10 @@ class WebmentionReceivedListener implements ShouldQueue {
 
     private function download($response, $url) {
         // Already downloaded
-        if(\p3k\url\host_matches($url, env('APP_URL')))
+        if(!parse_url($url, PHP_URL_HOST))
             return $url;
+
+        Log::info('Downloading image '.$url);
 
         $filename = 'responses/'.$response->event->id.'/'.md5($url).'.jpg';
         $full_filename = __DIR__.'/../../storage/app/public/'.$filename;

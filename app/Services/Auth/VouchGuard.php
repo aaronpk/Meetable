@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 use App\User;
+use Illuminate\Support\Str;
+use App\Events\UserCreated;
 
 class VouchGuard implements Guard {
 
@@ -46,6 +48,8 @@ class VouchGuard implements Guard {
             $user->url = $url;
             $user->api_token = Str::random(80);
             $user->save();
+
+            event(new UserCreated($user));
         }
         $cached = $user;
         return $user;
