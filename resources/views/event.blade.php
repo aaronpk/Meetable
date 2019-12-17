@@ -66,6 +66,7 @@
                 <div class="time">{!! $event->weekday() !!} {!! $event->display_time() !!}</div>
             @endif
             {!! $event->mf2_date_html() !!}
+            @if(!$event->is_past())
             <div class="add-to-calendar">
                 <div class="dropdown">
                     <div class="dropdown-trigger">
@@ -85,6 +86,7 @@
                     </div>
                 </div>
             </div>
+            @endif
         </span>
     </div>
 

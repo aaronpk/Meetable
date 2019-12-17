@@ -211,6 +211,18 @@ class Event extends Model
         return $start_html . $end_html;
     }
 
+    public function is_past() {
+        if($this->end_date) {
+            $date = new DateTime($this->end_date.' '.$this->end_time);
+        } else {
+            $date = new DateTime($this->start_date.' '.($this->end_time ?: $this->start_time));
+        }
+
+        $now = new DateTime();
+
+        return $date->format('U') < $now->format('U');
+    }
+
     public function location_summary() {
         $str = [];
         if($this->location_address) $str[] = $this->location_address;
