@@ -38,6 +38,10 @@
                         <span class="icon">@icon(copy)</span>
                         <span>Clone Event</span>
                     </a>
+                    <a class="dropdown-item" href="{{ route('add-event-photo', $event) }}">
+                        <span class="icon">@icon(camera)</span>
+                        <span>Add Photo</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -171,11 +175,11 @@
 
     @if($event->has_photos())
         <div class="responses photos" id="photos">
-            <ul class="photo-album">
+            <ul class="{{ $event->num_photos() > 1 ? 'photo-album' : 'single-photo' }}">
                 @foreach($event->photos()->get() as $photo)
                     @foreach($photo->photos as $p)
                         <li>
-                            <a href="@image_proxy($p, '1600x0')" class="u-photo photo-popup" data-original-url="{{ $photo->url ?: $photo->source_url }}" data-author-name="{{ $photo->author_name ?: parse_url($photo->url ?: $photo->source_url, PHP_URL_HOST) }}"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}"></a>
+                            <a href="@image_proxy($p, '1600x0')" class="u-photo photo-popup" data-original-url="{{ ($photo->url ?: $photo->source_url) ?: ($photo->creator ? $photo->creator->url : '') }}" data-author-name="{{ ($photo->author_name ?: parse_url($photo->url ?: $photo->source_url, PHP_URL_HOST)) ?: ($photo->creator ? $photo->creator->name : '') }}"><img src="@image_proxy($p, '0x440')" width="200" alt="{{ $photo->name }}"></a>
                         </li>
                     @endforeach
                  @endforeach

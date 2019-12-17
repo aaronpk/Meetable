@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\EventRevision, App\Tag;
+use App\Event, App\EventRevision, App\Tag, App\Response;
 use Illuminate\Support\Str;
 use Auth;
 
@@ -118,4 +118,31 @@ class EventController extends BaseController
         return redirect($event->permalink());
     }
 
+    public function add_event_photo(Event $event) {
+        return view('add-event-photo', [
+            'event' => $event,
+        ]);
+    }
+
+    public function upload_event_photo(Event $event) {
+
+        if(!request()->hasFile('photo')) {
+            return redirect($event->permalink().'#error');
+        }
+
+        // Save a copy of the file in the download folder
+        $filename = Str::random(30).'.jpg';
+
+        request('photo')->storeAs('public/responses/'.$event->id, $filename);
+        $photo_url = 'public/responses/'.$event->id.'/'.$filename;
+
+        // Create a new stub response to store this photo
+        $response = new Response;
+        $response->event_id = $event->id;
+        $response->created_by = Auth::user()->id;
+        $response->photos = [$photo_url];
+        $response->save();
+
+        return redirect($event->permalink().'#photos');
+    }
 }

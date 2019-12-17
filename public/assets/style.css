@@ -153,6 +153,9 @@
     font-size: 1.2em;
 }
 
+.single-photo img {
+    width: 100%;
+}
 
 /**
  * Photo Albums

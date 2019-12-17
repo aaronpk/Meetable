@@ -26,6 +26,10 @@ class Response extends Model
         return $this->belongsTo('\App\Event');
     }
 
+    public function creator() {
+        return $this->belongsTo('\App\User', 'created_by', 'id');
+    }
+
     public function author() {
         if($this->rsvp_user_id) {
             $user = User::where('id', $this->rsvp_user_id)->first();

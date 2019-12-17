@@ -86,6 +86,15 @@ class Event extends Model
         return $this->responses()->whereNotNull('photos');
     }
 
+    public function num_photos() {
+        $num = 0;
+        $responses = $this->photos()->get();
+        foreach($responses as $response) {
+            $num += count($response->photos);
+        }
+        return $num;
+    }
+
     public function blog_posts() {
         return $this->responses()->whereNotNull('name');
     }
