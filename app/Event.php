@@ -15,8 +15,8 @@ class Event extends Model
 
     public static function find_from_url($url) {
         // /{year}/{month}/{slug}-{key}
-        if(preg_match('~/[0-9]{4}/[0-9]{2}/[0-9a-zA-Z\-]+-([0-9a-zA-Z]+)$~', $url, $match)) {
-            return Event::where('key', $match[1])->first();
+        if(preg_match('~/[0-9]{4}/[0-9]{2}/([0-9a-zA-Z\-]+-)?([0-9a-zA-Z]+)$~', $url, $match)) {
+            return Event::where('key', $match[2] ?? $match[1])->first();
         } else {
             return null;
         }
