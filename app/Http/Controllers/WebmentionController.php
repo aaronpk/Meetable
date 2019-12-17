@@ -35,7 +35,9 @@ class WebmentionController extends BaseController
         $sourceURL = request('source');
 
         $xray = new XRay();
-        $data = $xray->parse($sourceURL);
+        $data = $xray->parse($sourceURL, [
+            'target' => $targetURL,
+        ]);
 
         // XRay tells us if the URL didn't link to the target
         if(isset($data['error'])) {
