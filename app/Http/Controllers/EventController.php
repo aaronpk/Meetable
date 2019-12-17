@@ -125,7 +125,6 @@ class EventController extends BaseController
     }
 
     public function upload_event_photo(Event $event) {
-
         if(!request()->hasFile('photo')) {
             return redirect($event->permalink().'#error');
         }
@@ -144,5 +143,14 @@ class EventController extends BaseController
         $response->save();
 
         return redirect($event->permalink().'#photos');
+    }
+
+    public function set_photo_order(Event $event) {
+        $event->photo_order = request('order');
+        $event->save();
+
+        return response()->json([
+            'result' => 'ok'
+        ]);
     }
 }

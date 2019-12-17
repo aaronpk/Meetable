@@ -9,6 +9,10 @@ class Event extends Model
 {
     use SoftDeletes;
 
+    protected $casts = [
+        'photo_order' => 'array',
+    ];
+
     public static function slug_from_name($name) {
         return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+/', '-', strtolower($name)));
     }
@@ -83,7 +87,7 @@ class Event extends Model
     }
 
     public function photos() {
-        return $this->responses()->whereNotNull('photos');
+        return $this->responses()->whereNotNull('photos')->orderBy('created_at');
     }
 
     public function num_photos() {
@@ -93,6 +97,30 @@ class Event extends Model
             $num += count($response->photos);
         }
         return $num;
+    }
+
+    public function photo_urls() {
+        $data = [];
+        foreach($this->photos()->get() as $photo) {
+            foreach($photo->photos as $u) {
+                $data[$u] = $photo;
+            }
+        }
+        $urls = [];
+        if($this->photo_order) {
+            foreach($this->photo_order as $u) {
+                if(array_key_exists($u, $data)) {
+                    $urls[] = [$u, $data[$u]];
+                    unset($data[$u]);
+                }
+            }
+        }
+        if(count($data)) {
+            foreach($data as $u=>$photo) {
+                $urls[] = [$u, $photo];
+            }
+        }
+        return $urls;
     }
 
     public function blog_posts() {

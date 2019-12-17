@@ -2,9 +2,11 @@
 
 @section('headtags')
 <link rel="webmention" href="{{ route('webmention') }}">
+<link rel="stylesheet" href="/jquery/jquery-ui-1.12.1/jquery-ui.min.css">
 @endsection
 
 @section('scripts')
+<script src="/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 @endsection
 
 @section('content')
@@ -176,12 +178,8 @@
     @if($event->has_photos())
         <div class="responses photos" id="photos">
             <ul class="photo-album">
-                @php($i=0)
-                @foreach($event->photos()->get() as $photo)
-                    @foreach($photo->photos as $p)
-                        <li><a href="@image_proxy($p, '1600x0')" class="u-photo photo-popup" data-original-url="{{ ($photo->url ?: $photo->source_url) ?: ($photo->creator ? $photo->creator->url : '') }}" data-author-name="{{ ($photo->author_name ?: parse_url($photo->url ?: $photo->source_url, PHP_URL_HOST)) ?: ($photo->creator ? $photo->creator->name : '') }}"><img src="@image_proxy($p, '230x230,sc')" width="230" height="230" alt="{{ $photo->name }}" class="square"><img src="@image_proxy($p, '710x0')" class="full"></a></li>
-                        @php($i++)
-                    @endforeach
+                @foreach($event->photo_urls() as $p)
+                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ ($p[1]->url ?: $p[1]->source_url) ?: ($p[1]->creator ? $p[1]->creator->url : '') }}" data-author-name="{{ ($p[1]->author_name ?: parse_url($p[1]->url ?: $p[1]->source_url, PHP_URL_HOST)) ?: ($p[1]->creator ? $p[1]->creator->name : '') }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->name }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full"></a></li>
                  @endforeach
             </ul>
         </div>
@@ -243,6 +241,28 @@
                 @endforeach
             </ul>
         </div>
+    @endif
+
+    @if(Auth::user())
+    <script>
+        $(function(){
+            $(".photo-album").sortable({
+                placeholder: "ui-state-highlight",
+                stop: function(event, ui) {
+                    var photoURLs = $(".photo-album li").map(function(){
+                        return $(this).data("photo-url");
+                    }).get();
+                    console.log(photoURLs);
+                    $.post("{{ route('set-photo-order', $event) }}", {
+                        _token: $("input[name=_token]").val(),
+                        order: photoURLs
+                    }, function(response){
+                        console.log(response);
+                    });
+                }
+            });
+        });
+    </script>
     @endif
 
     {{ csrf_field() }}

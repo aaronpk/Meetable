@@ -200,4 +200,8 @@ ul.photo-album li {
     display: inline;
 }
 
+.photo-album li.ui-sortable-placeholder {
+    min-height: 240px;
+}
+
 

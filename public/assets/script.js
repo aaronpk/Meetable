@@ -44,7 +44,6 @@ $(function(){
     var src = $(evt.currentTarget).attr("href");
     var source_url = $(evt.currentTarget).data("original-url");
     var author_name = $(evt.currentTarget).data("author-name");
-    console.log(src);
     evt.preventDefault();
     $("#photo-preview img").attr("src", src);
     $("#photo-preview .original-source a").attr("href", source_url);
