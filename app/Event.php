@@ -67,23 +67,23 @@ class Event extends Model
     }
 
     public function rsvps() {
-        return $this->responses()->whereIn('rsvp', ['yes','no','maybe','remote']);
+        return $this->responses()->whereIn('rsvp', ['yes','no','maybe','remote'])->orderBy('created_at', 'desc');
     }
 
     public function rsvps_yes() {
-        return $this->responses()->where('rsvp', 'yes');
+        return $this->responses()->where('rsvp', 'yes')->orderBy('created_at', 'desc');
     }
 
     public function rsvps_no() {
-        return $this->responses()->where('rsvp', 'no');
+        return $this->responses()->where('rsvp', 'no')->orderBy('created_at', 'desc');
     }
 
     public function rsvps_maybe() {
-        return $this->responses()->where('rsvp', 'maybe');
+        return $this->responses()->where('rsvp', 'maybe')->orderBy('created_at', 'desc');
     }
 
     public function rsvps_remote() {
-        return $this->responses()->where('rsvp', 'remote');
+        return $this->responses()->where('rsvp', 'remote')->orderBy('created_at', 'desc');
     }
 
     public function photos() {
@@ -124,11 +124,11 @@ class Event extends Model
     }
 
     public function blog_posts() {
-        return $this->responses()->whereNotNull('name');
+        return $this->responses()->whereNotNull('name')->orderBy('created_at', 'desc');
     }
 
     public function comments() {
-        return $this->responses()->whereNull('name')->whereNotNull('content_text');
+        return $this->responses()->whereNull('name')->whereNotNull('content_text')->orderBy('created_at', 'desc');
     }
 
     public function permalink() {
