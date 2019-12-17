@@ -9,7 +9,7 @@ use App\Events\WebmentionReceived;
 class WebmentionReceivedListener implements ShouldQueue {
 
     public function handle(WebmentionReceived $event) {
-        Log::info('Webmention received: '.$event->response->source_url);
+        Log::info('Webmention received: '.($event->response->source_url ?: $event->response->url));
 
         $response = $event->response;
 

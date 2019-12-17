@@ -57,61 +57,7 @@ class WebmentionController extends BaseController
             $response->source_url = $sourceURL;
         }
 
-        if(isset($source['published'])) {
-            $response->published = date('Y-m-d H:i:s', strtotime($source['published']));
-        }
-
-        foreach(['url', 'name'] as $prop) {
-            if(isset($source[$prop])) {
-                $response->{$prop} = $source[$prop];
-            } else {
-                $response->{$prop} = null;
-            }
-        }
-
-        if(isset($source['rsvp'])) {
-            $response->rsvp = strtolower($source['rsvp']);
-        } else {
-            $response->rsvp = null;
-        }
-
-        if(isset($source['content']['text'])) {
-            $response->content_text = $source['content']['text'];
-        } else {
-            $response->content_text = null;
-        }
-
-        if(isset($source['content']['html'])) {
-            $response->content_html = $source['content']['html'];
-        } else {
-            $response->content_html = null;
-        }
-
-        if(isset($source['photo'])) {
-            // A background job will be queued to download these photos
-            $response->photos = $source['photo'];
-        } else {
-            $response->photos = null;
-        }
-
-        foreach(['name', 'photo', 'url'] as $prop) {
-            if(isset($source['author'][$prop])) {
-                $response->{'author_'.$prop} = $source['author'][$prop];
-            } else {
-                $response->{'author_'.$prop} = null;
-            }
-        }
-
-        if(isset($source['author']['url'])) {
-            // Set the rsvp_user_id if source URL domain matches the author URL domain
-            if(\p3k\url\host_matches($sourceURL, $source['author']['url'])) {
-                // Check if there is a user with this URL
-                $rsvpUser = User::where('url', $source['author']['url'])->first();
-                if($rsvpUser) {
-                    $response->rsvp_user_id = $rsvpUser->id;
-                }
-            }
-        }
+        \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $sourceURL);
 
         $response->save();
 

@@ -11,6 +11,10 @@ class Response extends Model
         'photos' => 'array',
     ];
 
+    protected $hidden = [
+        'id', 'event_id', 'rsvp_user_id', 'created_by',
+    ];
+
     public static function image_proxy($url, $opts) {
         // https://github.com/willnorris/imageproxy
         $urlToSign = $url.'#'.$opts;

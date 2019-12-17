@@ -44,6 +44,7 @@ class VouchGuard implements Guard {
         if(!$user) {
             $user = new User();
             $user->url = $url;
+            $user->api_token = Str::random(80);
             $user->save();
         }
         $cached = $user;
