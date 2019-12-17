@@ -172,8 +172,6 @@
 }
 ul.photo-album {
   list-style-type: none;
-  /* display: grid is for fallback if the JS doesn't load.
-     the JS will change the display mode to remove the grid */
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 4px;
@@ -184,10 +182,22 @@ ul.photo-album li {
   padding: 0;
 }
 .photo-album img {
-  vertical-align: bottom;
-  margin: 2px; /* 2px on each img makes a 4px gap between images */
+  width: 100%;
   outline: 1px solid rgba(0, 0, 0, 0.1);
   outline-offset: -1px;
+}
+
+.photo-album img.full {
+    display: none;
+}
+.photo-album li:first-child img.square {
+    display: none;
+}
+.photo-album li:first-child {
+    grid-column-start: span 3;
+}
+.photo-album li:first-child img.full {
+    display: inline;
 }
 
 
