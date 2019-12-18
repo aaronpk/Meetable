@@ -21,7 +21,7 @@ class UserCreatedListener implements ShouldQueue {
         if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
             $user->name = $data['data']['name'];
             $user->photo = $this->download($user, $data['data']['photo']);
-            $this->info('  Found user details: '.$user->name.' '.$user->photo);
+            Log::info('  Found user details: '.$user->name.' '.$user->photo);
             $user->save();
         }
     }

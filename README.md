@@ -7,6 +7,8 @@ Install Laravel with a MySQL database backend
 
 Set up a queuing mechanism such as Redis
 
+Make sure the `storage` folder is writable by the web server 
+
 
 ### imageproxy
 
