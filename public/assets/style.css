@@ -92,7 +92,7 @@
     margin-bottom: 0.5em;
 }
 
-.event .responses li .avatar img {
+.event .responses li .avatar img.photo {
     width: 48px;
     border-radius: 4px;
     margin-right: 0.5em;
@@ -198,6 +198,13 @@ ul.photo-album li {
 }
 .photo-album li:first-child img.full {
     display: inline;
+}
+
+.photo-album.admin li:first-child img.square {
+    display: inline;
+}
+.photo-album.admin li:first-child {
+    grid-column-start: auto;
 }
 
 .photo-album li.ui-sortable-placeholder {

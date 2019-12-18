@@ -42,6 +42,10 @@
                         <span class="icon">@icon(camera)</span>
                         <span>Add Photo</span>
                     </a>
+                    <a class="dropdown-item" href="{{ route('edit-responses', $event) }}">
+                        <span class="icon">@icon(comment)</span>
+                        <span>Edit Responses</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -179,7 +183,7 @@
         <div class="responses photos" id="photos">
             <ul class="photo-album">
                 @foreach($event->photo_urls() as $p)
-                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ ($p[1]->url ?: $p[1]->source_url) ?: ($p[1]->creator ? $p[1]->creator->url : '') }}" data-author-name="{{ ($p[1]->author_name ?: parse_url($p[1]->url ?: $p[1]->source_url, PHP_URL_HOST)) ?: ($p[1]->creator ? $p[1]->creator->name : '') }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->name }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full"></a></li>
+                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ $p[1]->link() ?: ($p[1]->creator ? $p[1]->creator->url : '') }}" data-author-name="{{ ($p[1]->author_name ?: parse_url($p[1]->link(), PHP_URL_HOST)) ?: ($p[1]->creator ? $p[1]->creator->name : '') }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->name }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full"></a></li>
                  @endforeach
             </ul>
         </div>
@@ -202,7 +206,7 @@
             <ul>
                 @foreach($event->blog_posts as $post)
                     <li>
-                        <p class="post-name"><a href="{{ $post->url ?: $post->source_url }}">{{ $post->name }}</a></p>
+                        <p class="post-name"><a href="{{ $post->link() }}">{{ $post->name }}</a></p>
                         <p>by <a href="{{ $post->author()['url'] }}">{{ $post->author()['name'] }}</a>
                             @if($post->published)
                                 on {{ date('M j, Y', strtotime($post->published)) }}
@@ -222,7 +226,7 @@
                     <li>
                         <span class="avatar">
                             @if($comment->author()['photo'])
-                                <img src="@image_proxy($comment->author()['photo'], '96x96,sc')" width="48">
+                                <img src="@image_proxy($comment->author()['photo'], '96x96,sc')" width="48" class="photo">
                             @endif
                             <span class="author-details">
                                 <a href="{{ $comment->author()['url'] }}" class="author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
@@ -231,7 +235,7 @@
                         </span>
                         <span class="comment-content">{{ $comment->content_text }}</span>
                         <span class="meta">
-                            <a href="{{ $comment->url }}">
+                            <a href="{{ $comment->link() }}">
                                 <time datetime="{{ date('c', strtotime($comment->published)) }}">
                                     {{ date('M j, Y', strtotime($comment->published)) }}
                                 </time>

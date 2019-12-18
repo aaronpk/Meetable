@@ -153,4 +153,13 @@ class EventController extends BaseController
             'result' => 'ok'
         ]);
     }
+
+    public function edit_responses(Event $event) {
+        $responses = $event->responses()->get();
+
+        return view('edit-responses', [
+            'event' => $event,
+            'responses' => $responses,
+        ]);
+    }
 }

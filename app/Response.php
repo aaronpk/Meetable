@@ -47,6 +47,10 @@ class Response extends Model
         }
     }
 
+    public function link() {
+        return $this->url ?: $this->source_url;
+    }
+
     // https://laravel.com/docs/5.7/eloquent-mutators
     // Ensure null values instead of empty strings
 

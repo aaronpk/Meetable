@@ -27,7 +27,7 @@ class Event extends Model
     }
 
     public function responses() {
-        return $this->hasMany('\App\Response');
+        return $this->hasMany('\App\Response')->orderBy('created_at', 'desc');
     }
 
     public function rsvp_for_user(User $user) {
