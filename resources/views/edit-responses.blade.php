@@ -116,7 +116,7 @@
 <div class="modal" id="response-details">
     <div class="modal-background"></div>
     <div class="modal-card">
-        <div class="modal-card-body">
+        <div class="modal-card-body" style="border-radius: 8px;">
 
             <div class="field is-horizontal">
                 <div class="field-label">
@@ -248,8 +248,10 @@ $(function(){
 
     $(".view-response-details").click(function(evt){
         evt.preventDefault();
-        $.get($(evt.target).attr("href"), function(response){
 
+        $(this).parents(".dropdown").removeClass("is-active");
+
+        $.get($(evt.target).attr("href"), function(response){
             ['created_at','updated_at','url','source_url','published',
              'author_name','author_photo','author_url','name','content_text','rsvp'].forEach(function(field){
                 $("#response-"+field).val(response[field]);

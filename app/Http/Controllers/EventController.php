@@ -175,4 +175,22 @@ class EventController extends BaseController
             'response_id' => $id,
         ]);
     }
+
+    public function save_alt_text(Event $event) {
+
+        $response = Response::where('event_id', $event->id)->where('id', request('response_id'))->first();
+
+        if(!$response) {
+            return response()->json([
+                'result' => 'error',
+            ]);
+        }
+
+        $response->set_photo_alt(request('url'), request('alt'));
+        $response->save();
+
+        return response()->json([
+            'result' => 'ok',
+        ]);
+    }
 }

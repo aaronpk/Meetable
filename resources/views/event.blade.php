@@ -183,7 +183,7 @@
         <div class="responses photos" id="photos">
             <ul class="photo-album">
                 @foreach($event->photo_urls() as $p)
-                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ $p[1]->link() ?: ($p[1]->creator ? $p[1]->creator->url : '') }}" data-author-name="{{ ($p[1]->author_name ?: parse_url($p[1]->link(), PHP_URL_HOST)) ?: ($p[1]->creator ? $p[1]->creator->name : '') }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->name }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full"></a></li>
+                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ $p[1]->link() ?: ($p[1]->creator ? $p[1]->creator->url : '') }}" data-author-name="{{ ($p[1]->author_name ?: parse_url($p[1]->link(), PHP_URL_HOST)) ?: ($p[1]->creator ? $p[1]->creator->name : '') }}" data-alt-text="{{ $p[1]->photo_alt_text($p[0]) }}" data-response-id="{{ $p[1]->id }}" data-photo-url="{{ $p[0] }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}"></a></li>
                  @endforeach
             </ul>
         </div>
@@ -191,8 +191,23 @@
         <div class="modal" id="photo-preview">
             <div class="modal-background"></div>
             <div class="modal-card">
-                <div class="modal-card-body">
-                    <p class="image"><img src="" alt=""></p>
+                <div class="modal-card-body" style="border-radius: 8px">
+                    <p class="image"><img src=""></p>
+                    @if(Auth::user())
+                    <div style="margin-top: 1em">
+                        <div class="field has-addons">
+                            <div class="control has-icons-right is-expanded">
+                                <input class="input photo-alt-text" type="text" placeholder="alt text">
+                                <span class="hidden icon is-small is-right">@icon(check)</span>
+                            </div>
+                            <div class="control">
+                                <button class="button" id="save-photo-alt">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="response_id">
+                    <input type="hidden" id="photo_url">
+                    @endif
                     <p class="original-source">via <a href=""></a></p>
                 </div>
             </div>
@@ -268,6 +283,8 @@
         });
     </script>
     @endif
+
+    <input type="hidden" id="event_id" value="{{ $event->id }}">
 
     {{ csrf_field() }}
 

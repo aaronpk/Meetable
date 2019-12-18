@@ -12,6 +12,7 @@ class Response extends Model
     # https://laravel.com/docs/5.7/eloquent-mutators#array-and-json-casting
     protected $casts = [
         'photos' => 'array',
+        'photo_alt' => 'array',
     ];
 
     protected $hidden = [
@@ -52,6 +53,25 @@ class Response extends Model
 
     public function link() {
         return $this->url ?: $this->source_url;
+    }
+
+    public function photo_alt_text($url) {
+        // Returns the alt text for the given photo URL
+        if(is_array($this->photos) && in_array($url, $this->photos)) {
+            if(is_array($this->photo_alt) && array_key_exists($url, $this->photo_alt)) {
+                return $this->photo_alt[$url];
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public function set_photo_alt($url, $alt) {
+        $alts = $this->photo_alt;
+        if(!is_array($alts))
+            $alts = [];
+        $alts[$url] = $alt;
+        $this->photo_alt = $alts;
     }
 
     // https://laravel.com/docs/5.7/eloquent-mutators

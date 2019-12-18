@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function(){
     Route::get('/event/{event}/responses', 'EventController@edit_responses')->name('edit-responses');
     Route::post('/event/{event}/responses/{response}/delete', 'EventController@delete_response')->name('delete-response');
     Route::get('/event/{event}/responses/{response}.json', 'EventController@get_response_details')->name('get-response-details');
+    Route::post('/event/{event}/responses/save_alt_text', 'EventController@save_alt_text')->name('save-alt-text');
 
     Route::post('/event/{event}/rsvp', 'EventResponseController@save_rsvp')->name('event-rsvp');
     Route::post('/event/{event}/rsvp_delete', 'EventResponseController@delete_rsvp')->name('event-rsvp-delete');
