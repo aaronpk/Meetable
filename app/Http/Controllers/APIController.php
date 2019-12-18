@@ -48,7 +48,17 @@ class APIController extends BaseController
         if(!$response) {
             $response = new Response;
             $response->event_id = $event->id;
-            $response->created_by = Auth::user()->id;
+            if(Auth::user()->is_admin) {
+                // Allow admin users to override the created_by to other users
+                $by = Auth::user()->id;
+                if(request('by')) {
+                    if($u = User::where('url', request('by'))->first())
+                        $by = $u->id;
+                }
+                $response->created_by = $by;
+            } else {
+                $response->created_by = Auth::user()->id;
+            }
         }
 
         \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $url);
