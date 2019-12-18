@@ -50,11 +50,16 @@ class WebmentionController extends BaseController
             return $this->error("There was a problem parsing the source URL");
         }
 
-        $response = $event->responses()->where('source_url', $sourceURL)->first();
+        $response = $event->responses()->withTrashed()->where('source_url', $sourceURL)->first();
         if(!$response) {
             $response = new Response;
             $response->event_id = $event->id;
             $response->source_url = $sourceURL;
+        } else {
+            if($response->trashed()) {
+                // Don't allow deleted source URLs to be re-added
+                return $this->error("The webmention from this URL has been deleted from the event and won't be added again");
+            }
         }
 
         \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $sourceURL);

@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Response extends Model
 {
+    use SoftDeletes;
+
     # https://laravel.com/docs/5.7/eloquent-mutators#array-and-json-casting
     protected $casts = [
         'photos' => 'array',

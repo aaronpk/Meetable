@@ -64,3 +64,6 @@ $(function(){
 
 });
 
+function csrf_token() {
+    return $("input[name=_token]").val();
+}

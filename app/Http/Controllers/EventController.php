@@ -162,4 +162,17 @@ class EventController extends BaseController
             'responses' => $responses,
         ]);
     }
+
+    public function get_response_details(Event $event, Response $response) {
+        return response()->json($response);
+    }
+
+    public function delete_response(Event $event, Response $response) {
+        $id = $response->id;
+        $response->delete();
+        return response()->json([
+            'result' => 'ok',
+            'response_id' => $id,
+        ]);
+    }
 }
