@@ -92,12 +92,12 @@ class EventController extends BaseController
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
             'latitude', 'longitude', 'timezone',
-            'website', 'description'
+            'website', 'description',
         ];
 
         // Save a snapshot of the previous state
         $revision = new EventRevision;
-        foreach(array_merge($properties, ['key','slug','created_by','last_modified_by']) as $p) {
+        foreach(array_merge($properties, ['key','slug','created_by','last_modified_by','photo_order']) as $p) {
             $revision->{$p} = $event->{$p} ?: null;
         }
         $revision->save();
