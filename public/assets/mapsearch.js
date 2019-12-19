@@ -1,14 +1,35 @@
 jQuery(function(){
 
     if(document.getElementById('map')) {
+
+        var selectedPlacePin;
+
+        var lat = 45.5;
+        var lng = -122.64;
+        var zoom = 8;
+        var initialMapPinLocation;
+        if($(document.getElementById('map')).data("latitude")) {
+            lat = $(document.getElementById('map')).data("latitude");
+            lng = $(document.getElementById('map')).data("longitude");
+            initialMapPinLocation = new google.maps.LatLng(lat, lng);
+            zoom = 15;
+            $("#location_preview").removeClass("hidden");
+        }
+
         var map = new google.maps.Map(document.getElementById('map'), {
-            center: new google.maps.LatLng(45.5,-122.6),
-            zoom: 8
+            center: new google.maps.LatLng(lat,lng),
+            zoom: zoom
         });
 
         var service = new google.maps.places.AutocompleteService();
         var places = new google.maps.places.PlacesService(map);
-        var selectedPlacePin;
+
+        if(initialMapPinLocation) {
+            selectedPlacePin = new google.maps.Marker({
+                position: initialMapPinLocation,
+                map: map
+            });
+        }
 
         function googleMapsTypeahead(input) {
             return new Promise((resolve, reject) => {
@@ -41,6 +62,7 @@ jQuery(function(){
                     selectedPlacePin.setMap(null);
                     selectedPlacePin = null;
                 }
+
                 selectedPlacePin = new google.maps.Marker({
                     position: result.geometry.location,
                     map: map

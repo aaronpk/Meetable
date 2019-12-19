@@ -84,7 +84,7 @@ form h2.subtitle {
 
     <h2 class="subtitle">Where will the event take place?</h2>
 
-    @if(!$event->id && env('GOOGLEMAPS_API_KEY'))
+    @if(env('GOOGLEMAPS_API_KEY'))
         <div class="field">
             <div class="dropdown" style="display: block;">
                 <div class="dropdown-trigger" style="">
@@ -98,7 +98,7 @@ form h2.subtitle {
         </div>
 
         <div class="ui message hidden" id="location_preview">
-            <div id="map" style="width: 100%; height: 180px; border-radius: 4px; border: 1px #ccc solid;"></div>
+            <div id="map" data-latitude="{{ $event->latitude }}" data-longitude="{{ $event->longitude }}" style="width: 100%; height: 180px; border-radius: 4px; border: 1px #ccc solid;"></div>
         </div>
     @endif
 
@@ -190,8 +190,8 @@ form h2.subtitle {
 
     <button class="button is-primary" type="submit">Save</button>
 
-    <input type="hidden" name="latitude">
-    <input type="hidden" name="longitude">
+    <input type="hidden" name="latitude" value="{{ $event->latitude }}">
+    <input type="hidden" name="longitude" value="{{ $event->longitude }}">
     <input type="hidden" name="cover_image" id="cover-photo-filename" value="{{ $event->cover_image }}">
 
     {{ csrf_field() }}
