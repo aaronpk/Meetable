@@ -47,6 +47,23 @@
     line-height: 1.2em;
 }
 
+@media(max-width: 400px) {
+    .event .event-name {
+        font-size: 2.2rem;
+        line-height: 1.2em;
+        margin-bottom: 1rem;
+    }
+
+    .event .date.segment, .event .location.segment, .event .website.segment {
+        font-size: 1.2em;
+        line-height: 1.2em;
+    }
+}
+
+.event .website.segment {
+    overflow: hidden;
+}
+
 .event .segment.with-icon {
     display: grid;
     grid-template-columns: 40px auto;

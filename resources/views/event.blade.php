@@ -109,7 +109,11 @@
     @if($event->website)
         <div class="website segment with-icon">
             <span class="icon">@icon(link)</span>
-            <span><a href="{{ $event->website }}" class="u-url" rel="canonical">{{ \p3k\url\display_url($event->website) }}</a></span>
+            <span>
+                <a href="{{ $event->website }}" class="u-url" rel="canonical" title="{{ $event->website }}">
+                    {{ strlen($event->website) > 40 ?  parse_url($event->website, PHP_URL_HOST) : \p3k\url\display_url($event->website) }}
+                </a>
+            </span>
         </div>
     @endif
 
