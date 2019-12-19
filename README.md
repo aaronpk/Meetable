@@ -16,7 +16,16 @@ Install https://github.com/willnorris/imageproxy
 
 Run with:
 
-`imageproxy -cache memory -allowHosts events.example.org -baseURL https://events.example.org/ -signatureKey 1234 -addr 127.0.0.1:8090`
+```
+imageproxy \
+  -cache memory:500 \
+  -cache /path/to/storage/cache \
+  -baseURL https://events.example.org/ \
+  -signatureKey 1234 \
+  -allowHosts events.example.org \
+  -referrers \*.example.org \
+  -addr 127.0.0.1:8090
+```
 
 Configure nginx to proxy `/img/` to the imageproxy:
 
