@@ -164,11 +164,11 @@ class Event extends Model
         } else {
             if($this->start_time) {
                 $start = new DateTime($this->start_date.' '.$this->start_time);
-                return '<time datetime="'.$start_date->format('Y-m-d H:i').'">'
+                return '<time datetime="'.$start->format('Y-m-d H:i').'">'
                         . $start->format('M j, Y g:ia')
                         . '</time>';
             } else {
-                return '<time datetime="'.$start_date->format('Y-m-d').'">'
+                return '<time datetime="'.$start->format('Y-m-d').'">'
                         . $start_date->format('M j, Y')
                         . '</time>';
             }
