@@ -123,11 +123,11 @@
         @endforeach
     </div>
 
-    @if($event->has_rsvps() || Auth::user())
+    @if($event->has_rsvps() || (Auth::user() && !$event->is_past()))
         <div class="responses rsvps" id="rsvps">
             <h2 class="subtitle">RSVPs</h2>
 
-            @if(Auth::user())
+            @if(Auth::user() && !$event->is_past())
                 @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
                     <div class="buttons has-addons">
                         <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
