@@ -183,7 +183,7 @@
         <div class="responses photos" id="photos">
             <ul class="photo-album">
                 @foreach($event->photo_urls() as $p)
-                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ $p[1]->link() ?: ($p[1]->creator ? $p[1]->creator->url : '') }}" data-author-name="{{ ($p[1]->author_name ?: parse_url($p[1]->link(), PHP_URL_HOST)) ?: ($p[1]->creator ? $p[1]->creator->name : '') }}" data-alt-text="{{ $p[1]->photo_alt_text($p[0]) }}" data-response-id="{{ $p[1]->id }}" data-photo-url="{{ $p[0] }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}"></a></li>
+                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ $p[1]->photo_original_url() }}" data-author-name="{{ $p[1]->photo_author_name() }}" data-alt-text="{{ $p[1]->photo_alt_text($p[0]) }}" data-response-id="{{ $p[1]->id }}" data-photo-url="{{ $p[0] }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}"></a></li>
                  @endforeach
             </ul>
         </div>

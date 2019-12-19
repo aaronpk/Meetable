@@ -74,6 +74,24 @@ class Response extends Model
         $this->photo_alt = $alts;
     }
 
+    public function photo_original_url() {
+        return $this->link() ?: ($this->creator ? $this->creator->url : '');
+    }
+
+    public function photo_author_name() {
+        if($this->author_name)
+            return $this->author_name;
+
+        if($this->creator) {
+            return $this->creator->name ?: parse_url($this->creator->url, PHP_URL_HOST);
+        }
+
+        if($this->link())
+            return parse_url($this->link(), PHP_URL_HOST);
+
+        return '';
+    }
+
     // https://laravel.com/docs/5.7/eloquent-mutators
     // Ensure null values instead of empty strings
 
