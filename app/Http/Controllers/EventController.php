@@ -65,10 +65,13 @@ class EventController extends BaseController
 
         // If there was a cover photo added, move it to the permanent location and add to the event
         if($from = request('cover_image')) {
-            if(preg_match('/^public\/events\/(temp|\d+)\/[a-zA-Z0-9]+\.jpg$/', $from)) {
+            if(preg_match('/^public\/events\/(temp|\d+)\/[a-zA-Z0-9]+\.jpg$/', $from, $match)) {
                 $fn = basename($from);
                 $filename = 'public/events/'.$event->id.'/'.$fn;
-                Storage::move($from, $filename);
+                if($match[1] == 'temp')
+                    Storage::move($from, $filename);
+                else
+                    Storage::copy($from, $filename);
                 $event->cover_image = $filename;
                 $event->save();
             }
