@@ -62,9 +62,12 @@ jQuery(function(){
                     }
                     if(result.address_components[i].types.includes('administrative_area_level_1')) {
                         region = result.address_components[i].long_name;
+                        if(region == locality) {
+                            region = '';
+                        }
                     }
                     if(result.address_components[i].types.includes('country')) {
-                        country = result.address_components[i].short_name;
+                        country = result.address_components[i].long_name;
                     }
                 }
                 if(result.address_components[0].types.includes('subpremise')) {
