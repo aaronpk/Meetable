@@ -4,6 +4,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DateTime, DateTimeZone;
+use DB;
 
 class Event extends Model
 {
@@ -317,11 +318,26 @@ class Event extends Model
     }
 
     public static function timezones() {
-        // TODO: make a real list
-        // TODO: add any timezones from saved events to the list too
-        return [
-            '',
-            'America/New_York',
-        ];
+        $used = Event::select('timezone')
+            ->whereNotNull('timezone')
+            ->groupBy('timezone')
+            ->orderBy('timezone')
+            ->get();
+
+        $timezones = [''];
+
+        // First add all the timezones that have been used
+        foreach($used as $tz)
+            $timezones[] = $tz->timezone;
+
+        $timezones[] = '──────────';
+
+        // Then add all the known timezones if they aren't already in the list
+        foreach(DateTimeZone::listIdentifiers(DateTimeZone::ALL) as $tz) {
+            if(!in_array($tz, $timezones))
+                $timezones[] = $tz;
+        }
+
+        return $timezones;
     }
 }

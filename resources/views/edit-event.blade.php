@@ -136,11 +136,11 @@ form h2.subtitle {
             <div class="select">
                 <select name="timezone">
                     @foreach(\App\Event::timezones() as $tz)
-                        <option value="{{ $tz }}" {{ $event->timezone == $tz ? 'selected' : '' }}>{{ $tz }}</option>
+                        <option value="{{ $tz }}" {{ $event->timezone == $tz ? 'selected' : '' }} {{ $tz == '──────────' ? 'disabled' : '' }}>{{ $tz }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="help">only useful when there is a start/end time</div>
+            <div class="help">only used when there is a start/end time</div>
         </div>
     </div>
 
