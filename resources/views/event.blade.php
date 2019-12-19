@@ -72,7 +72,7 @@
             {!! $event->mf2_date_html() !!}
             @if(!$event->is_past())
             <div class="add-to-calendar">
-                <div class="dropdown">
+                <div class="dropdown is-hoverable">
                     <div class="dropdown-trigger">
                         <a aria-haspopup="true" aria-controls="add-to-calendar-menu">
                             <span>Add to Calendar</span>
