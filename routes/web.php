@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function(){
     Route::get('/event/{event}/clone', 'EventController@clone_event')->name('clone-event');
     Route::post('/event/{event}/delete', 'EventController@delete_event')->name('delete-event');
 
+    Route::post('/event/timezone', 'EventController@get_timezone')->name('get-timezone');
+
     Route::get('/event/{event}/photo', 'EventController@add_event_photo')->name('add-event-photo');
     Route::post('/event/{event}/photo', 'EventController@upload_event_photo')->name('upload-event-photo');
     Route::post('/event/{event}/photo_order', 'EventController@set_photo_order')->name('set-photo-order');

@@ -304,4 +304,24 @@ class Event extends Model
         return $html;
     }
 
+    public function setLatitude($value) {
+        $this->attributes['latitude'] = $value ?: null;
+    }
+
+    public function setLongitude($value) {
+        $this->attributes['longitude'] = $value ?: null;
+    }
+
+    public function setTimezone($value) {
+        $this->attributes['timezone'] = $value ?: null;
+    }
+
+    public static function timezones() {
+        // TODO: make a real list
+        // TODO: add any timezones from saved events to the list too
+        return [
+            '',
+            'America/New_York',
+        ];
+    }
 }

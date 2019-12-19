@@ -130,6 +130,18 @@ form h2.subtitle {
             <input class="input" type="time" name="end_time" autocomplete="off" value="{{ $event->end_time ?: '' }}">
             <div class="help">leave end time blank for multi-day events</div>
         </div>
+
+        <div class="control is-expanded">
+            <label class="label">Timezone (optional)</label>
+            <div class="select">
+                <select name="timezone">
+                    @foreach(\App\Event::timezones() as $tz)
+                        <option value="{{ $tz }}" {{ $event->timezone == $tz ? 'selected' : '' }}>{{ $tz }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="help">only useful when there is a start/end time</div>
+        </div>
     </div>
 
     <h2 class="subtitle">Details</h2>
@@ -153,6 +165,9 @@ form h2.subtitle {
     </div>
 
     <button class="button is-primary" type="submit">Save</button>
+
+    <input type="hidden" name="latitude">
+    <input type="hidden" name="longitude">
 
     {{ csrf_field() }}
 </form>

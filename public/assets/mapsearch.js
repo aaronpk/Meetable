@@ -81,10 +81,27 @@ jQuery(function(){
             $("input[name=location_region]").val(region);
             $("input[name=location_country]").val(country);
 
+            $("input[name=latitude]").val(result.geometry.location.lat());
+            $("input[name=longitude]").val(result.geometry.location.lng());
 
             map.setCenter(result.geometry.location);
             map.setZoom(15);
             $("#location_preview").removeClass("hidden");
+
+            // Trigger a timezone lookup
+            $.post("/event/timezone", {
+                _token: csrf_token(),
+                latitude: result.geometry.location.lat(),
+                longitude: result.geometry.location.lng()
+            }, function(response){
+                if($("option[value='"+response.timezone+"']").length) {
+                    $("select[name=timezone]").val(response.timezone);
+                } else {
+                    $("select[name=timezone]").append('<option value="'+response.timezone+'">'+response.timezone+'</option>');
+                    $("select[name=timezone]").val(response.timezone);
+                }
+            });
+
         });
     }
 

@@ -39,6 +39,10 @@ class EventController extends BaseController
         $event->location_region = request('location_region') ?: '';
         $event->location_country = request('location_country') ?: '';
 
+        $event->latitude = request('latitude') ?: '';
+        $event->longitude = request('longitude') ?: '';
+        $event->timezone = request('timezone') ?: '';
+
         $event->start_date = date('Y-m-d', strtotime(request('start_date')));
         if(request('end_date'))
             $event->end_date = date('Y-m-d', strtotime(request('end_date')));
@@ -87,6 +91,7 @@ class EventController extends BaseController
         $properties = [
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
+            'latitude', 'longitude', 'timezone',
             'website', 'description'
         ];
 
@@ -177,7 +182,6 @@ class EventController extends BaseController
     }
 
     public function save_alt_text(Event $event) {
-
         $response = Response::where('event_id', $event->id)->where('id', request('response_id'))->first();
 
         if(!$response) {
@@ -193,4 +197,13 @@ class EventController extends BaseController
             'result' => 'ok',
         ]);
     }
+
+    public function get_timezone() {
+        // Return timezone for the given lat/lng
+        $timezone = \p3k\Timezone::timezone_for_location(request('latitude'), request('longitude'));
+        return response()->json([
+            'timezone' => $timezone,
+        ]);
+    }
+
 }
