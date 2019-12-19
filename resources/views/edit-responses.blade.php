@@ -256,7 +256,9 @@ $(function(){
              'author_name','author_photo','author_url','name','content_text','rsvp'].forEach(function(field){
                 $("#response-"+field).val(response[field]);
             });
-             $("#response-photos").val(response.photos.join("\n\n"));
+            if(response.photos) {
+                $("#response-photos").val(response.photos.join("\n\n"));
+            }
             $("#response-details").addClass("is-active");
         });
     });
