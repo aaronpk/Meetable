@@ -34,8 +34,16 @@ class APIController extends BaseController
 
         $xray = new XRay();
 
-        // TODO: add twitter credentials here if configured
-        $data = $xray->parse($url);
+        $opts = [];
+
+        if(parse_url($url, PHP_URL_HOST) == 'twitter.com' && env('TWITTER_CONSUMER_KEY')) {
+            $opts['twitter_api_key'] = env('TWITTER_CONSUMER_KEY');
+            $opts['twitter_api_secret'] = env('TWITTER_CONSUMER_SECRET');
+            $opts['twitter_access_token'] = env('TWITTER_ACCESS_TOKEN');
+            $opts['twitter_access_token_secret'] = env('TWITTER_ACCESS_TOKEN_SECRET');
+        }
+
+        $data = $xray->parse($url, $opts);
 
         if(isset($data['error'])) {
             return $this->error($data['error_description']);
