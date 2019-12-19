@@ -14,6 +14,8 @@ class Event extends Model
         'photo_order' => 'array',
     ];
 
+    private static $US_NAMES = ['US', 'USA', 'United States'];
+
     public static function slug_from_name($name) {
         return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+/', '-', strtolower($name)));
     }
@@ -294,7 +296,7 @@ class Event extends Model
         if($this->location_address) $str[] = $this->location_address;
         if($this->location_locality) $str[] = $this->location_locality;
         if($this->location_region) $str[] = $this->location_region;
-        if($this->location_country) $str[] = $this->location_country;
+        if($this->location_country && !in_array($this->location_country, self::$US_NAMES)) $str[] = $this->location_country;
         return implode(', ', $str);
     }
 
@@ -303,8 +305,15 @@ class Event extends Model
         if($this->location_address) $str[] = '<span class="p-street-address">'.e($this->location_address).'</span>';
         if($this->location_locality) $str[] = '<span class="p-locality">'.e($this->location_locality).'</span>';
         if($this->location_region) $str[] ='<span class="p-region">'.e($this->location_region).'</span>';
-        if($this->location_country) $str[] = '<span class="p-country-name">'.e($this->location_country).'</span>';
-        return implode(', ', $str);
+        $country_data = '';
+        if($this->location_country) {
+            if(in_array($this->location_country, self::$US_NAMES)) {
+                $country_data = '<data class="p-country-name" value="'.e($this->location_country).'"></data>';
+            } else {
+                $str[] = '<span class="p-country-name">'.e($this->location_country).'</span>';
+            }
+        }
+        return implode(', ', $str) . $country_data;
     }
 
     public function location_summary_with_name() {
@@ -313,14 +322,15 @@ class Event extends Model
         if($this->location_address) $str[] = $this->location_address;
         if($this->location_locality) $str[] = $this->location_locality;
         if($this->location_region) $str[] = $this->location_region;
-        if($this->location_country) $str[] = $this->location_country;
+        if($this->location_country && !in_array($this->location_country, self::$US_NAMES))
+            $str[] = $this->location_country;
         return implode(', ', $str);
     }
 
     public function location_city() {
         $str = [];
         if($this->location_locality) $str[] = $this->location_locality;
-        if(in_array($this->location_country, ['US', 'USA', 'United States'])) {
+        if(in_array($this->location_country, self::$US_NAMES)) {
             if($this->location_region) $str[] = $this->location_region;
         } else {
             if($this->location_country) $str[] = $this->location_country;
