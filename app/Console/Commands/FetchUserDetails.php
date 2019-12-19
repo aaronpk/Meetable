@@ -33,7 +33,7 @@ class FetchUserDetails extends Command {
         if(!parse_url($url, PHP_URL_HOST))
             return $url;
 
-        $filename = 'users/'.$user->id.'-'.md5($url);
+        $filename = 'users/'.$user->id.'-'.md5($url).'.jpg';
         $full_filename = __DIR__.'/../../storage/app/public/'.$filename;
 
         $dir = dirname($full_filename);
