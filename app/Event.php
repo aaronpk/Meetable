@@ -305,15 +305,15 @@ class Event extends Model
         return $html;
     }
 
-    public function setLatitude($value) {
+    public function setLatitudeAttribute($value) {
         $this->attributes['latitude'] = $value ?: null;
     }
 
-    public function setLongitude($value) {
+    public function setLongitudeAttribute($value) {
         $this->attributes['longitude'] = $value ?: null;
     }
 
-    public function setTimezone($value) {
+    public function setTimezoneAttribute($value) {
         $this->attributes['timezone'] = $value ?: null;
     }
 
