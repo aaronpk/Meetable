@@ -39,8 +39,8 @@ class EventController extends BaseController
         $event->location_region = request('location_region') ?: '';
         $event->location_country = request('location_country') ?: '';
 
-        $event->latitude = request('latitude') ?: '';
-        $event->longitude = request('longitude') ?: '';
+        $event->latitude = request('latitude') ?: null;
+        $event->longitude = request('longitude') ?: null;
         $event->timezone = request('timezone') ?: '';
 
         $event->start_date = date('Y-m-d', strtotime(request('start_date')));

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag;
-use DateTime;
+use DateTime, DateTimeZone;
 use DB;
 
 class ICSController extends BaseController
@@ -15,11 +15,10 @@ class ICSController extends BaseController
     private function _addEventToCal(&$vCalendar, &$event) {
         $vEvent = new \Eluceo\iCal\Component\Event();
 
-        $vEvent->setUseUtc(false); // force floating times
-
         // start date only
         // full-day events
         if($event->start_date && !$event->start_time && !$event->end_date && !$event->end_time) {
+            $vEvent->setUseUtc(false); // force floating times
             $vEvent->setDtStart(new DateTime($event->start_date))
                    ->setDtEnd(new DateTime($event->start_date))
                    ->setNoTime(true);
@@ -27,25 +26,38 @@ class ICSController extends BaseController
         // start and end date, no time
         // multi-day events
         elseif($event->start_date && !$event->start_time && $event->end_date && !$event->end_time) {
-            header('X-Start-Date: '.$event->start_date);
-            header('X-End-Date: '.$event->end_date);
+            $vEvent->setUseUtc(false); // force floating times
             $vEvent->setDtStart(new DateTime($event->start_date))
                    ->setDtEnd(new DateTime($event->end_date))
                    ->setNoTime(true);
         }
         // start date with only start time
         elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
-            $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time));
+            if($event->timezone) {
+                $start = new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone));
+                $vEvent->setDtStart($start);
+            } else {
+                $vEvent->setUseUtc(false); // force floating times
+                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time));
+            }
         }
         // start date with start and end time
         elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
-            $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
-                   ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time));
+            if($event->timezone) {
+            } else {
+                $vEvent->setUseUtc(false); // force floating times
+                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
+                       ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time));
+            }
         }
         // start and end date and time
         elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
-            $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
-                   ->setDtEnd(new DateTime($event->end_date.' '.$event->end_time));
+            if($event->timezone) {
+            } else {
+                $vEvent->setUseUtc(false); // force floating times
+                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
+                       ->setDtEnd(new DateTime($event->end_date.' '.$event->end_time));
+            }
         }
 
         $vEvent->setSummary($event->name);

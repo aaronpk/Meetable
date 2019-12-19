@@ -42,10 +42,12 @@
 
                             <data style="display: none;">
                                 {!! $event->mf2_date_html() !!}
+                                @if($event->location_name || $event->location_summary_with_mf2())
                                 <div class="p-location h-card">
                                     <div class="p-name">{{ $event->location_name }}</div>
                                     <div>{!! $event->location_summary_with_mf2() !!}</div>
                                 </div>
+                                @endif
                             </data>
 
                         </li>

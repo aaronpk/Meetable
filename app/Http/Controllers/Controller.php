@@ -134,14 +134,17 @@ class Controller extends BaseController
         }
         elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
+            if($event->timezone) $params['ctz'] = $event->timezone;
         }
         elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
             $end = (new DateTime($event->start_date.' '.$event->end_time))->format('Ymd\THis');
+            if($event->timezone) $params['ctz'] = $event->timezone;
         }
         elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
             $end = (new DateTime($event->end_date.' '.$event->end_time))->format('Ymd\THis');
+            if($event->timezone) $params['ctz'] = $event->timezone;
         }
 
         $params['dates'] = $start . ($end ? '/' . $end : '');

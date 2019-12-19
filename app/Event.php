@@ -200,15 +200,25 @@ class Event extends Model
 
         if($this->end_time) {
             $end_time = new DateTime($this->end_time);
-            return $start_time->format('g:ia') . ' - ' . $end_time->format('g:ia');
+            if($start_time->format('a') == $end_time->format('a'))
+                $start_format = 'g:i';
+            else
+                $start_format = 'g:ia';
+            $str = $start_time->format($start_format) . ' - ' . $end_time->format('g:ia');
         } else {
-            return $start_time->format('g:ia');
+            $str = $start_time->format('g:ia');
         }
+
+        if($this->timezone) {
+            $str .= ' (' . $this->timezone . ')';
+        }
+
+        return $str;
     }
 
     public function weekday() {
         $start_date = new DateTime($this->start_date);
-        return $start_date->format('l');
+        return $start_date->format('D');
     }
 
     public function mf2_date_html() {
@@ -223,15 +233,28 @@ class Event extends Model
             $end = (new DateTime($this->end_date))->format('Y-m-d');
         }
         elseif($this->start_date && $this->start_time && !$this->end_date && !$this->end_time) {
-            $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+            if($this->timezone)
+                $start = (new DateTime($this->start_date.' '.$this->start_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
+            else
+                $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
         }
         elseif($this->start_date && $this->start_time && !$this->end_date && $this->end_time) {
-            $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
-            $end = (new DateTime($this->start_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
+            if($this->timezone) {
+                $start = (new DateTime($this->start_date.' '.$this->start_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
+                $end = (new DateTime($this->start_date.' '.$this->end_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
+            } else {
+                $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+                $end = (new DateTime($this->start_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
+            }
         }
         elseif($this->start_date && $this->start_time && $this->end_date && $this->end_time) {
-            $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
-            $end = (new DateTime($this->end_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
+            if($this->timezone) {
+                $start = (new DateTime($this->start_date.' '.$this->start_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
+                $end = (new DateTime($this->end_date.' '.$this->end_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
+            } else {
+                $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+                $end = (new DateTime($this->end_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
+            }
         }
 
         $start_html = '<data class="dt-start" value="' . $start . '"></data>';
