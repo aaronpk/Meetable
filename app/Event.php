@@ -183,7 +183,7 @@ class Event extends Model
                         . $start->format('M j, Y g:ia')
                         . '</time>';
             } else {
-                return '<time datetime="'.$start->format('Y-m-d').'">'
+                return '<time datetime="'.$start_date->format('Y-m-d').'">'
                         . $start_date->format('M j, Y')
                         . '</time>';
             }
