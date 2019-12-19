@@ -63,8 +63,7 @@
                 </div>
                 @if($response->name)
                     <p class="post-name"><a href="{{ $response->link() }}">{{ $response->name }}</a></p>
-                @endif
-                @if($response->content_text)
+                @elseif($response->content_text)
                     <span class="comment-content">{{ $response->content_text }}</span>
                 @endif
                 @if($response->photos)
@@ -258,6 +257,8 @@ $(function(){
             });
             if(response.photos) {
                 $("#response-photos").val(response.photos.join("\n\n"));
+            } else {
+                $("#response-photos").val("");
             }
             $("#response-details").addClass("is-active");
         });
