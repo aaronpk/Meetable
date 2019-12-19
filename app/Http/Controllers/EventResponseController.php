@@ -23,7 +23,6 @@ class EventResponseController extends BaseController
         if(!$rsvp) {
             $rsvp = new Response();
             $rsvp->event_id = $event->id;
-            $rsvp->type = 'rsvp';
             $rsvp->rsvp_user_id = Auth::user()->id;
             $rsvp->created_by = Auth::user()->id;
         }
