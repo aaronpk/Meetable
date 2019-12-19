@@ -9,6 +9,32 @@
   fill: currentColor;
 }
 
+.fa-spin {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.has-delete {
+    position: relative;
+}
+.has-delete > .delete {
+    position: absolute;
+    right: .5rem;
+    top: .5rem;
+    background-color: rgba(255,255,255,0.2);
+}
+.has-delete > .delete:hover {
+    background-color: rgba(255,255,255,0.3);
+}
+
 .button.is-pressed {
     box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
     background-color: #e6e6e6;
@@ -28,10 +54,17 @@
 }
 
 .event-form {
-    max-width: 75ch;
+    max-width: 720px;
 }
 
 /* event permalinks */
+
+@media(max-width: 720px) {
+    .event .cover-image {
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+    }
+}
 
 .event .segment {
     margin-bottom: 1em;
@@ -172,6 +205,10 @@
 
 .single-photo img {
     width: 100%;
+}
+
+#drop-area.active {
+    background-color: #e4e4e4;
 }
 
 /**

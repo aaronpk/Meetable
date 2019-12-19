@@ -58,6 +58,30 @@ form h2.subtitle {
         <input class="input" type="text" autocomplete="off" name="name" value="{{ $event->name }}">
     </div>
 
+    <!-- cover photo will be cropped to 1440x640 -->
+    <h2 class="subtitle">Add a cover image (optional)</h2>
+
+    <div id="cover-photo-preview" class="{{ $event->cover_image ? '' : 'hidden' }} has-delete">
+        <button class="delete"></button>
+        <img src="{{ $event->cover_image_cropped() }}" width="720" height="320">
+    </div>
+
+    <div class="field" id="upload-cover-field">
+        <div class="file is-boxed">
+            <label class="file-label" style="width: 100%;">
+                <input id="cover-image-input-field" class="file-input" type="file" accept=".jpg,.png,image/jpeg,image/png">
+                <span class="file-cta" id="drop-area">
+                    <span class="file-icon">@icon(upload)</span>
+                    <span class="file-icon-loading hidden">@spinning_icon(spinner)</span>
+                    <span class="file-label">Choose an image...</span>
+                </span>
+                <span class="file-name hidden"></span>
+            </label>
+        </div>
+    </div>
+    <div class="help">cover images should be at least 1440px wide and will be cropped to 1440x640</div>
+
+
     <h2 class="subtitle">Where will the event take place?</h2>
 
     @if(!$event->id && env('GOOGLEMAPS_API_KEY'))
@@ -168,9 +192,57 @@ form h2.subtitle {
 
     <input type="hidden" name="latitude">
     <input type="hidden" name="longitude">
+    <input type="hidden" name="cover_image" id="cover-photo-filename" value="{{ $event->cover_image }}">
 
     {{ csrf_field() }}
 </form>
+
+<script>
+function handleFiles(files) {
+
+    var formData = new FormData();
+    formData.append("image", files[0]);
+    formData.append("_token", csrf_token());
+
+    var request = new XMLHttpRequest();
+    request.open("POST", "{{ route('upload-event-cover-image') }}");
+    request.onreadystatechange = function() {
+        if(request.readyState == XMLHttpRequest.DONE) {
+            handleFileUploadResponse(request.responseText);
+        }
+    }
+    request.send(formData);
+
+    $("#upload-cover-field .file-icon").addClass("hidden");
+    $("#upload-cover-field .file-icon-loading").removeClass("hidden");
+}
+
+function handleFileUploadResponse(response) {
+    var data = JSON.parse(response);
+
+    $("#cover-photo-filename").val(data.url);
+    $("#cover-photo-preview img").attr("src", data.cropped);
+    $("#cover-photo-preview").removeClass("hidden");
+
+    $("#upload-cover-field .file-icon").removeClass("hidden");
+    $("#upload-cover-field .file-icon-loading").addClass("hidden");
+}
+
+$(function(){
+
+    $("#cover-image-input-field").on("change", function(evt){
+        handleFiles(evt.target.files);
+    });
+
+    $("#cover-photo-preview .delete").click(function(evt){
+        evt.preventDefault();
+        $("#cover-photo-filename").val("");
+        $("#cover-photo-preview img").attr("src", "");
+        $("#cover-photo-preview").addClass("hidden");
+    });
+
+});
+</script>
 
 </section>
 

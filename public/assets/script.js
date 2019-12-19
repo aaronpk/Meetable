@@ -94,6 +94,40 @@ $(function(){
     }
   });
 
+    // Global listeners for file upload drop areas. Requires a function on the page called handleFiles()
+    let dropArea = document.getElementById('drop-area');
+
+    if(dropArea) {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+          dropArea.addEventListener(eventName, function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, function(e){
+                dropArea.classList.add('active');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, function(e){
+                dropArea.classList.remove('active');
+            }, false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+    }
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer;
+        let files = dt.files;
+
+        handleFiles(files);
+    }
+
+
 });
 
 function csrf_token() {

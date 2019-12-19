@@ -45,6 +45,8 @@ Route::middleware('auth')->group(function(){
     Route::post('/event/{event}/photo', 'EventController@upload_event_photo')->name('upload-event-photo');
     Route::post('/event/{event}/photo_order', 'EventController@set_photo_order')->name('set-photo-order');
 
+    Route::post('/event/cover_image', 'EventController@upload_event_cover_image')->name('upload-event-cover-image');
+
     Route::get('/event/{event}/responses', 'EventController@edit_responses')->name('edit-responses');
     Route::post('/event/{event}/responses/{response}/delete', 'EventController@delete_response')->name('delete-response');
     Route::get('/event/{event}/responses/{response}.json', 'EventController@get_response_details')->name('get-response-details');

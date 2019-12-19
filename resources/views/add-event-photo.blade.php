@@ -32,38 +32,7 @@
 
 <script>
 
-let dropArea = document.getElementById('drop-area');
-
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  dropArea.addEventListener(eventName, function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }, false);
-});
-
-['dragenter', 'dragover'].forEach(eventName => {
-    dropArea.addEventListener(eventName, function(e){
-        dropArea.classList.add('active');
-    }, false);
-});
-
-['dragleave', 'drop'].forEach(eventName => {
-    dropArea.addEventListener(eventName, function(e){
-        dropArea.classList.remove('active');
-    }, false);
-});
-
-dropArea.addEventListener('drop', handleDrop, false);
-
-function handleDrop(e) {
-    let dt = e.dataTransfer;
-    let files = dt.files;
-
-    handleFiles(files);
-}
-
 function handleFiles(files) {
-    console.log(files);
     let input = document.getElementById('file-input-field');
     input.files = files;
     $(".file-input").change();
@@ -76,12 +45,6 @@ $(".file-input").on("change", function(evt){
 });
 
 </script>
-
-<style>
-#drop-area.active {
-    background-color: #e4e4e4;
-}
-</style>
 
 </section>
 

@@ -60,6 +60,12 @@
 
 <article class="h-event event">
 
+    @if($event->cover_image)
+        <div class="cover-image">
+            <img src="{{ $event->cover_image_cropped() }}" class="u-featured" style="max-width: 720px; width: 100%;">
+        </div>
+    @endif
+
     <h1 class="p-name event-name">{{ $event->name }}</h1>
 
     <div class="date segment with-icon">
@@ -135,13 +141,13 @@
                 @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
                     <div class="buttons has-addons">
                         <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
-                        <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(trash)</button>
+                        <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(minus-circle)</button>
                     </div>
                 @else
                     <div class="buttons has-addons">
                         <button id="rsvp-button" class="button is-light" data-action="{{ route('event-rsvp', $event->id) }}">I'm Going!</button>
                         @if($event->rsvp_string_for_user(Auth::user()) == 'no')
-                            <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(trash)</button>
+                            <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(minus-circle)</button>
                         @endif
                     </div>
                 @endif
