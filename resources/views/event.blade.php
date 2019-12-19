@@ -232,7 +232,8 @@
                 @foreach($event->blog_posts as $post)
                     <li>
                         <p class="post-name"><a href="{{ $post->link() }}">{{ $post->name }}</a></p>
-                        <p>by <a href="{{ $post->author()['url'] }}">{{ $post->author()['name'] }}</a>
+                        <p>
+                            by <a href="{{ $post->author()['url'] ?: $post->link() }}">{{ $post->author()['name'] ?: parse_url($post->link(), PHP_URL_HOST) }}</a>
                             @if($post->published)
                                 on {{ date('M j, Y', strtotime($post->published)) }}
                             @endif
