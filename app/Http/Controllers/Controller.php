@@ -7,7 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag;
-use DateTime;
+use DateTime, DateTimeZone, Exception;
 use DB;
 
 class Controller extends BaseController
@@ -183,6 +183,38 @@ class Controller extends BaseController
         return view('index', [
             'tag' => $tag,
             'data' => $data,
+        ]);
+    }
+
+    public function local_time() {
+
+        try {
+            $timezone = new DateTimeZone(request('tz'));
+        } catch(Exception $e) {
+            $timezone = null;
+        }
+
+        try {
+            $date = new DateTime(request('date'), $timezone);
+        } catch(Exception $e) {
+            $date = null;
+        }
+
+        $timezones = [];
+        foreach(Event::used_timezones() as $tz) {
+            $d = new DateTime(request('date'), $timezone);
+            $d->setTimeZone(new DateTimeZone($tz->timezone));
+
+            $timezones[] = [
+                'name' => $tz->timezone,
+                'date' => $d,
+            ];
+        }
+
+        return view('local-time', [
+            'date' => $date,
+            'timezone' => $timezone,
+            'timezones' => $timezones,
         ]);
     }
 }

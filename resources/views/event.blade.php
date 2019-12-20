@@ -73,7 +73,15 @@
         <span>
             <div>{!! $event->display_date() !!}</div>
             @if(!$event->is_multiday() && $event->display_time())
-                <div class="time">{!! $event->weekday() !!} {!! $event->display_time() !!}</div>
+                <div class="time">
+                    {!! $event->weekday() !!}
+                    @if($event->timezone)
+                        <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">{!! $event->display_time() !!}</a>
+                        ({{ $event->timezone }})
+                    @else
+                        {!! $event->display_time() !!}
+                    @endif
+                </div>
             @endif
             {!! $event->mf2_date_html() !!}
             @if(!$event->is_past())

@@ -192,6 +192,11 @@ class Event extends Model
         }
     }
 
+    public function start_datetime_local() {
+        $start_date = new DateTime($this->start_date.' '.$this->start_time);
+        return $start_date->format('Ymd\THi');
+    }
+
     public function display_date() {
         $start_date = new DateTime($this->start_date);
 
@@ -223,10 +228,6 @@ class Event extends Model
             $str = $start_time->format($start_format) . ' - ' . $end_time->format('g:ia');
         } else {
             $str = $start_time->format('g:ia');
-        }
-
-        if($this->timezone) {
-            $str .= ' (' . $this->timezone . ')';
         }
 
         return $str;
@@ -364,12 +365,16 @@ class Event extends Model
         $this->attributes['timezone'] = $value ?: null;
     }
 
-    public static function timezones() {
-        $used = Event::select('timezone')
+    public static function used_timezones() {
+        return Event::select('timezone')
             ->whereNotNull('timezone')
             ->groupBy('timezone')
             ->orderBy('timezone')
             ->get();
+    }
+
+    public static function timezones() {
+        $used = self::used_timezones();
 
         $timezones = [''];
 

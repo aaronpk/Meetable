@@ -23,6 +23,8 @@ Route::get('/{year}', 'Controller@index')->name('year');
 
 Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 
+Route::get('/local-time', 'Controller@local_time')->name('local_time');
+
 Route::get('/webmention', 'WebmentionController@get');
 Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
 
