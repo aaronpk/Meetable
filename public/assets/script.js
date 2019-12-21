@@ -41,6 +41,7 @@ $(function(){
   });
 
   $(".photo-popup").click(function(evt){
+    $("#photo-preview img").attr("src", ""); // blank out the previous photo
     $(".photo-popup").removeClass("active-photo");
     $(this).addClass("active-photo");
     var src = $(evt.currentTarget).attr("href");

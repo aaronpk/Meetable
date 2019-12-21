@@ -293,7 +293,6 @@
                     var photoURLs = $(".photo-album li").map(function(){
                         return $(this).data("photo-url");
                     }).get();
-                    console.log(photoURLs);
                     $.post("{{ route('set-photo-order', $event) }}", {
                         _token: $("input[name=_token]").val(),
                         order: photoURLs
