@@ -203,10 +203,13 @@ class Event extends Model
         if($this->is_multiday()) {
             $end_date = new DateTime($this->end_date);
 
-            if($start_date->format('F') == $end_date->format('F'))
+            if($start_date->format('Y') != $end_date->format('Y')) {
+                return $start_date->format('F j, Y') . ' - ' . $end_date->format('F j, Y');
+            } elseif($start_date->format('F') == $end_date->format('F')) {
                 return $start_date->format('F j') . ' - ' . $end_date->format('j, Y');
-            else
+            } else {
                 return $start_date->format('F j') . ' - ' . $end_date->format('F j, Y');
+            }
 
         } else {
             return $start_date->format('F j, Y');
