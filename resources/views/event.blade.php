@@ -77,7 +77,7 @@
                     {!! $event->weekday() !!}
                     @if($event->timezone)
                         <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">{!! $event->display_time() !!}</a>
-                        ({{ $event->timezone }})
+                        <span class="timezone">({{ $event->timezone }})</span>
                     @else
                         {!! $event->display_time() !!}
                     @endif

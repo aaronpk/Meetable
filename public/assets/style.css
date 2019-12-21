@@ -110,6 +110,10 @@
     font-weight: 300;
 }
 
+.event .date .timezone {
+    font-size: 0.8em;
+}
+
 .event .responses, .event .description {
     max-width: 710px;
     border-top: 1px #ddd solid;
