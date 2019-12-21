@@ -29,7 +29,7 @@ class WebmentionController extends BaseController
         $event = Event::find_from_url($targetURL);
 
         if(!$event) {
-            return $this->error('Could not find event from target URL');
+            return $this->error('Target URL was not a valid event URL. Webmentions are only supported to event URLs.', 200);
         }
 
         $sourceURL = request('source');
@@ -68,7 +68,13 @@ class WebmentionController extends BaseController
 
         event(new WebmentionReceived($response));
 
-        return redirect($event->permalink().'#rsvps');
+        if(request()->wantsJson()) {
+            return response()->json([
+                'result' => 'accepted'
+            ]);
+        } else {
+            return redirect($event->permalink().'#rsvps');
+        }
     }
 
     public function get() {
@@ -76,10 +82,18 @@ class WebmentionController extends BaseController
     }
 
     private function error($error, $code=400) {
-        return view('webmention', [
-            'error' => $error,
-            'source' => request('source'),
-            'target' => request('target'),
-        ]);
+        if(request()->wantsJson()) {
+            return response()->json([
+                'error' => $error,
+                'source' => request('source'),
+                'target' => request('target'),
+            ], 400);
+        } else {
+            return view('webmention', [
+                'error' => $error,
+                'source' => request('source'),
+                'target' => request('target'),
+            ]);
+        }
     }
 }
