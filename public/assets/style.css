@@ -169,7 +169,8 @@
 }
 
 .event .comments .author-details {
-    line-height: 1em;
+    line-height: 1.1em;
+    display: grid;
 }
 .event .comments a.author-name {
     display: block;

@@ -265,6 +265,9 @@
                             <span class="author-details">
                                 <a href="{{ $comment->author()['url'] }}" class="author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
                                 <a href="{{ $comment->author()['url'] }}" class="author-url">{{ p3k\url\display_url($comment->author()['url']) }}</a>
+                                @if($comment->rsvp)
+                                  <img src="/images/rsvp-{{ $comment->rsvp }}.png" width="79">
+                                @endif
                             </span>
                         </span>
                         <span class="comment-content">{{ $comment->content_text }}</span>
