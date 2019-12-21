@@ -17,12 +17,12 @@ class Event extends Model
     private static $US_NAMES = ['US', 'USA', 'United States'];
 
     public static function slug_from_name($name) {
-        return preg_replace('/--+/', '-', preg_replace('/[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+/', '-', strtolower($name)));
+        return preg_replace('/--+/', '-', mb_ereg_replace('[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+', '-', mb_strtolower($name)));
     }
 
     public static function find_from_url($url) {
         // /{year}/{month}/{slug}-{key}
-        if(preg_match('~/[0-9]{4}/[0-9]{2}/([0-9a-zA-Z\-]+-)?([0-9a-zA-Z]+)$~', $url, $match)) {
+        if(preg_match('~/[0-9]{4}/[0-9]{2}/(.+-)?([0-9a-zA-Z]+)$~', $url, $match)) {
             return Event::where('key', $match[2] ?? $match[1])->first();
         } else {
             return null;
