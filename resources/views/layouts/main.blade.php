@@ -17,6 +17,18 @@
     <link href="/bulma-0.8.0/bulma.min.css" rel="stylesheet">
 
     <link href="/assets/style.css" rel="stylesheet">
+
+    @if(env('GA_ID'))
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GA_ID') }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ env('GA_ID') }}');
+    </script>
+    @endif
 </head>
 <body>
 
