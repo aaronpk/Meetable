@@ -159,9 +159,18 @@ class Controller extends BaseController
 
         $events = Event::whereHas('tags', function($query) use ($tag){
             $query->where('tag', $tag);
-        })->orderBy('events.start_date', 'desc')->get();
+        })->orderBy('events.start_date', 'desc');
+
+        if(request('year') && is_numeric(request('year'))) {
+            $events = $events->whereYear('start_date', request('year'));
+            if(request('month') && is_numeric(request('month')))
+                $events = $events->whereMonth('start_date', request('month'));
+        }
+
+        $events = $events->get();
 
         if(count($events) == 0) {
+            // TODO: maybe show a page like "no events" instead
             abort(404);
         }
 
