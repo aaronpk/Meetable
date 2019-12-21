@@ -14,9 +14,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function index($year=false, $month=false) {
+    public function index($year=false, $month=false, $day=false) {
 
-        if($year && $month) {
+        if($year && $month && $day) {
+            $events = Event::where('start_date', $year.'-'.$month.'-'.$day)
+                ->orderBy('start_date')
+                ->get();
+        } elseif($year && $month) {
             $events = Event::whereYear('start_date', $year)
                 ->whereMonth('start_date', $month)
                 ->orderBy('start_date')
@@ -49,6 +53,7 @@ class Controller extends BaseController
         return view('index', [
             'year' => $year,
             'month' => $month,
+            'day' => $day,
             'data' => $data,
         ]);
     }

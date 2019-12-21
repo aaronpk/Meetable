@@ -13,6 +13,8 @@
 
     @if(isset($tag))
         <h1 class="title">Events Tagged #{{ $tag }}</h1>
+    @elseif(!empty($day))
+        <h1 class="title">{{ env('APP_NAME') }} on {{ date('F j, Y', strtotime($year.'-'.$month.'-'.$day)) }}</h1>
     @elseif(!empty($month))
         <h1 class="title">{{ env('APP_NAME') }} in {{ date('F Y', strtotime($year.'-'.$month.'-01')) }}</h1>
     @elseif(!empty($year))

@@ -18,6 +18,7 @@ Route::get('/archive', 'Controller@archive')->name('archive');
 Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
 Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event-short');
 
+Route::get('/{year}/{month}/{day}', 'Controller@index')->name('day');
 Route::get('/{year}/{month}', 'Controller@index')->name('month');
 Route::get('/{year}', 'Controller@index')->name('year');
 
