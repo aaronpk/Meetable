@@ -241,7 +241,7 @@ class Event extends Model
         return $start_date->format('D');
     }
 
-    public function mf2_date_html() {
+    public function start_and_end_dates() {
         $start = false;
         $end = false;
 
@@ -276,6 +276,12 @@ class Event extends Model
                 $end = (new DateTime($this->end_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
             }
         }
+
+        return [$start, $end];
+    }
+
+    public function mf2_date_html() {
+        list($start, $end) = $this->start_and_end_dates();
 
         $start_html = '<data class="dt-start" value="' . $start . '"></data>';
         $end_html = $end ? '<data class="dt-end" value="' . $end . '"></data>' : '';
@@ -366,6 +372,53 @@ class Event extends Model
 
     public function setTimezoneAttribute($value) {
         $this->attributes['timezone'] = $value ?: null;
+    }
+
+    public function toGoogleJSON() {
+        // https://developers.google.com/search/docs/data-types/event
+
+        $data = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Event',
+            'name' => $this->name,
+            'location' => [
+                '@type' => 'Place',
+                'name' => $this->location_name,
+                'address' => [
+                    '@type' => 'PostalAddress',
+                ],
+            ],
+        ];
+
+        if($this->location_address)
+            $data['location']['address']['streetAddress'] = $this->location_address;
+
+        if($this->location_locality)
+            $data['location']['address']['addressLocality'] = $this->location_locality;
+
+        if($this->location_region)
+            $data['location']['address']['addressRegion'] = $this->location_region;
+
+        if($this->location_country)
+            $data['location']['address']['addressCountry'] = $this->location_country;
+
+        if($this->description)
+            $data['description'] = substr($this->description, 0, 512).'...'; // google only shows a snippet
+
+        list($start, $end) = $this->start_and_end_dates();
+
+        $data['startDate'] = $start;
+        if($end)
+            $data['endDate'] = $end;
+
+        if($this->cover_image) {
+            $data['image'] = $this->cover_image_cropped();
+        } elseif($this->photo_urls()) {
+            $urls = $this->photo_urls();
+            $data['image'] = self::image_proxy($urls[0][0], '1600x0');
+        }
+
+        return json_encode($data, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
     }
 
     public static function used_timezones() {

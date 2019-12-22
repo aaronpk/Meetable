@@ -3,6 +3,9 @@
 @section('headtags')
 <link rel="webmention" href="{{ route('webmention') }}">
 <link rel="stylesheet" href="/jquery/jquery-ui-1.12.1/jquery-ui.min.css">
+<script type="application/ld+json">
+{!! $event->toGoogleJSON() !!}
+</script>
 @endsection
 
 @section('scripts')
