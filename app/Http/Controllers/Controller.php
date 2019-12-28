@@ -140,7 +140,7 @@ class Controller extends BaseController
     public function tags() {
 
         $query = Tag::join('event_tag', 'tags.id', 'event_tag.tag_id')
-            ->groupBy('tag_id')
+            ->groupBy('tag')
             ->selectRaw('count(*) as num, tag')
             ->orderBy('num', 'desc')
             ->get();
