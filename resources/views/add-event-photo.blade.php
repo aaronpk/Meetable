@@ -4,7 +4,7 @@
 
 <section class="section">
 
-<form action="{{ route('upload-event-photo', $event) }}" method="post" enctype="multipart/form-data">
+<form action="{{ route('upload-event-photo', $event) }}" method="post" enctype="multipart/form-data" class="event-form">
 
     <h2 class="title">Add a Photo</h2>
 
@@ -12,18 +12,28 @@
 
     <br>
 
+    <div id="photo-preview" class="has-delete">
+        <button class="delete"></button>
+        <img src="" width="720" height="320">
+    </div>
+
     <div class="field">
         <div class="file is-boxed">
-            <label class="file-label">
+            <label class="file-label" style="width: 100%">
                 <input id="file-input-field" class="file-input" type="file" name="photo" accept=".jpg,image/jpeg">
                 <span class="file-cta" id="drop-area">
                     <span class="file-icon">@icon(upload)</span>
                     <span class="file-label">Choose a photo...</span>
                 </span>
-                <span class="file-name hidden"></span>
+                <span class="file-name hidden" style="width: 100%; max-width: 100%;"></span>
             </label>
         </div>
     </div>
+
+    <div class="field">
+        <input class="input photo-alt-text" type="text" placeholder="alt text" name="alt">
+    </div>
+
 
     <button class="button is-primary" type="submit" disabled>Add Photo</button>
 
@@ -40,6 +50,7 @@ function handleFiles(files) {
 
 $(".file-input").on("change", function(evt){
     $(".file-name").text(evt.target.files[0].name).removeClass("hidden");
+    $("#photo-preview img").attr("src", URL.createObjectURL(evt.target.files[0]));
     $(".file").addClass("has-name");
     $(".button.is-primary").removeAttr("disabled");
 });

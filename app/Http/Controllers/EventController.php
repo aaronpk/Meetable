@@ -192,6 +192,13 @@ class EventController extends BaseController
         $response->event_id = $event->id;
         $response->created_by = Auth::user()->id;
         $response->photos = [$photo_url];
+
+        if(request('alt')) {
+            $response->photo_alt = [
+                $photo_url => request('alt')
+            ];
+        }
+
         $response->save();
 
         return redirect($event->permalink().'#photos');
