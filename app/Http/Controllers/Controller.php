@@ -65,11 +65,6 @@ class Controller extends BaseController
 
         $events = $events->get();
 
-        if(count($events) == 0) {
-            // TODO: maybe show a page like "no events" instead
-            abort(404);
-        }
-
         return $this->show_events_from_query($events, [
             'tag' => $tag,
         ]);

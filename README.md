@@ -39,7 +39,7 @@ Configure nginx to proxy `/img/` to the imageproxy:
 
 ```
   location /public {
-    alias /web/sites/Almanac/storage/app/public;
+    alias /web/sites/events.example.org/storage/app/public;
   }
 ```
 

@@ -60,7 +60,7 @@
         @endforeach
         </ul>
     @else
-        <p>No events</p>
+        <p>No {{ isset($tag) && !isset($archive) ? 'upcoming ' : '' }}events</p>
     @endif
 
     @if(isset($tag))
