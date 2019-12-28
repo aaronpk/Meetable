@@ -12,7 +12,7 @@
 <section class="section">
 
     @if(isset($tag))
-        <h1 class="title">Events Tagged #{{ $tag }}</h1>
+        <h1 class="title">{{ isset($archive) ? '' : 'Upcoming' }} Events Tagged #{{ $tag }}</h1>
     @elseif(!empty($day))
         <h1 class="title">{{ env('APP_NAME') }} on {{ date('F j, Y', strtotime($year.'-'.$month.'-'.$day)) }}</h1>
     @elseif(!empty($month))
@@ -64,12 +64,16 @@
     @endif
 
     @if(isset($tag))
+        <div class="">
+            <a href="{{ route('tag-archive', $tag) }}">@icon(archive) Tag Archive</a>
+        </div>
+
         <div class="subscribe-ics">
-            <a href="{{ route('ics-tag', $tag) }}">iCalendar Feed</a>
+            <a href="{{ route('ics-tag', $tag) }}">@icon(calendar-alt) iCalendar Feed</a>
         </div>
     @elseif(empty($month) && empty($year))
         <div class="subscribe-ics">
-            <a href="{{ route('ics-index') }}">iCalendar Feed</a>
+            <a href="{{ route('ics-index') }}">@icon(calendar-alt) iCalendar Feed</a>
         </div>
     @endif
 

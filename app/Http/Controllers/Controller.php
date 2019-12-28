@@ -14,26 +14,31 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function index($year=false, $month=false, $day=false) {
-
+    private function events_query($year=false, $month=false, $day=false, $only_future=true) {
         if($year && $month && $day) {
-            $events = Event::where('start_date', $year.'-'.$month.'-'.$day)
-                ->orderBy('start_date')
-                ->get();
+            $events = Event::where('start_date', $year.'-'.$month.'-'.$day);
         } elseif($year && $month) {
             $events = Event::whereYear('start_date', $year)
-                ->whereMonth('start_date', $month)
-                ->orderBy('start_date')
-                ->get();
+                ->whereMonth('start_date', $month);
         } elseif($year) {
-            $events = Event::whereYear('start_date', $year)
-                ->orderBy('start_date', 'desc')
-                ->get();
+            $events = Event::whereYear('start_date', $year);
+        } elseif($only_future) {
+            $events = Event::where('start_date', '>=', date('Y-m-d'));
         } else {
-            $events = Event::where('start_date', '>=', date('Y-m-d'))
-                ->orderBy('start_date')
-                ->get();
+            $events = new Event();
         }
+
+        if($only_future)
+            $events = $events->orderBy('start_date');
+        else
+            $events = $events->orderBy('start_date', 'desc');
+
+        return $events;
+    }
+
+    public function index($year=false, $month=false, $day=false) {
+        $events = $this->events_query($year, $month, $day);
+        $events = $events->get();
 
         return $this->show_events_from_query($events, [
             'year' => $year,
@@ -44,16 +49,19 @@ class Controller extends BaseController
 
     public function tag($tag) {
         $tag = Tag::normalize($tag);
-
-        $events = Event::whereHas('tags', function($query) use ($tag){
-            $query->where('tag', $tag);
-        })->orderBy('events.start_date', 'desc');
+        $year = $month = false;
 
         if(request('year') && is_numeric(request('year'))) {
-            $events = $events->whereYear('start_date', request('year'));
+            $year = request('year');
             if(request('month') && is_numeric(request('month')))
-                $events = $events->whereMonth('start_date', request('month'));
+                $month = request('month');
         }
+
+        $events = $this->events_query($year, $month);
+
+        $events = $events->whereHas('tags', function($query) use ($tag){
+            $query->where('tag', $tag);
+        });
 
         $events = $events->get();
 
@@ -64,6 +72,28 @@ class Controller extends BaseController
 
         return $this->show_events_from_query($events, [
             'tag' => $tag,
+        ]);
+    }
+
+    public function tag_archive($tag) {
+        $tag = Tag::normalize($tag);
+
+        $events = $this->events_query(false, false, false, false);
+
+        $events = $events->whereHas('tags', function($query) use ($tag){
+            $query->where('tag', $tag);
+        });
+
+        $events = $events->get();
+
+        if(count($events) == 0) {
+            // TODO: maybe show a page like "no events" instead
+            abort(404);
+        }
+
+        return $this->show_events_from_query($events, [
+            'tag' => $tag,
+            'archive' => true,
         ]);
     }
 

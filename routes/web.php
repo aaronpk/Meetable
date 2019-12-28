@@ -23,6 +23,7 @@ Route::get('/{year}/{month}', 'Controller@index')->name('month');
 Route::get('/{year}', 'Controller@index')->name('year');
 
 Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
+Route::get('/tag/{tag}/archive', 'Controller@tag_archive')->name('tag-archive');
 
 Route::get('/local-time', 'Controller@local_time')->name('local_time');
 
