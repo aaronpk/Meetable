@@ -86,7 +86,7 @@
                 @endif
                 @if($response->source_url)
                     <span class="meta">
-                        Received
+                        Webmention Received
                         <time datetime="{{ date('c', strtotime($response->created_at)) }}">
                             {{ date('M j, Y g:ia', strtotime($response->created_at)) }}
                         </time>
