@@ -8,16 +8,19 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag;
 use DateTime, DateTimeZone;
-use DB;
+use DB, Log;
 
 class ICSController extends BaseController
 {
     private function _addEventToCal(&$vCalendar, &$event) {
         $vEvent = new \Eluceo\iCal\Component\Event();
 
+        $isset = false;
+
         // start date only
         // full-day events
         if($event->start_date && !$event->start_time && !$event->end_date && !$event->end_time) {
+            $isset = true;
             $vEvent->setUseUtc(false); // force floating times
             $vEvent->setDtStart(new DateTime($event->start_date))
                    ->setDtEnd(new DateTime($event->start_date))
@@ -26,6 +29,7 @@ class ICSController extends BaseController
         // start and end date, no time
         // multi-day events
         elseif($event->start_date && !$event->start_time && $event->end_date && !$event->end_time) {
+            $isset = true;
             $vEvent->setUseUtc(false); // force floating times
             $vEvent->setDtStart(new DateTime($event->start_date))
                    ->setDtEnd(new DateTime($event->end_date))
@@ -34,9 +38,11 @@ class ICSController extends BaseController
         // start date with only start time
         elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
             if($event->timezone) {
+                $isset = true;
                 $start = new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone));
                 $vEvent->setDtStart($start);
             } else {
+                $isset = true;
                 $vEvent->setUseUtc(false); // force floating times
                 $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time));
             }
@@ -44,7 +50,11 @@ class ICSController extends BaseController
         // start date with start and end time
         elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
             if($event->timezone) {
+                $isset = true;
+                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
+                       ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
             } else {
+                $isset = true;
                 $vEvent->setUseUtc(false); // force floating times
                 $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
                        ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time));
@@ -53,11 +63,19 @@ class ICSController extends BaseController
         // start and end date and time
         elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
             if($event->timezone) {
+                $isset = true;
+                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
+                       ->setDtEnd(new DateTime($event->end_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
             } else {
+                $isset = true;
                 $vEvent->setUseUtc(false); // force floating times
                 $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
                        ->setDtEnd(new DateTime($event->end_date.' '.$event->end_time));
             }
+        }
+
+        if(!$isset) {
+            Log::warning('Rendered ics feed with no date for event '.$event->id);
         }
 
         $vEvent->setSummary($event->name);
