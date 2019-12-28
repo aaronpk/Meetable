@@ -60,7 +60,8 @@ class EventController extends BaseController
         $event->save();
 
         foreach(explode(' ', request('tags')) as $t) {
-            $event->tags()->attach(Tag::get($t));
+            if(trim($t))
+                $event->tags()->attach(Tag::get($t));
         }
 
         // If there was a cover photo added, move it to the permanent location and add to the event
@@ -145,7 +146,8 @@ class EventController extends BaseController
         $event->tags()->detach();
         // Add all the tags back
         foreach(explode(' ', request('tags')) as $t) {
-            $event->tags()->attach(Tag::get($t));
+            if(trim($t))
+                $event->tags()->attach(Tag::get($t));
         }
 
         return redirect($event->permalink());
