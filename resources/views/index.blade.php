@@ -60,7 +60,7 @@
         @endforeach
         </ul>
     @else
-        <p>No {{ isset($tag) && !isset($archive) ? 'upcoming ' : '' }}events</p>
+        <div class="content"><p>No {{ isset($tag) && !isset($archive) ? 'upcoming ' : '' }}events</p></div>
     @endif
 
     @if(isset($tag))

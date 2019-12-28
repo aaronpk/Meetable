@@ -24,6 +24,7 @@ Route::get('/{year}', 'Controller@index')->name('year');
 
 Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
 Route::get('/tag/{tag}/archive', 'Controller@tag_archive')->name('tag-archive');
+Route::get('/tags', 'Controller@tags')->name('tags');
 
 Route::get('/local-time', 'Controller@local_time')->name('local_time');
 

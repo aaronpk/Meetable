@@ -271,3 +271,32 @@ ul.photo-album li {
 }
 
 
+.tagcloud {
+    max-width: 800px;
+}
+
+.tagcloud span {
+    margin: 0 20px;
+    line-height: 60px;
+}
+
+.tagcloud .smallest {
+    font-size: 40px;
+}
+
+.tagcloud .small {
+    font-size: 52px;
+}
+
+.tagcloud .medium {
+    font-size: 60px;
+}
+
+.tagcloud .large {
+    font-size: 70px;
+}
+
+.tagcloud .largest {
+    font-size: 80px;
+}
+

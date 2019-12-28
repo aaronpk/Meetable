@@ -137,6 +137,49 @@ class Controller extends BaseController
         ]);
     }
 
+    public function tags() {
+
+        $query = Tag::join('event_tag', 'tags.id', 'event_tag.tag_id')
+            ->groupBy('tag_id')
+            ->selectRaw('count(*) as num, tag')
+            ->orderBy('num', 'desc')
+            ->get();
+
+        $tags = [];
+        $max = false;
+        foreach($query as $q) {
+
+            if($max === false) // the first one is the max
+                $max = $q->num;
+
+            $pct = round($q->num / $max * 100);
+
+            if($pct < 20)
+                $class = 'smallest';
+            elseif($pct < 40)
+                $class = 'small';
+            elseif($pct < 60)
+                $class = 'medium';
+            elseif($pct < 80)
+                $class = 'large';
+            else
+                $class = 'largest';
+
+            $tags[] = [
+                'tag' => $q->tag,
+                'num' => $q->num,
+                'percent' => $pct,
+                'class' => $class,
+            ];
+        }
+
+        shuffle($tags);
+
+        return view('tags', [
+            'tags' => $tags,
+        ]);
+    }
+
     public function event($year, $month, $key_or_slug, $key2=false) {
 
         if($key2) {
