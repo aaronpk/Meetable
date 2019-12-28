@@ -35,6 +35,39 @@ class Controller extends BaseController
                 ->get();
         }
 
+        return $this->show_events_from_query($events, [
+            'year' => $year,
+            'month' => $month,
+            'day' => $day,
+        ]);
+    }
+
+    public function tag($tag) {
+        $tag = Tag::normalize($tag);
+
+        $events = Event::whereHas('tags', function($query) use ($tag){
+            $query->where('tag', $tag);
+        })->orderBy('events.start_date', 'desc');
+
+        if(request('year') && is_numeric(request('year'))) {
+            $events = $events->whereYear('start_date', request('year'));
+            if(request('month') && is_numeric(request('month')))
+                $events = $events->whereMonth('start_date', request('month'));
+        }
+
+        $events = $events->get();
+
+        if(count($events) == 0) {
+            // TODO: maybe show a page like "no events" instead
+            abort(404);
+        }
+
+        return $this->show_events_from_query($events, [
+            'tag' => $tag,
+        ]);
+    }
+
+    private function show_events_from_query(&$events, $opts=[]) {
         $data = [];
 
         foreach($events as $event) {
@@ -50,12 +83,9 @@ class Controller extends BaseController
             $data[$y][$m][] = $event;
         }
 
-        return view('index', [
-            'year' => $year,
-            'month' => $month,
-            'day' => $day,
+        return view('index', array_merge($opts, [
             'data' => $data,
-        ]);
+        ]));
     }
 
     public function archive() {
@@ -157,47 +187,6 @@ class Controller extends BaseController
         $url = 'http://www.google.com/calendar/render?' . http_build_query($params);
 
         return redirect($url, 302);
-    }
-
-    public function tag($tag) {
-        $tag = Tag::normalize($tag);
-
-        $events = Event::whereHas('tags', function($query) use ($tag){
-            $query->where('tag', $tag);
-        })->orderBy('events.start_date', 'desc');
-
-        if(request('year') && is_numeric(request('year'))) {
-            $events = $events->whereYear('start_date', request('year'));
-            if(request('month') && is_numeric(request('month')))
-                $events = $events->whereMonth('start_date', request('month'));
-        }
-
-        $events = $events->get();
-
-        if(count($events) == 0) {
-            // TODO: maybe show a page like "no events" instead
-            abort(404);
-        }
-
-        $data = [];
-
-        foreach($events as $event) {
-            $y = date('Y', strtotime($event->start_date));
-            $m = (int)date('m', strtotime($event->start_date));
-
-            if(!isset($data[$y]))
-                $data[$y] = [];
-
-            if(!isset($data[$y][$m]))
-                $data[$y][$m] = [];
-
-            $data[$y][$m][] = $event;
-        }
-
-        return view('index', [
-            'tag' => $tag,
-            'data' => $data,
-        ]);
     }
 
     public function local_time() {
