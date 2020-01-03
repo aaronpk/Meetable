@@ -19,7 +19,8 @@ a.title:hover, a.subtitle:hover {
 }
 </style>
 
-<ul class="year">
+<ul class="year h-feed">
+    <data class="p-name" value="Past Events"></data>
 @foreach($data as $year => $months)
 
     <li>
