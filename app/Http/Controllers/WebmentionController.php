@@ -55,6 +55,16 @@ class WebmentionController extends BaseController
             $response = new Response;
             $response->event_id = $event->id;
             $response->source_url = $sourceURL;
+
+            // If the webmention is from a user who has logged in, approve it immediately
+            $users = User::where('url', 'like', '%aaronparecki.com%')->get();
+            foreach($users as $user) {
+                if(\p3k\url\host_matches($sourceURL, $user->url)) {
+                    $response->approved = true;
+                    $response->approved_at = date('Y-m-d H:i:s');
+                }
+            }
+
         } else {
             if($response->trashed()) {
                 // Don't allow deleted source URLs to be re-added

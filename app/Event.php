@@ -44,7 +44,9 @@ class Event extends Model
     }
 
     public function responses() {
-        return $this->hasMany('\App\Response')->orderBy('created_at', 'desc');
+        return $this->hasMany('\App\Response')
+            ->where('approved', true)
+            ->orderBy('created_at', 'desc');
     }
 
     public function rsvp_for_user(User $user) {

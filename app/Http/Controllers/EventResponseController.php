@@ -21,10 +21,13 @@ class EventResponseController extends BaseController
         $rsvp = $event->rsvp_for_user(Auth::user());
 
         if(!$rsvp) {
-            $rsvp = new Response();
+            $rsvp = new Response;
             $rsvp->event_id = $event->id;
             $rsvp->rsvp_user_id = Auth::user()->id;
             $rsvp->created_by = Auth::user()->id;
+            $rsvp->approved_by = Auth::user()->id;
+            $rsvp->approved_at = date('Y-m-d H:i:s');
+            $rsvp->approved = true;
         }
 
         $rsvp->rsvp = request('rsvp') ? 'yes' : 'no';

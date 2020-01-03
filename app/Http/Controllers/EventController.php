@@ -190,6 +190,9 @@ class EventController extends BaseController
         // Create a new stub response to store this photo
         $response = new Response;
         $response->event_id = $event->id;
+        $response->approved = true;
+        $response->approved_by = Auth::user()->id;
+        $response->approved_at = date('Y-m-d H:i:s');
         $response->created_by = Auth::user()->id;
         $response->photos = [$photo_url];
 
