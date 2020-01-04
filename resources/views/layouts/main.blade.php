@@ -57,6 +57,7 @@
                     <a class="navbar-item" href="{{ route('index') }}">Upcoming Events</a>
                 @endif
                 <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
+                <a class="navbar-item" href="{{ route('tags') }}">Discover</a>
                 @if(Auth::user())
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endif
