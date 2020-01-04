@@ -139,20 +139,35 @@ class Controller extends BaseController
 
     public function tags() {
 
-        $query = Tag::join('event_tag', 'tags.id', 'event_tag.tag_id')
-            ->groupBy('tag')
-            ->selectRaw('count(*) as num, tag')
-            ->orderBy('num', 'desc')
-            ->get();
+        // $query = Tag::join('event_tag', 'tags.id', 'event_tag.tag_id')
+        //     ->groupBy('tag')
+        //     ->selectRaw('count(*) as num, tag')
+        //     ->orderBy('num', 'desc')
+        //     ->get();
+
+        // Group tags by the number of different cities they are used in, and sort by the number of events.
+        // This should produce a list where the first tags are the most broad/common across many cities,
+        // and the tags lower down in the list are usually city-specific.
+        $query = DB::select(DB::raw('SELECT tag, COUNT(1) AS num_cities, SUM(num) AS num_events
+            FROM
+            (SELECT tags.tag, events.location_locality AS locality, COUNT(1) AS num
+            FROM events
+            JOIN event_tag ON event_tag.event_id = events.id
+            JOIN tags ON event_tag.tag_id = tags.id
+            GROUP BY tag, locality
+            ORDER BY tag) AS data
+            GROUP BY tag
+            ORDER BY num_cities DESC, tag
+            '));
 
         $tags = [];
         $max = false;
         foreach($query as $q) {
 
             if($max === false) // the first one is the max
-                $max = $q->num;
+                $max = $q->num_events;
 
-            $pct = round($q->num / $max * 100);
+            $pct = round($q->num_events / $max * 100);
 
             if($pct < 20)
                 $class = 'smallest';
@@ -167,13 +182,11 @@ class Controller extends BaseController
 
             $tags[] = [
                 'tag' => $q->tag,
-                'num' => $q->num,
+                'num' => $q->num_events,
                 'percent' => $pct,
                 'class' => $class,
             ];
         }
-
-        shuffle($tags);
 
         return view('tags', [
             'tags' => $tags,
