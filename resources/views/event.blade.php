@@ -134,6 +134,17 @@
         </div>
     @endif
 
+    @if($event->tickets_url)
+        <div class="website segment with-icon">
+            <span class="icon">@icon(ticket-alt)</span>
+            <span>
+                <a href="{{ $event->tickets_url }}" title="{{ $event->tickets_url }}">
+                    {{ strlen($event->tickets_url) > 40 ?  parse_url($event->tickets_url, PHP_URL_HOST) : \p3k\url\display_url($event->tickets_url) }}
+                </a>
+            </span>
+        </div>
+    @endif
+
     <div class="e-content description segment content">
         {!! $event->html() !!}
     </div>
@@ -144,7 +155,7 @@
         @endforeach
     </div>
 
-    @if($event->has_rsvps() || (Auth::user() && !$event->is_past()))
+    @if($event->rsvps_enabled && ($event->has_rsvps() || (Auth::user() && !$event->is_past())))
         <div class="responses rsvps" id="rsvps">
             <h2 class="subtitle">RSVPs</h2>
 

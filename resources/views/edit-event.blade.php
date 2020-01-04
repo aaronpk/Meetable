@@ -177,6 +177,12 @@ form h2.subtitle {
     </div>
 
     <div class="field">
+        <label class="label">Registration URL</label>
+        <input class="input" type="url" autocomplete="off" name="tickets_url" value="{{ $event->tickets_url }}">
+        <div class="help">if the event requires registration, link to the registration page here. this will also disable RSVPs here.</div>
+    </div>
+
+    <div class="field">
         <label class="label">Description</label>
         <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ $event->description }}</textarea>
         <div class="help">markdown and HTML are supported</div>

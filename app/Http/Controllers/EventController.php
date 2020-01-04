@@ -53,6 +53,7 @@ class EventController extends BaseController
 
         $event->description = request('description');
         $event->website = request('website');
+        $event->tickets_url = request('tickets_url');
 
         $event->created_by = Auth::user()->id;
         $event->last_modified_by = Auth::user()->id;
@@ -107,7 +108,7 @@ class EventController extends BaseController
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
             'latitude', 'longitude', 'timezone',
-            'website', 'description',
+            'website', 'tickets_url', 'description',
         ];
 
         // Save a snapshot of the previous state

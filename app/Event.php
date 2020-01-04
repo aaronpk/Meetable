@@ -364,6 +364,12 @@ class Event extends Model
         return $html;
     }
 
+    public function setTicketsUrlAttribute($value) {
+        $this->attributes['tickets_url'] = $value ?: null;
+        // Disable RSVPs if there is a ticket URL set
+        $this->attributes['rsvps_enabled'] = $value ? false : true;
+    }
+
     public function setLatitudeAttribute($value) {
         $this->attributes['latitude'] = $value ?: null;
     }
