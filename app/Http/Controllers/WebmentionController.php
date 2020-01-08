@@ -50,14 +50,16 @@ class WebmentionController extends BaseController
             return $this->error("There was a problem parsing the source URL");
         }
 
-        $response = $event->responses()->withTrashed()->where('source_url', $sourceURL)->first();
+        $response = Response::where('event_id', $event->id)
+          ->withTrashed()
+          ->where('source_url', $sourceURL)->first();
         if(!$response) {
             $response = new Response;
             $response->event_id = $event->id;
             $response->source_url = $sourceURL;
 
             // If the webmention is from a user who has logged in, approve it immediately
-            $users = User::where('url', 'like', '%aaronparecki.com%')->get();
+            $users = User::where('url', 'like', '%'.parse_url($sourceURL, PHP_URL_HOST).'%')->get();
             foreach($users as $user) {
                 if(\p3k\url\host_matches($sourceURL, $user->url)) {
                     $response->approved = true;
