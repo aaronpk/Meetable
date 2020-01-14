@@ -209,3 +209,7 @@ Configure your web server to proxy `/img/` to the imageproxy, e.g. for nginx:
   }
 ```
 
+## License
+
+Copyright 2020 by Aaron Parecki. Available under the MIT license.
+
