@@ -119,7 +119,7 @@ This project provides no authentication mechanism itself. Instead, it relies on 
 
 When the `Remote-User` header is present, this app considers users logged-in with the value of that header as their unique user ID, which is expected to be a URL.
 
-You can set up any authentication mechanism in front of the app, such as setting a cookie on the parent domain, or by using a project such as [Vouch](https://github.com/vouch/vouch-proxy) to offload authentication to an external OAuth service.
+You can set up any authentication mechanism in front of the app, such as setting a cookie on the parent domain, or by using a project such as [Vouch Proxy](https://github.com/vouch/vouch-proxy) to offload authentication to an external OAuth service.
 
 As long as the app sees a `Remote-User` header, users will be considered logged in.
 
