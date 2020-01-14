@@ -3,9 +3,9 @@
 @section('content')
 <section class="section">
 
-<div class="tagcloud">
+<div class="tagcloud tags">
     @foreach($tags as $tag)
-        <span class="{{ $tag['class'] }}"><nobr><a href="{{ route('tag', $tag['tag']) }}">{{ $tag['tag'] }}</a></nobr></span>
+        <nobr><a href="{{ route('tag', $tag['tag']) }}" class="tag is-rounded {{ $tag['class'] }}">#{{ $tag['tag'] }}</a></nobr>
     @endforeach
 </div>
 

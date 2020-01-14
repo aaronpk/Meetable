@@ -56,6 +56,8 @@ class Controller extends BaseController
             '));
         $tags = [];
         foreach($query as $tag) {
+            // Only show tags used by more than 1 event, otherwise the list is very
+            // long and it isn't very interesting to click a tag and see just one event
             if($tag->events_count > 1)
                 $tags[] = $tag;
         }
