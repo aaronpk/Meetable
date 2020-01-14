@@ -63,6 +63,14 @@
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
 }
+@media(max-width: 400px) {
+    .widget {
+        display: block;
+    }
+    .equals {
+        text-align: center;
+    }
+}
 .equals {
     font-size: 40px;
 }
