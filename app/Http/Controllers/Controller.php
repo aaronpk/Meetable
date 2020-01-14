@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag;
 use DateTime, DateTimeZone, Exception;
@@ -38,12 +39,32 @@ class Controller extends BaseController
 
     public function index($year=false, $month=false, $day=false) {
         $events = $this->events_query($year, $month, $day);
+        $event_ids = $events->pluck('id');
         $events = $events->get();
+
+        $query = DB::select(DB::raw('SELECT tag, COUNT(1) AS cities_count, SUM(num) AS events_count
+            FROM
+            (SELECT tags.tag, events.location_locality AS locality, COUNT(1) AS num
+            FROM events
+            JOIN event_tag ON event_tag.event_id = events.id
+            JOIN tags ON event_tag.tag_id = tags.id
+            WHERE events.id IN ('.implode(',', $event_ids->all()).')
+            GROUP BY tag, locality
+            ORDER BY tag) AS data
+            GROUP BY tag
+            ORDER BY cities_count DESC, tag
+            '));
+        $tags = [];
+        foreach($query as $tag) {
+            if($tag->events_count > 1)
+                $tags[] = $tag;
+        }
 
         return $this->show_events_from_query($events, [
             'year' => $year,
             'month' => $month,
             'day' => $day,
+            'tags' => $tags,
         ]);
     }
 

@@ -23,6 +23,14 @@
         <h1 class="title">{{ env('APP_NAME') }}</h1>
     @endif
 
+    @if(isset($tags))
+    <div class="tags are-medium">
+        @foreach($tags as $t)
+          <a href="{{ route('tag', $t->tag) }}" class="tag is-rounded">#{{ $t->tag }}</a>
+        @endforeach
+    </div>
+    @endif
+
     @if(count($data))
         <ul class="event-list h-feed">
         @foreach($data as $y => $months)
