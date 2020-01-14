@@ -2,6 +2,10 @@
 
 Meetable is a minimal events aggregator website.
 
+You can see a live version of this project at:
+
+https://events.indieweb.org
+
 ## Features
 
 * **Discovery** List of upcoming events on the home page, and archive view of past events.
