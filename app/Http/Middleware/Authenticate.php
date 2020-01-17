@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Auth;
 
 class Authenticate extends Middleware
 {
@@ -15,7 +16,9 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if(!$request->expectsJson()) {
-            return 'https://'.env('VOUCH_HOSTNAME').'/login?url='.urlencode($request->url());
+            // Get the URL to redirect to from the active Guard.
+            // This allows different guards to implement this differently.
+            return Auth::guard()->redirectWhenNotAuthenticated($request->url());
         } else {
             return abort(401);
         }

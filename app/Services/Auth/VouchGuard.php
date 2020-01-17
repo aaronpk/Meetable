@@ -9,11 +9,15 @@ use App\User;
 use Illuminate\Support\Str;
 use App\Events\UserCreated;
 
-class VouchGuard implements Guard {
+class VouchGuard implements CustomGuard {
 
     protected $request;
     protected $provider;
     protected $user;
+
+    public function redirectWhenNotAuthenticated($fromUrl) {
+        return 'https://'.env('VOUCH_HOSTNAME').'/login?url='.urlencode($fromUrl);
+    }
 
     public function __construct(UserProvider $provider, Request $request) {
         $this->request = $request;
