@@ -36,7 +36,7 @@ When logged in, you can add photos directly to an event page. Event pages also a
 * [Composer](https://getcomposer.org)
 * MySQL
 * Redis
-* [imageproxy](https://github.com/willnorris/imageproxy)
+* Optional: [imageproxy](https://github.com/willnorris/imageproxy)
 
 ### Installation
 
@@ -134,7 +134,7 @@ AUTH_SHOW_LOGOUT=false
 
 The simplest authentication option is to use GitHub OAuth. By default, any GitHub user will be able to log in to the application. You can also configure it to allow only certain users to log in if you wish, and any other user will see an error message if they try to log in.
 
-You'll need to [create a GitHub OAuth application](https://github.com/settings/developers) and include the app's client ID and secret in the config file.
+You'll need to [create a GitHub OAuth application](https://github.com/settings/developers) and include the app's client ID and secret in the config file. In the GitHub app settings, set the callback URL to `https://events.example.org/auth/github`.
 
 ```bash
 AUTH_METHOD=github
@@ -221,9 +221,11 @@ If you want your website to be visible even to logged-out users, make sure Vouch
 
 ### imageproxy
 
-Install https://github.com/willnorris/imageproxy
+By default, this project will handle its own image resizing itself. Uploaded files are resized on the fly as needed and a cached copy is stored locally.
 
-Run with a config such as:
+If you want to offload image resizing onto a separate component, install [go imageproxy](https://github.com/willnorris/imageproxy) and run it at its own path in the web server.
+
+Run go imageproxy with a config such as:
 
 ```
 imageproxy \

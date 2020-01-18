@@ -37,6 +37,9 @@ Route::get('/login', 'AuthController@login')->name('login');
 Route::get('/logout', 'AuthController@logout')->name('logout');
 Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
 
+Route::get('/img/{settings}/{image}', 'ImageController@render')
+  ->where(['image' => '.+']);
+
 Route::middleware('auth')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');

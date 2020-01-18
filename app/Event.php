@@ -32,8 +32,10 @@ class Event extends Model
     public static function image_proxy($url, $opts) {
         // https://github.com/willnorris/imageproxy
         $urlToSign = $url.'#'.$opts;
-        $sig = strtr(base64_encode(hash_hmac('sha256', $urlToSign, env('IMAGE_PROXY_KEY'), 1)), '/+' , '_-');
-        return env('IMAGE_PROXY_BASE').$opts.',s'.$sig.'/'.$url;
+        $key = env('IMAGE_PROXY_KEY') ?: env('APP_KEY');
+        $sig = strtr(base64_encode(hash_hmac('sha256', $urlToSign, $key, 1)), '/+' , '_-');
+        $base = env('IMAGE_PROXY_BASE') ?: '/img/';
+        return $base.$opts.',s'.$sig.'/'.$url;
     }
 
     public function cover_image_cropped() {
