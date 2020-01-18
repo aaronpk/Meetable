@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -226,10 +225,11 @@ class Controller extends BaseController
             $slug = false;
         }
 
-        $event = Event::where('key', $key)->first();
+        $event = Event::find_from_url(parse_url(request()->url(), PHP_URL_PATH));
 
         if(!$event) {
-            abort(404);
+            // Check for fuzzy matches, and either redirect to the event or show the list of matching events
+            return $this->find_matching_events($year, $month, $key);
         }
 
         // Redirect to the canonical URL
@@ -246,6 +246,32 @@ class Controller extends BaseController
             'month' => $month,
             'key' => $key,
             'slug' => $slug,
+        ]);
+    }
+
+    public function event_shorturl($key) {
+        return $this->event(0, 0, $key);
+    }
+
+    public function find_matching_events($year, $month, $partial_slug) {
+        $events = Event::whereYear('start_date', $year)
+          ->whereMonth('start_date', $month)
+          ->where('slug', 'like', $partial_slug.'%')
+          ->get();
+
+        if($events->count() == 0) {
+            abort(404);
+        }
+
+        if($events->count() == 1) {
+            $event = $events->first();
+            return redirect($event->permalink(), 302);
+        }
+
+        // Show a list of all matching events
+        return $this->show_events_from_query($events, [
+            'year' => $year,
+            'month' => $month,
         ]);
     }
 
