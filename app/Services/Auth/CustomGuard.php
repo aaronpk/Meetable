@@ -2,10 +2,27 @@
 namespace App\Services\Auth;
 
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Str;
+use App\User;
 
-interface CustomGuard extends Guard {
+abstract class CustomGuard implements Guard {
 
-    public function redirectWhenNotAuthenticated($fromUrl);
+    abstract public function redirectWhenNotAuthenticated($fromUrl);
+
+    protected function getUserFromURL($url) {
+        $user = User::where('url', $url)->first();
+
+        $created = false;
+
+        if(!$user) {
+            $user = new User();
+            $user->url = $url;
+            $user->api_token = Str::random(80);
+            $user->save();
+            $created = true;
+        }
+
+        return [$user, $created];
+    }
 
 }
-

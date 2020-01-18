@@ -37,7 +37,7 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => 'vouch',
+            'driver' => env('AUTH_METHOD', 'vouch'),
             'provider' => 'users',
         ],
 

@@ -33,6 +33,10 @@ Route::post('/webmention', 'WebmentionController@webmention')->name('webmention'
 
 Route::get('/add-to-google/{event}', 'Controller@add_to_google')->name('add-to-google');
 
+Route::get('/login', 'AuthController@login')->name('login');
+Route::get('/logout', 'AuthController@logout')->name('logout');
+Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
+
 Route::middleware('auth')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');

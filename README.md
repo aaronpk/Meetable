@@ -115,16 +115,53 @@ server {
 
 ### Authentication
 
-This project provides no authentication mechanism itself. Instead, it relies on the web server being able to authenticate users somehow, and setting an environment variable when users are logged in.
+There are two different ways to handle user authentication depending on how you'd like to set it up. You can either use GitHub so that GitHub users can log in, or you can use your own custom authentication mechanism configured externally.
 
-When the `Remote-User` header is present, this app considers users logged-in with the value of that header as their unique user ID, which is expected to be a URL.
+In your configuration file, you'll need to tell the project which authentication method to use, euther `github` or `vouch`.
 
-You can set up any authentication mechanism in front of the app, such as setting a cookie on the parent domain, or by using a project such as [Vouch Proxy](https://github.com/vouch/vouch-proxy) to offload authentication to an external OAuth service.
+```bash
+AUTH_METHOD=
+```
 
-As long as the app sees a `Remote-User` header, users will be considered logged in.
+You can also choose whether or not you want a "log in/out" link to appear in the top navbar. When using single-sign-on with Vouch, it may be preferable to not have a log out button since that would log them out from more than just this website. For a more traditional experience, you can show both links.
 
+```bash
+AUTH_SHOW_LOGIN=true
+AUTH_SHOW_LOGOUT=false
+```
+
+#### GitHub Authentication
+
+The simplest authentication option is to use GitHub OAuth. By default, any GitHub user will be able to log in to the application. You can also configure it to allow only certain users to log in if you wish, and any other user will see an error message if they try to log in.
+
+You'll need to [create a GitHub OAuth application](https://github.com/settings/developers) and include the app's client ID and secret in the config file.
+
+```bash
+AUTH_METHOD=github
+GITHUB_CLIENT_ID=324e1d05a96d34ba2166
+GITHUB_CLIENT_SECRET=030ede9c41fcc589cc57e65931c73ed96e255f81
+```
+
+If you want to configure a list of allowed users, define them as a space-separated list of usernames in the config file:
+
+```
+GITHUB_ALLOWED_USERS=user1 user2 user3
+```
 
 #### Vouch Proxy
+
+In this configuration, this project provides no authentication mechanism itself. Instead, it relies on the web server being able to authenticate users somehow, and setting an environment variable when users are logged in.
+
+When the `Remote-User` header is present, this app considers users logged-in with the value of that header as their unique user ID, which is expected to be a URL. As long as the app sees a `Remote-User` header, users will be considered logged in.
+
+[Vouch Proxy](https://github.com/vouch/vouch-proxy) can offload authentication to an external OAuth service, and can be configured to set the HTTP `Remote-User` header that this project looks for.
+
+Configure the application to use Vouch and tell it the hostname of your Vouch server.
+
+```bash
+AUTH_METHOD=vouch
+VOUCH_HOSTNAME=sso.example.org
+```
 
 Below is an example configuration for using Vouch proxy to set the `Remote-User` header.
 

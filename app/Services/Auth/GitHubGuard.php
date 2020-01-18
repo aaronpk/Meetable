@@ -8,24 +8,26 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\User;
 use Illuminate\Support\Str;
 use App\Events\UserCreated;
+use App\Http\Controllers\GitHubController;
 
-class VouchGuard extends CustomGuard {
+class GitHubGuard extends CustomGuard {
 
     protected $request;
     protected $provider;
     protected $user;
 
     public function redirectWhenNotAuthenticated($fromUrl) {
-        return 'https://'.env('VOUCH_HOSTNAME').'/login?url='.urlencode($fromUrl);
+        session(['AUTH_RETURN_TO' => $fromUrl]);
+        return GitHubController::githubAuthURL();
     }
 
     public function login_url() {
-        $url = session('AUTH_RETURN_TO') ?: route('index');
-        return 'https://'.env('VOUCH_HOSTNAME').'/login?url='.urlencode($url);
+        return GitHubController::githubAuthURL();
     }
 
     public function logout() {
-        return 'https://'.env('VOUCH_HOSTNAME').'/logout?url='.urlencode(route('index'));
+        session(['GITHUB_USER' => null]);
+        return null;
     }
 
     public function __construct(UserProvider $provider, Request $request) {
@@ -35,19 +37,19 @@ class VouchGuard extends CustomGuard {
     }
 
     public function check() {
-        $url = $this->request->server->get('HTTP_REMOTE_USER');
+        $url = session('GITHUB_USER');
         return $url == true;
     }
 
     public function guest() {
-        $url = $this->request->server->get('HTTP_REMOTE_USER');
+        $url = session('GITHUB_USER');
         return $url != true;
     }
 
     public function user() {
         static $cached = false;
 
-        $url = $this->request->server->get('HTTP_REMOTE_USER');
+        $url = session('GITHUB_USER');
 
         if(!$url)
           return null;
@@ -57,8 +59,11 @@ class VouchGuard extends CustomGuard {
 
         list($user, $created) = $this->getUserFromURL($url);
 
-        if($created)
-            event(new UserCreated($user));
+        if($created) {
+            $user->name = session('GITHUB_USER_NAME');
+            $user->photo = $user->downloadProfilePhoto(session('GITHUB_USER_PHOTO'));
+            $user->save();
+        }
 
         $cached = $user;
         return $user;

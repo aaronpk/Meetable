@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Storage;
 
 class User extends Authenticatable
 {
@@ -36,4 +37,19 @@ class User extends Authenticatable
      */
     protected $casts = [
     ];
+
+    public function downloadProfilePhoto($url) {
+        $path = 'users';
+        $filename = $this->id.'-'.md5($url).'.jpg';
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $image = curl_exec($ch);
+        curl_close($ch);
+
+        Storage::disk('public')->put($path.'/'.$filename, $image);
+
+        return 'public/'.$path.'/'.$filename;
+    }
 }

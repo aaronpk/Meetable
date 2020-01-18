@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Services\Auth\VouchGuard;
+use App\Services\Auth\GitHubGuard;
 use Auth;
 
 class AuthServiceProvider extends ServiceProvider
@@ -29,6 +30,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::extend('vouch', function($app, $name, array $config) {
             return new VouchGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
+        });
+
+        Auth::extend('github', function($app, $name, array $config) {
+            return new GitHubGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
         });
     }
 }

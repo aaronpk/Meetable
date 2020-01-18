@@ -62,6 +62,15 @@
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endif
             </div>
+            @if(env('AUTH_SHOW_LOGIN') == 'true' || env('AUTH_SHOW_LOGOUT') == 'true')
+            <div class="navbar-end">
+                @if(Auth::user() && env('AUTH_SHOW_LOGOUT') == 'true')
+                    <a class="navbar-item" href="{{ route('logout') }}">Log Out</a>
+                @elseif(!Auth::user() && env('AUTH_SHOW_LOGIN') == 'true')
+                    <a class="navbar-item" href="{{ route('login') }}">Log In</a>
+                @endif
+            </div>
+            @endif
         </div>
     </nav>
 
