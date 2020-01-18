@@ -138,8 +138,8 @@ You'll need to [create a GitHub OAuth application](https://github.com/settings/d
 
 ```bash
 AUTH_METHOD=github
-GITHUB_CLIENT_ID=324e1d05a96d34ba2166
-GITHUB_CLIENT_SECRET=030ede9c41fcc589cc57e65931c73ed96e255f81
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
 ```
 
 If you want to configure a list of allowed users, define them as a space-separated list of usernames in the config file:
