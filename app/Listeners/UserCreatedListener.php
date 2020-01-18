@@ -23,6 +23,9 @@ class UserCreatedListener implements ShouldQueue {
             $user->photo = $user->downloadProfilePhoto($data['data']['photo']);
             Log::info('  Found user details: '.$user->name.' '.$user->photo);
             $user->save();
+        } else {
+            Log::warning('  Error fetching user details for '.$user->url);
+            Log::warning(json_encode($data));
         }
     }
 

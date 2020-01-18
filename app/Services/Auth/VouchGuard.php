@@ -66,7 +66,7 @@ class VouchGuard extends CustomGuard {
 
     public function id() {
         $user = $this->user();
-        return $user->id;
+        return $user ? $user->id : null;
     }
 
     public function validate(array $credentials = []) {
