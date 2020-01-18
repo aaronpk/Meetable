@@ -49,10 +49,14 @@ class ImageController extends BaseController
             return response()->file(storage_path('app/'.$cacheFile));
         }
 
-        if(parse_url($url, PHP_URL_HOST))
+        if(parse_url($url, PHP_URL_HOST)) {
             $image = Image::make($url); // allow resizing external images
-        else
-            $image = Image::make(storage_path('app/'.$url));
+        } else {
+            if(Storage::exists($url))
+                $image = Image::make(storage_path('app/'.$url));
+            else
+                return $this->invalid('not found');
+        }
 
         // Resize the image
         if($opts['w'] == 0 || $opts['h'] == 0) {
