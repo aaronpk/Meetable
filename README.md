@@ -73,10 +73,16 @@ Once you've configured everything in the `.env` file, you can run the migrations
 php artisan migrate
 ```
 
-In a production system you'll want to make sure the background worker script is running
+In a production system you'll want to make sure the background worker script is running:
 
 ```bash
 php artisan queue:listen
+```
+
+Alternatively, you can set up a cron job to run every minute which will process any jobs on the queue:
+
+```bash
+php artisan queue:work --stop-when-empty
 ```
 
 
@@ -223,7 +229,23 @@ If you want your website to be visible even to logged-out users, make sure Vouch
 
 Permissions in this site can be configured to support a few different use cases.
 
-You can choose whether to accept comments, RSVPs, and photos via [Webmention](https://webmention.net) in the config file. Define `ENABLE_WEBMENTION_RESPONSES=true` or `false`.
+You can choose whether all users or just admin users can manage events and the website text.
+
+```
+ALLOW_MANAGE_EVENTS=users
+ALLOW_MANAGE_EVENTS=admins
+ALLOW_MANAGE_SITE=users
+ALLOW_MANAGE_SITE=admins
+```
+
+Currently `ALLOW_MANAGE_EVENTS` enables access to everything around events, including creating, editing, and deleting events, as well as adding and deleting responses.
+
+You can choose whether to accept comments, RSVPs, and photos via [Webmention](https://webmention.net) in the config file.
+
+```
+ENABLE_WEBMENTION_RESPONSES=true
+ENABLE_WEBMENTION_RESPONSES=false
+```
 
 
 ### Images
