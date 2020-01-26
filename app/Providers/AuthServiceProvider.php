@@ -44,7 +44,7 @@ class AuthServiceProvider extends ServiceProvider
             if(env('ALLOW_MANAGE_EVENTS') == 'users')
                 return true;
 
-            elseif(env('ALLOW_MANAGE_EVENTS') == 'admins')
+            if(env('ALLOW_MANAGE_EVENTS') == 'admins')
                 return $user->is_admin == 1;
 
             return false;
@@ -60,14 +60,23 @@ class AuthServiceProvider extends ServiceProvider
             if(env('ALLOW_MANAGE_EVENTS') == 'users')
                 return true;
 
-            elseif(env('ALLOW_MANAGE_EVENTS') == 'admins')
+            if(env('ALLOW_MANAGE_EVENTS') == 'admins')
                 return $user->is_admin == 1;
 
             return false;
         });
 
         Gate::define('manage-site', function($user) {
-            return $user && $user->is_admin == 1;
+            if(!$user)
+                return false;
+
+            if(env('ALLOW_MANAGE_SITE') == 'users')
+                return true;
+
+            if(env('ALLOW_MANAGE_SITE') == 'admins')
+                return $user->is_admin == 1;
+
+            return false;
         });
     }
 }
