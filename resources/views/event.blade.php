@@ -26,7 +26,7 @@
 @section('content')
 <section class="section">
 
-@if(Auth::user())
+@can('manage-event', $event)
 
 <div class="level">
   <div class="level-left"></div>
@@ -69,7 +69,7 @@
   </div>
 </div>
 
-@endif
+@endcan
 
 
 <article class="h-event event">
@@ -236,7 +236,7 @@
             <div class="modal-card">
                 <div class="modal-card-body" style="border-radius: 8px">
                     <p class="image"><img src=""></p>
-                    @if(Auth::user())
+                    @can('manage-event', $event)
                     <div style="margin-top: 1em">
                         <div class="field has-addons">
                             <div class="control has-icons-right is-expanded">
@@ -250,7 +250,7 @@
                     </div>
                     <input type="hidden" id="response_id">
                     <input type="hidden" id="photo_url">
-                    @endif
+                    @endcan
                     <p class="original-source">via <a href=""></a></p>
                 </div>
             </div>
@@ -309,7 +309,7 @@
         </div>
     @endif
 
-    @if(Auth::user())
+    @can('manage-event', $event)
     <script>
         $(function(){
             $(".photo-album").sortable({
@@ -328,7 +328,7 @@
             });
         });
     </script>
-    @endif
+    @endcan
 
     <input type="hidden" id="event_id" value="{{ $event->id }}">
 

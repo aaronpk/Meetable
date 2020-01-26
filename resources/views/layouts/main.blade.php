@@ -58,9 +58,9 @@
                 @endif
                 <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
                 <a class="navbar-item" href="{{ route('tags') }}">Discover</a>
-                @if(Auth::user())
+                @can('create-event')
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
-                @endif
+                @endcan
             </div>
             @if(env('AUTH_SHOW_LOGIN') == 'true' || env('AUTH_SHOW_LOGOUT') == 'true')
             <div class="navbar-end">

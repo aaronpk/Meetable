@@ -8,7 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\EventRevision, App\Tag, App\Response;
 use Illuminate\Support\Str;
-use Auth, Storage;
+use Auth, Storage, Gate;
 
 
 class EventController extends BaseController
@@ -16,6 +16,8 @@ class EventController extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function new_event() {
+        Gate::authorize('create-event');
+
         $event = new Event;
         return view('edit-event', [
             'event' => $event,
@@ -25,6 +27,8 @@ class EventController extends BaseController
     }
 
     public function create_event() {
+        Gate::authorize('create-event');
+
         $event = new Event();
         $event->name = request('name');
 
@@ -83,11 +87,15 @@ class EventController extends BaseController
     }
 
     public function delete_event(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         $event->delete();
         return redirect('/');
     }
 
     public function edit_event(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         return view('edit-event', [
             'event' => $event,
             'mode' => 'edit',
@@ -96,6 +104,8 @@ class EventController extends BaseController
     }
 
     public function clone_event(Event $event) {
+        Gate::authorize('create-event');
+
         return view('edit-event', [
             'event' => $event,
             'mode' => 'clone',
@@ -104,6 +114,8 @@ class EventController extends BaseController
     }
 
     public function save_event(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         $properties = [
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
@@ -155,6 +167,8 @@ class EventController extends BaseController
     }
 
     public function upload_event_cover_image(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         if(!request()->hasFile('image')) {
             return response()->json(['error'=>'missing file']);
         }
@@ -172,12 +186,16 @@ class EventController extends BaseController
     }
 
     public function add_event_photo(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         return view('add-event-photo', [
             'event' => $event,
         ]);
     }
 
     public function upload_event_photo(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         if(!request()->hasFile('photo')) {
             return redirect($event->permalink().'#error');
         }
@@ -209,6 +227,8 @@ class EventController extends BaseController
     }
 
     public function set_photo_order(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         $event->photo_order = request('order');
         $event->save();
 
@@ -218,6 +238,8 @@ class EventController extends BaseController
     }
 
     public function edit_responses(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         $responses = $event->responses()->get();
 
         return view('edit-responses', [
@@ -227,10 +249,13 @@ class EventController extends BaseController
     }
 
     public function get_response_details(Event $event, Response $response) {
+        Gate::authorize('manage-event', $event);
         return response()->json($response);
     }
 
     public function delete_response(Event $event, Response $response) {
+        Gate::authorize('manage-event', $event);
+
         $id = $response->id;
         $response->delete();
         return response()->json([
@@ -240,6 +265,8 @@ class EventController extends BaseController
     }
 
     public function save_alt_text(Event $event) {
+        Gate::authorize('manage-event', $event);
+
         $response = Response::where('event_id', $event->id)->where('id', request('response_id'))->first();
 
         if(!$response) {
