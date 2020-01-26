@@ -14,6 +14,10 @@ class Event extends Model
         'photo_order' => 'array',
     ];
 
+    protected $hidden = [
+        'id',
+    ];
+
     private static $US_NAMES = ['US', 'USA', 'United States'];
 
     public static function slug_from_name($name) {
@@ -60,6 +64,10 @@ class Event extends Model
     public function rsvp_string_for_user(User $user) {
         $rsvp = $this->rsvp_for_user($user);
         return $rsvp ? $rsvp->rsvp : null;
+    }
+
+    public function createdBy() {
+        return $this->belongsTo('\App\User', 'created_by');
     }
 
     public function tags() {

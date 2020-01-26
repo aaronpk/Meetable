@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tag extends Model
 {
+    protected $hidden = [
+        'id', 'pivot',
+    ];
+
     public function events() {
         return $this->belongsToMany('\App\Event');
     }
