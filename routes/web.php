@@ -30,8 +30,10 @@ Route::get('/tags', 'Controller@tags')->name('tags');
 
 Route::get('/local-time', 'Controller@local_time')->name('local_time');
 
-Route::get('/webmention', 'WebmentionController@get');
-Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
+if(env('ENABLE_WEBMENTION_RESPONSES')) {
+    Route::get('/webmention', 'WebmentionController@get');
+    Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
+}
 
 Route::get('/add-to-google/{event}', 'Controller@add_to_google')->name('add-to-google');
 

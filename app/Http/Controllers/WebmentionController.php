@@ -15,6 +15,8 @@ use p3k\XRay;
 class WebmentionController extends BaseController
 {
     public function webmention() {
+        if(env('ENABLE_WEBMENTION_RESPONSES') == 'false')
+            return abort(404);
 
         // Process synchronously for now so people have an easier time debuggong,
         // move to async if it becomes a problem
@@ -89,6 +91,9 @@ class WebmentionController extends BaseController
     }
 
     public function get() {
+        if(!env('ENABLE_WEBMENTION_RESPONSES'))
+            return abort(404);
+
         return view('webmention');
     }
 

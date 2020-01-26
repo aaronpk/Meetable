@@ -219,7 +219,14 @@ In the `location ~* \.php` block which proxies requests to the PHP handler, add 
 If you want your website to be visible even to logged-out users, make sure Vouch is configured with `publicAccess: true` to avoid sending back an error page when users are not logged in.
 
 
-### imageproxy
+### Permissions
+
+Permissions in this site can be configured to support a few different use cases.
+
+You can choose whether to accept comments, RSVPs, and photos via [Webmention](https://webmention.net) in the config file. Define `ENABLE_WEBMENTION_RESPONSES=true` or `false`.
+
+
+### Images
 
 By default, this project will handle its own image resizing itself. Uploaded files are resized on the fly as needed and a cached copy is stored locally.
 

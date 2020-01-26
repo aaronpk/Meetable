@@ -1,7 +1,11 @@
 @extends('layouts/main')
 
 @section('headtags')
+
+@if(env('ENABLE_WEBMENTION_RESPONSES'))
 <link rel="webmention" href="{{ route('webmention') }}">
+@endif
+
 <link rel="stylesheet" href="/jquery/jquery-ui-1.12.1/jquery-ui.min.css">
 <script type="application/ld+json">
 {!! $event->toGoogleJSON() !!}
