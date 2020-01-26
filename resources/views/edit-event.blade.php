@@ -44,6 +44,14 @@
     <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
 </div>
 
+@if($mode == 'create')
+    @if($message = \App\Setting::html_value('add_an_event'))
+        <article class="message is-primary">
+            <div class="message-body content">{!! $message !!}</div>
+        </article>
+    @endif
+@endif
+
 <style>
 form h2.subtitle {
     margin-top: 3em;

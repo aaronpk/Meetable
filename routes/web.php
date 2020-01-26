@@ -73,4 +73,9 @@ Route::middleware('auth')->group(function(){
     Route::post('/event/{event}/rsvp', 'EventResponseController@save_rsvp')->name('event-rsvp');
     Route::post('/event/{event}/rsvp_delete', 'EventResponseController@delete_rsvp')->name('event-rsvp-delete');
 
+    Route::middleware('can:manage-site')->group(function(){
+        Route::get('/settings', 'SettingsController@get')->name('settings');
+        Route::post('/settings/save', 'SettingsController@post')->name('settings-save');
+    });
+
 });

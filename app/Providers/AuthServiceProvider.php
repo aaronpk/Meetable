@@ -66,5 +66,8 @@ class AuthServiceProvider extends ServiceProvider
             return false;
         });
 
+        Gate::define('manage-site', function($user) {
+            return $user && $user->is_admin == 1;
+        });
     }
 }

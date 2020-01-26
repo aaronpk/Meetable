@@ -62,8 +62,11 @@
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endcan
             </div>
-            @if(env('AUTH_SHOW_LOGIN') == 'true' || env('AUTH_SHOW_LOGOUT') == 'true')
+            @if(env('AUTH_SHOW_LOGIN') == 'true' || env('AUTH_SHOW_LOGOUT') == 'true' || Gate::allows('manage-site'))
             <div class="navbar-end">
+                @can('manage-site')
+                    <a class="navbar-item" href="{{ route('settings') }}">Settings</a>
+                @endcan
                 @if(Auth::user() && env('AUTH_SHOW_LOGOUT') == 'true')
                     <a class="navbar-item" href="{{ route('logout') }}">Log Out</a>
                 @elseif(!Auth::user() && env('AUTH_SHOW_LOGIN') == 'true')
