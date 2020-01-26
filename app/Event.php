@@ -18,6 +18,10 @@ class Event extends Model
         'id',
     ];
 
+    protected $appends = [
+        'tag_list',
+    ];
+
     private static $US_NAMES = ['US', 'USA', 'United States'];
 
     public static function slug_from_name($name) {
@@ -70,8 +74,16 @@ class Event extends Model
         return $this->belongsTo('\App\User', 'created_by');
     }
 
+    public function lastModifiedBy() {
+        return $this->belongsTo('\App\User', 'last_modified_by');
+    }
+
     public function tags() {
         return $this->belongsToMany('\App\Tag');
+    }
+
+    public function getTagListAttribute() {
+        return array_map(function($t){ return $t->tag; }, $this->tags->all());
     }
 
     public function tags_string() {

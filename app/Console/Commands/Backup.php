@@ -14,7 +14,7 @@ class Backup extends Command {
         $existingFiles = Storage::allFiles('events');
         print_r($existingFiles);
 
-        $events = Event::all();
+        $events = Event::with('responses.creator')->get();
         foreach($events as $event) {
 
             $file = 'events'.$event->permalink().'.json';
@@ -30,8 +30,8 @@ class Backup extends Command {
             }
 
             // Load related models
-            $event->load('tags', 'createdBy');
-            $event->createdBy->makeHidden(['created_at', 'updated_at', 'is_admin']);
+            $event->load('createdBy', 'lastModifiedBy', 'responses', 'responses.creator', 'responses.approvedBy');
+            $event->makeHidden('tags');
 
             $this->info('Backing up event to '.$file);
             Storage::put($file, $event->toJson(JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES));
@@ -43,6 +43,7 @@ class Backup extends Command {
 
             $file = 'users/'.$user->id.'.json';
             $this->info('Backing up user '.$user->url.' to '.$file);
+            $user->makeVisible(['created_at', 'updated_at', 'is_admin']);
             Storage::put($file, $user->toJson(JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES));
 
         }

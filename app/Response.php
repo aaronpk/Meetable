@@ -16,7 +16,7 @@ class Response extends Model
     ];
 
     protected $hidden = [
-        'id', 'event_id', 'rsvp_user_id', 'created_by',
+        'id', 'event_id', 'rsvp_user_id', 'created_by', 'approved_by',
     ];
 
     public function event() {
@@ -25,6 +25,10 @@ class Response extends Model
 
     public function creator() {
         return $this->belongsTo('\App\User', 'created_by', 'id');
+    }
+
+    public function approvedBy() {
+        return $this->belongsTo('\App\User', 'approved_by', 'id');
     }
 
     public function author() {

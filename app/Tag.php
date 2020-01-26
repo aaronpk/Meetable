@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tag extends Model
 {
     protected $hidden = [
-        'id', 'pivot',
+        'id', 'pivot', 'created_at', 'updated_at'
     ];
 
     public function events() {
