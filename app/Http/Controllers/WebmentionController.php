@@ -15,7 +15,7 @@ use p3k\XRay;
 class WebmentionController extends BaseController
 {
     public function webmention() {
-        if(env('ENABLE_WEBMENTION_RESPONSES') == 'false')
+        if(!env('ENABLE_WEBMENTION_RESPONSES'))
             return abort(404);
 
         // Process synchronously for now so people have an easier time debuggong,
