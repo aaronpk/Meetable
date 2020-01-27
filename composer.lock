@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b495634be21b6ea1684996055deadf86",
+    "content-hash": "ab85a141d0db59cbba353de741da67de",
     "packages": [
         {
             "name": "aws/aws-sdk-php",
@@ -718,23 +718,23 @@
         },
         {
             "name": "eluceo/ical",
-            "version": "0.15.1",
+            "version": "0.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/markuspoerschke/iCal.git",
-                "reference": "bdd24747587f6f9b10770a7b873a13e273f85f39"
+                "reference": "97da0d94c9716e65c141066a2d96aa098379721b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/markuspoerschke/iCal/zipball/bdd24747587f6f9b10770a7b873a13e273f85f39",
-                "reference": "bdd24747587f6f9b10770a7b873a13e273f85f39",
+                "url": "https://api.github.com/repos/markuspoerschke/iCal/zipball/97da0d94c9716e65c141066a2d96aa098379721b",
+                "reference": "97da0d94c9716e65c141066a2d96aa098379721b",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0"
+                "php": ">=7.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.0"
+                "phpunit/phpunit": "^7.0"
             },
             "suggest": {
                 "ext-mbstring": "Massive performance enhancement of line folding"
@@ -765,7 +765,7 @@
                 "ics",
                 "php calendar"
             ],
-            "time": "2019-08-06T20:33:43+00:00"
+            "time": "2019-12-29T22:08:56+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
