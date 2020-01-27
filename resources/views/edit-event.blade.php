@@ -110,7 +110,7 @@ form h2.subtitle {
         </div>
     @endif
 
-    <div class="field is-grouped">
+    <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">Venue</label>
             <input class="input" type="text" autocomplete="off" name="location_name" value="{{ $event->location_name }}">
@@ -120,7 +120,7 @@ form h2.subtitle {
             <input class="input" type="text" autocomplete="off" name="location_address" value="{{ $event->location_address }}">
         </div>
     </div>
-    <div class="field is-grouped">
+    <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">City</label>
             <input class="input" type="text" autocomplete="off" name="location_locality" value="{{ $event->location_locality }}">
@@ -137,7 +137,7 @@ form h2.subtitle {
 
     <h2 class="subtitle">When is the event?</h2>
 
-    <div class="field is-grouped">
+    <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">Start Date</label>
             <input class="input" type="date" name="start_date" autocomplete="off" value="{{ $event->start_date }}">
@@ -150,7 +150,7 @@ form h2.subtitle {
         </div>
     </div>
 
-    <div class="field is-grouped">
+    <div class="field is-grouped is-grouped-multiline" id="time-fields">
         <div class="control is-expanded">
             <label class="label">Start Time (optional)</label>
             <input class="input" type="time" name="start_time" autocomplete="off" value="{{ $event->start_time ?: '' }}">
@@ -162,10 +162,12 @@ form h2.subtitle {
             <input class="input" type="time" name="end_time" autocomplete="off" value="{{ $event->end_time ?: '' }}">
             <div class="help">leave end time blank for multi-day events</div>
         </div>
+    </div>
 
+    <div class="field hidden" id="timezone-field">
         <div class="control is-expanded">
             <label class="label">Timezone (optional)</label>
-            <div class="select">
+            <div class="select is-fullwidth">
                 <select name="timezone">
                     @foreach(\App\Event::timezones() as $tz)
                         <option value="{{ $tz }}" {{ $event->timezone == $tz ? 'selected' : '' }} {{ $tz == '──────────' ? 'disabled' : '' }}>{{ $tz }}</option>
@@ -255,6 +257,22 @@ $(function(){
         $("#cover-photo-filename").val("");
         $("#cover-photo-preview img").attr("src", "");
         $("#cover-photo-preview").addClass("hidden");
+    });
+
+    $("input[name=start_time]").on('change', function(){
+        if($(this).val()) {
+            $("#timezone-field").removeClass('hidden');
+        } else {
+            $("#timezone-field").addClass('hidden');
+        }
+    });
+
+    $("input[name=end_date]").on('change', function(){
+        if($(this).val()) {
+            $("#time-fields").addClass('hidden');
+        } else {
+            $("#time-fields").removeClass('hidden');
+        }
     });
 
 });
