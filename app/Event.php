@@ -450,6 +450,18 @@ class Event extends Model
             $data['image'] = self::image_proxy($urls[0][0], '1600x0');
         }
 
+        if($this->tickets_url) {
+            $data['offers'] = [
+                '@type' => 'Offer',
+                'url' => $this->tickets_url,
+            ];
+        } elseif($this->website) {
+            $data['offers'] = [
+                '@type' => 'Offer',
+                'url' => $this->website,
+            ];
+        }
+
         return json_encode($data, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
     }
 
