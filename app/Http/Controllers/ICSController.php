@@ -96,6 +96,8 @@ class ICSController extends BaseController
         $vEvent->setCreated(new DateTime($event->created_at));
         $vEvent->setModified(new DateTime($event->updated_at));
 
+        $vEvent->setMsBusyStatus('free');
+
         $vCalendar->addComponent($vEvent);
     }
 
