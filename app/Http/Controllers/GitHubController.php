@@ -19,7 +19,6 @@ class GitHubController extends BaseController
             'response_type' => 'code',
             'client_id' => env('GITHUB_CLIENT_ID'),
             'redirect_uri' => route('github-oauth-redirect'),
-            'scope' => 'user',
             'state' => $state,
         ];
 
