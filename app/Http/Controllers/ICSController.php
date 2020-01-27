@@ -78,7 +78,24 @@ class ICSController extends BaseController
             Log::warning('Rendered ics feed with no date for event '.$event->id);
         }
 
-        $vEvent->setSummary($event->name);
+        if(env('SHOW_RSVPS_IN_ICS')) {
+            $summary = $event->name;
+
+            $rsvps = [];
+            foreach($event->rsvps_yes as $rsvp) {
+                if($name = $rsvp->author()['name']) {
+                    $words = explode(' ', $name);
+                    $rsvps[] = $words[0];
+                }
+            }
+            if(count($rsvps)) {
+                $summary .= ' ('.implode(', ', $rsvps).')';
+            }
+
+            $vEvent->setSummary($summary);
+        } else {
+            $vEvent->setSummary($event->name);
+        }
 
         $description = $event->absolute_permalink() . "\n\n"
             . strip_tags($event->html());
