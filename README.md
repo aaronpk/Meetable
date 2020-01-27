@@ -280,6 +280,55 @@ Configure your web server to proxy `/img/` to the imageproxy, e.g. for nginx:
   }
 ```
 
+
+## Installing on Heroku
+
+```
+export HEROKU_ORGANIZATION=
+
+git clone https://github.com/aaronpk/Meetable.git
+
+cd Meetable
+
+composer install
+
+heroku git:remote -a your-heroku-app-name
+
+heroku config:set APP_KEY=`php artisan key:generate --show`
+
+# Add MySQL
+heroku addons:create cleardb:punch
+
+# Pull the parts out of the database URL that was added 
+heroku config | grep CLEARDB_DATABASE_URL
+
+heroku config:set DB_USERNAME=
+heroku config:set DB_PASSWORD=
+heroku config:set DB_HOST=
+heroku config:set DB_DATABASE=
+
+# Set config variables for everything you need to set from .env.template
+...
+
+# Make sure we can view the Laravel logs
+heroku config:set LOG_CHANNEL=stderr
+
+# Run the database migrations
+heroku run php artisan migrate
+
+# Set up a cron job to run the worker
+# Add the scheduler add-on
+heroku addons:create scheduler:standard
+# Configure it
+heroku addons:open scheduler
+# Add this command to the scheduler:
+# php artisan queue:work --stop-when-empty
+
+# Watch the logs:
+heroku logs --tail
+```
+
+
 ## License
 
 Copyright 2020 by Aaron Parecki. Available under the MIT license.
