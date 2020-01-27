@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "ext-imagick": "*",
         "doctrine/dbal": "^2.9",
         "eluceo/ical": "^0.15.1",
         "fideloper/proxy": "^4.0",
@@ -23,8 +24,7 @@
         "p3k/html-sanitizer": "^0.1",
         "p3k/timezone": "^0.1.0",
         "p3k/utils": "^1.2",
-        "p3k/xray": "^1.9",
-        "ext-imagick": "*"
+        "p3k/xray": "^1.9"
     },
     "require-dev": {
         "facade/ignition": "^1.4",
