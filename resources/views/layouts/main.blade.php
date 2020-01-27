@@ -18,6 +18,10 @@
 
     <link href="/assets/style.css" rel="stylesheet">
 
+    @if(env('FAVICON_URL'))
+        <link rel="shortcut icon" href="{{ env('FAVICON_URL') }}" type="image/vnd.microsoft.icon" />
+    @endif
+
     @if(env('GA_ID'))
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GA_ID') }}"></script>
