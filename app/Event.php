@@ -52,7 +52,7 @@ class Event extends Model
         if(!$this->cover_image)
             return '';
 
-        return self::image_proxy($this->cover_image, '1440x640,sc');
+        return $this->cover_image;
     }
 
     public function responses() {

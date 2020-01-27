@@ -8,7 +8,8 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\EventRevision, App\Tag, App\Response;
 use Illuminate\Support\Str;
-use Auth, Storage, Gate;
+use Auth, Storage, Gate, Log;
+use Image;
 
 
 class EventController extends BaseController
@@ -59,6 +60,8 @@ class EventController extends BaseController
         $event->website = request('website');
         $event->tickets_url = request('tickets_url');
 
+        $event->cover_image = request('cover_image');
+
         $event->created_by = Auth::user()->id;
         $event->last_modified_by = Auth::user()->id;
 
@@ -67,20 +70,6 @@ class EventController extends BaseController
         foreach(explode(' ', request('tags')) as $t) {
             if(trim($t))
                 $event->tags()->attach(Tag::get($t));
-        }
-
-        // If there was a cover photo added, move it to the permanent location and add to the event
-        if($from = request('cover_image')) {
-            if(preg_match('/^public\/events\/(temp|\d+)\/[a-zA-Z0-9]+\.jpg$/', $from, $match)) {
-                $fn = basename($from);
-                $filename = 'public/events/'.$event->id.'/'.$fn;
-                if($match[1] == 'temp')
-                    Storage::move($from, $filename);
-                else
-                    Storage::copy($from, $filename);
-                $event->cover_image = $filename;
-                $event->save();
-            }
         }
 
         return redirect($event->permalink());
@@ -120,12 +109,12 @@ class EventController extends BaseController
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
             'latitude', 'longitude', 'timezone',
-            'website', 'tickets_url', 'description',
+            'website', 'tickets_url', 'description', 'cover_image',
         ];
 
         // Save a snapshot of the previous state
         $revision = new EventRevision;
-        $fixed_properties = ['key','slug','created_by','last_modified_by','photo_order','cover_image'];
+        $fixed_properties = ['key','slug','created_by','last_modified_by','photo_order'];
         foreach(array_merge($properties, $fixed_properties) as $p) {
             $revision->{$p} = $event->{$p} ?: null;
         }
@@ -134,19 +123,6 @@ class EventController extends BaseController
         // Update the properties on the event
         foreach($properties as $p) {
             $event->{$p} = request($p) ?: null;
-        }
-
-        // Handle cover image, only modify if a new photo was added in the temp folder
-        if($from = request('cover_image')) {
-            if(preg_match('/^public\/events\/temp\/[a-zA-Z0-9]+\.jpg$/', $from)) {
-                // If it doesn't match a temp name, then it is the same image it was previously
-                $fn = basename($from);
-                $filename = 'public/events/'.$event->id.'/'.$fn;
-                Storage::move($from, $filename);
-                $event->cover_image = $filename;
-            }
-        } else {
-            $event->cover_image = null;
         }
 
         // Generate a new slug
@@ -173,15 +149,18 @@ class EventController extends BaseController
             return response()->json(['error'=>'missing file']);
         }
 
-        // Save a copy of the file in the download folder
-        $filename = Str::random(30).'.jpg';
+        $image = Image::make(request('image'));
 
-        request('image')->storeAs('public/events/temp/', $filename);
-        $photo_url = 'public/events/temp/'.$filename;
+        $image->fit(1440, 640);
+
+        // Save the resized cover photo in the storage folder
+        $filename = 'public/events/'.date('Ymd').'-'.Str::random(30).'.jpg';
+
+        Storage::put($filename, $image->stream('jpg', 80), 'public');
+        $photo_url = Storage::url($filename);
 
         return response()->json([
             'url' => $photo_url,
-            'cropped' => Event::image_proxy($photo_url, '1440x640,sc'),
         ]);
     }
 
@@ -203,8 +182,8 @@ class EventController extends BaseController
         // Save a copy of the file in the download folder
         $filename = Str::random(30).'.jpg';
 
-        request('photo')->storeAs('public/responses/'.$event->id, $filename);
-        $photo_url = 'public/responses/'.$event->id.'/'.$filename;
+        Storage::putFileAs('public/responses/'.$event->id, request('photo'), $filename, 'public');
+        $photo_url = Storage::url('public/responses/'.$event->id.'/'.$filename);
 
         // Create a new stub response to store this photo
         $response = new Response;

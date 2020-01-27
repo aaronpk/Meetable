@@ -71,7 +71,7 @@ form h2.subtitle {
 
     <div id="cover-photo-preview" class="{{ $event->cover_image ? '' : 'hidden' }} has-delete">
         <button class="delete"></button>
-        <img src="{{ $event->cover_image_cropped() }}" width="720" height="320">
+        <img src="{{ $event->cover_image }}" width="720" height="320">
     </div>
 
     <div class="field" id="upload-cover-field">
@@ -235,7 +235,7 @@ function handleFileUploadResponse(response) {
     var data = JSON.parse(response);
 
     $("#cover-photo-filename").val(data.url);
-    $("#cover-photo-preview img").attr("src", data.cropped);
+    $("#cover-photo-preview img").attr("src", data.url);
     $("#cover-photo-preview").removeClass("hidden");
 
     $("#upload-cover-field .file-icon").removeClass("hidden");
