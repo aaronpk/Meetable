@@ -41,24 +41,26 @@ class Controller extends BaseController
         $event_ids = $events->pluck('id');
         $events = $events->get();
 
-        $query = DB::select(DB::raw('SELECT tag, COUNT(1) AS cities_count, SUM(num) AS events_count
-            FROM
-            (SELECT tags.tag, events.location_locality AS locality, COUNT(1) AS num
-            FROM events
-            JOIN event_tag ON event_tag.event_id = events.id
-            JOIN tags ON event_tag.tag_id = tags.id
-            WHERE events.id IN ('.implode(',', $event_ids->all()).')
-            GROUP BY tag, locality
-            ORDER BY tag) AS data
-            GROUP BY tag
-            ORDER BY cities_count DESC, tag
-            '));
         $tags = [];
-        foreach($query as $tag) {
-            // Only show tags used by more than 1 event, otherwise the list is very
-            // long and it isn't very interesting to click a tag and see just one event
-            if($tag->events_count > 1)
-                $tags[] = $tag;
+        if(count($events) > 0) {
+            $query = DB::select(DB::raw('SELECT tag, COUNT(1) AS cities_count, SUM(num) AS events_count
+                FROM
+                (SELECT tags.tag, events.location_locality AS locality, COUNT(1) AS num
+                FROM events
+                JOIN event_tag ON event_tag.event_id = events.id
+                JOIN tags ON event_tag.tag_id = tags.id
+                WHERE events.id IN ('.implode(',', $event_ids->all()).')
+                GROUP BY tag, locality
+                ORDER BY tag) AS data
+                GROUP BY tag
+                ORDER BY cities_count DESC, tag
+                '));
+            foreach($query as $tag) {
+                // Only show tags used by more than 1 event, otherwise the list is very
+                // long and it isn't very interesting to click a tag and see just one event
+                if($tag->events_count > 1)
+                    $tags[] = $tag;
+            }
         }
 
         return $this->show_events_from_query($events, [
