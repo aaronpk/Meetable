@@ -41,7 +41,8 @@
             <span class="navbar-item">
                 <a href="{{ route('index') }}" class="navbar-logo">
                 @if(env('LOGO_URL'))
-                    <img src="{{ env('LOGO_URL') }}" width="120">
+                    <img src="{{ env('LOGO_URL') }}" style="width: {{ env('LOGO_WIDTH') }};
+                        {{ env('LOGO_HEIGHT') ? 'height: '.env('LOGO_HEIGHT').'; max-height: '.env('LOGO_HEIGHT') : '' }}">
                 @else
                     {{ env('APP_NAME') }}
                 @endif
