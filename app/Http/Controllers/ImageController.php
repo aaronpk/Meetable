@@ -43,17 +43,20 @@ class ImageController extends BaseController
 
         // Check for a cached image already
         $hash = md5($urlToSign);
-        $cacheFile = 'cache/'.substr($hash,0,1).'/'.substr($hash,1,1).'/'.$hash.'.jpg';
+        $cacheFile = 'public/cache/'.substr($hash,0,1).'/'.substr($hash,1,1).'/'.$hash.'.jpg';
 
         if(Storage::exists($cacheFile)) {
-            return response()->file(storage_path('app/'.$cacheFile));
+            return redirect(Storage::url($cacheFile));
         }
 
         if(parse_url($url, PHP_URL_HOST)) {
             $image = Image::make($url); // allow resizing external images
         } else {
+            if(env('FILESYSTEM_DRIVER') == 'local')
+                $url = str_replace('/storage/', '/public/', $url);
+
             if(Storage::exists($url))
-                $image = Image::make(storage_path('app/'.$url));
+                $image = Image::make(Storage::get($url));
             else
                 return $this->invalid('not found');
         }
@@ -71,7 +74,7 @@ class ImageController extends BaseController
         }
 
         // Store a cached copy
-        Storage::put($cacheFile, $image->stream('jpg', 80));
+        Storage::put($cacheFile, $image->stream('jpg', 80), 'public');
 
         return $image->response();
     }

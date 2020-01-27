@@ -35,29 +35,22 @@ class WebmentionReceivedListener implements ShouldQueue {
     }
 
     private function download($response, $url) {
-        // Already downloaded
-        if(!parse_url($url, PHP_URL_HOST))
-            return $url;
-
         Log::info('Downloading image '.$url);
 
-        $filename = 'responses/'.$response->event->id.'/'.md5($url).'.jpg';
-        $full_filename = __DIR__.'/../../storage/app/public/'.$filename;
-
-        $dir = dirname($full_filename);
-        if(!file_exists($dir))
-            mkdir($dir, 0755, true);
-
-        $fp = fopen($full_filename, 'w+');
+        $filename = 'public/responses/'.$response->event->id.'/'.md5($url).'.jpg';
 
         $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_FILE, $fp);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_exec($ch);
-        curl_close($ch);
-        fclose($fp);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $temp = curl_exec($ch);
 
-        return 'public/'.$filename;
+        Storage::put($filename, $temp);
+        Storage::setVisibility($filename, 'public');
+
+        $photo_url = Storage::url($filename);
+        Log::info('  saved as '.$photo_url);
+
+        return $photo_url;
     }
 
 }

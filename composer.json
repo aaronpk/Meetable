@@ -16,6 +16,8 @@
         "intervention/image": "^2.5",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
+        "league/flysystem-aws-s3-v3": "^1.0",
+        "league/flysystem-cached-adapter": "^1.0",
         "michelf/php-markdown": "^1.8",
         "mnabialek/laravel-sql-logger": "^2.2",
         "p3k/html-sanitizer": "^0.1",

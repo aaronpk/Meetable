@@ -35,7 +35,7 @@ When logged in, you can add photos directly to an event page. Event pages also a
 * PHP 7.2+
 * [Composer](https://getcomposer.org)
 * MySQL
-* Redis
+* Optional: Redis
 * Optional: [imageproxy](https://github.com/willnorris/imageproxy)
 
 ### Installation
@@ -112,12 +112,15 @@ server {
     include fastcgi_params;
     fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
   }
-
-  location /public {
-    alias /web/sites/events.example.org/storage/app/public;
-  }
 }
 ```
+
+If you're using the `local` storage driver to store uploaded images on disk, then make sure to symlink the storage folder:
+
+```
+php artisan storage:link
+```
+
 
 ### Authentication
 
