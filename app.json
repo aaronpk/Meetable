@@ -1,0 +1,9 @@
+{
+  "name": "Meetable",
+  "description": "A minimal event aggregator",
+  "keywords": ["events", "community"],
+  "repository": "https://github.com/aaronpk/Meetable",
+  "addons": [
+      "heroku-redis"
+  ]
+}
