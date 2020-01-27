@@ -20,36 +20,14 @@ class FetchUserDetails extends Command {
 
       if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
         $user->name = $data['data']['name'];
-        $user->photo = $this->download($user, $data['data']['photo']);
+        $user->photo = $user->downloadProfilePhoto($data['data']['photo']);
         $this->info('  Found user details: '.$user->name.' '.$user->photo);
+      } else {
+        $this->info('  No h-card found');
       }
 
       $user->save();
     }
   }
-
-    private function download($user, $url) {
-        // Already downloaded
-        if(!parse_url($url, PHP_URL_HOST))
-            return $url;
-
-        $filename = 'users/'.$user->id.'-'.md5($url).'.jpg';
-        $full_filename = __DIR__.'/../../storage/app/public/'.$filename;
-
-        $dir = dirname($full_filename);
-        if(!file_exists($dir))
-            mkdir($dir, 0755, true);
-
-        $fp = fopen($full_filename, 'w+');
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_FILE, $fp);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_exec($ch);
-        curl_close($ch);
-        fclose($fp);
-
-        return env('APP_URL').'/public/'.$filename;
-    }
 
 }

@@ -38,8 +38,7 @@ class User extends Authenticatable
     ];
 
     public function downloadProfilePhoto($url) {
-        $path = 'users';
-        $filename = $this->id.'-'.md5($url).'.jpg';
+        $filename = 'public/users/'.$this->id.'-'.md5($url).'.jpg';
 
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
@@ -47,8 +46,9 @@ class User extends Authenticatable
         $image = curl_exec($ch);
         curl_close($ch);
 
-        Storage::disk('public')->put($path.'/'.$filename, $image);
+        Storage::put($filename, $image);
+        Storage::setVisibility($filename, 'public');
 
-        return 'public/'.$path.'/'.$filename;
+        return Storage::url($filename);
     }
 }
