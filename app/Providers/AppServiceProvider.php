@@ -25,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        if($this->app->environment('production') && parse_url(env('APP_URL'), PHP_URL_SCHEME) == 'https') {
+            URL::forceScheme('https');
+        }
+
         Schema::defaultStringLength(191);
 
         Blade::directive('icon', function ($expression) {
