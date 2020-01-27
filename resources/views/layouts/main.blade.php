@@ -35,7 +35,7 @@
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <span class="navbar-item">
-                <a href="{{ route('index') }}">
+                <a href="{{ route('index') }}" class="navbar-logo">
                 @if(env('LOGO_URL'))
                     <img src="{{ env('LOGO_URL') }}" width="120">
                 @else

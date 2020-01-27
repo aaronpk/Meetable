@@ -22,6 +22,10 @@
     }
 }
 
+.navbar a.navbar-logo {
+    line-height: 0;
+}
+
 .has-delete {
     position: relative;
 }
