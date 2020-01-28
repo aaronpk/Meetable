@@ -23,7 +23,10 @@ class Controller extends BaseController
         } elseif($year) {
             $events = Event::whereYear('start_date', $year);
         } elseif($only_future) {
-            $events = Event::where('start_date', '>=', date('Y-m-d'))->orWhere('end_date', '>=', date('Y-m-d'));
+            $events = Event::where(function($query){
+                $query->where('start_date', '>=', date('Y-m-d'))
+                      ->orWhere('end_date', '>=', date('Y-m-d'));
+            });
         } else {
             $events = new Event();
         }
