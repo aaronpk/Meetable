@@ -33,7 +33,7 @@ a.title:hover, a.subtitle:hover {
                         {{ date('F', mktime(0,0,0, $month, 1, $year)) }}
                     </a>
                     {{-- only show count of events for dates older than 18 months ago --}}
-                    @if( mktime(0,0,0, $month, 1, $year) < strtotime('18 months ago') )
+                    @if( count($events) > 2 && mktime(0,0,0, $month, 1, $year) < strtotime('18 months ago') )
                         &bull; <a href="{{ route('month', [$year, sprintf('%02d', $month)]) }}">{{ count($events) }} {{ count($events) == 1 ? 'event' : 'events' }}</a>
                     @else
                         <ul>
