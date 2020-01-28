@@ -33,10 +33,10 @@ class Controller extends BaseController
         if($url = getenv('CLEARDB_DATABASE_URL')) {
             $db = parse_url($url);
             session([
-                'setup.db_name' => substr($url['path'], 1),
-                'setup.db_host' => $url['host'],
-                'setup.db_username' => $url['user'],
-                'setup.db_password' => $url['pass'],
+                'setup.db_name' => substr($db['path'], 1),
+                'setup.db_host' => $db['host'],
+                'setup.db_username' => $db['user'],
+                'setup.db_password' => $db['pass'],
             ]);
         }
 
