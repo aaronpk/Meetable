@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Log;
 
 class Handler extends ExceptionHandler
 {
@@ -35,6 +36,7 @@ class Handler extends ExceptionHandler
     public function report(Exception $exception)
     {
         if($exception instanceof \PDOException) {
+            Log::error($exception->getMessage());
             abort(550);
         }
 
