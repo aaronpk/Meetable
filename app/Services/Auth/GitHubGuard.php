@@ -62,6 +62,14 @@ class GitHubGuard extends CustomGuard {
         if($created) {
             $user->name = session('GITHUB_USER_NAME');
             $user->photo = $user->downloadProfilePhoto(session('GITHUB_USER_PHOTO'));
+
+            if(env('GITHUB_ADMIN_USERS')) {
+                $adminUsers = explode(' ', env('GITHUB_ADMIN_USERS'));
+                if(in_array(session('GITHUB_LOGIN'), $adminUsers)) {
+                    $user->admin = true;
+                }
+            }
+
             $user->save();
         }
 

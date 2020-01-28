@@ -97,6 +97,7 @@ class GitHubController extends BaseController
         // Now set the session data to make this user logged-in
         session([
             'GITHUB_USER' => $userdata['html_url'],
+            'GITHUB_LOGIN' => $userdata['login'],
             'GITHUB_USER_NAME' => $userdata['name'],
             'GITHUB_USER_PHOTO' => $userdata['avatar_url'],
         ]);
