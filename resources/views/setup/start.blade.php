@@ -23,6 +23,10 @@
             <p>We'll eventually store this information in a config file. If we can't create the config file for any reason, we'll show you the contents of the file and you can create it on your server manually.</p>
         @endif
 
+        <pre>
+        {{ print_r(session()->all()) }}
+        </pre>
+
         <a href="{{ route('setup.database') }}" class="button is-primary">Let's Go</a>
       </div>
     </article>
