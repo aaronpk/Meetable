@@ -5,11 +5,27 @@ define('LARAVEL_START', microtime(true));
 // installing the dependencies, we can tell them to do so. If they download a release,
 // the dependencies should have already come with that download.
 if(!file_exists(__DIR__.'/../vendor/autoload.php')) {
-    require_once(__DIR__.'/../resources/setup/missing-dependencies.php');
+    require(__DIR__.'/../resources/setup/missing-dependencies.php');
     die();
 }
 
 require __DIR__.'/../vendor/autoload.php';
+
+
+// Load the .env file if it exists
+$dotenv = Dotenv\Dotenv::create(__DIR__.'/..');
+if(file_exists(__DIR__.'/../.env')) {
+  $dotenv->load();
+}
+
+// Check for environment variables and trigger the setup flow if it doesn't exist
+if(!getenv('APP_NAME')) {
+    // Setting the APP_NAME to 'Meetable Installer' will trigger `routes/web.php` to
+    // define the setup routes instead of app routes
+    $_ENV['APP_NAME'] = 'Meetable Installer';
+    // Use a temporary fixed APP_KEY during installation
+    $_ENV['APP_KEY'] = 'base64:v7ZDOfJbqzXdbbJ/3GYSAP+B4jm3rMlrWiNutsaQYEE=';
+}
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
 

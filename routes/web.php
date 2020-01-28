@@ -1,17 +1,31 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+// Check whether setup has been completed and define installer routes if not
+if($_ENV['APP_NAME'] == 'Meetable Installer') {
+
+Route::get('/', 'Setup\Controller@index')->name('setup.redirect');
+Route::get('/setup', 'Setup\Controller@setup')->name('setup.setup');
+Route::get('/setup/db', 'Setup\Controller@database')->name('setup.database');
+Route::post('/setup/db-test', 'Setup\Controller@test_database')->name('setup.test-database');
+Route::get('/setup/app-settings', 'Setup\Controller@app_settings')->name('setup.app-settings');
+Route::post('/setup/app-settings', 'Setup\Controller@save_app_settings')->name('setup.save-app-settings');
+Route::get('/setup/auth-settings', 'Setup\Controller@auth_settings')->name('setup.auth-settings');
+Route::post('/setup/auth-settings', 'Setup\Controller@save_auth_settings')->name('setup.save-auth-settings');
+Route::get('/setup/save', 'Setup\Controller@save_config')->name('setup.save-config');
+Route::get('/setup/database', 'Setup\Controller@create_database_error')->name('setup.create-database');
+
+} else {
 
 Route::get('/', 'Controller@index')->name('index');
+
+######
+## SETUP ROUTES
+## If they hit reload after setup, send them back to the home page
+Route::get('/setup/save', function(){ return redirect('/'); });
+## Create the database here
+Route::get('/setup/database', 'Setup\Controller@create_database')->name('setup.create-database');
+######
+
 
 Route::get('/archive', 'Controller@archive')->name('archive');
 
@@ -79,3 +93,5 @@ Route::middleware('auth')->group(function(){
     });
 
 });
+
+}
