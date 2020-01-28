@@ -1,7 +1,7 @@
 <?php
 
 // Check whether setup has been completed and define installer routes if not
-if($_ENV['APP_NAME'] == 'Meetable Installer') {
+if(defined('MEETABLE_SETUP')) {
 
 Route::get('/', 'Setup\Controller@index')->name('setup.redirect');
 Route::get('/setup', 'Setup\Controller@setup')->name('setup.setup');

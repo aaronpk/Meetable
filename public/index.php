@@ -25,6 +25,7 @@ if(!getenv('APP_NAME')) {
     $_ENV['APP_NAME'] = 'Meetable Installer';
     // Use a temporary fixed APP_KEY during installation
     $_ENV['APP_KEY'] = 'base64:v7ZDOfJbqzXdbbJ/3GYSAP+B4jm3rMlrWiNutsaQYEE=';
+    define('MEETABLE_SETUP', true);
 }
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
