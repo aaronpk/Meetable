@@ -29,6 +29,17 @@ class Controller extends BaseController
     }
 
     public function database() {
+        // Check for a Heroku ClearDB config string and set that as the defaults
+        if($url = getenv('CLEARDB_DATABASE_URL')) {
+            $db = parse_url($url);
+            session([
+                'setup.db_name' => substr($url['path'], 1),
+                'setup.db_host' => $url['host'],
+                'setup.db_username' => $url['user'],
+                'setup.db_password' => $url['pass'],
+            ]);
+        }
+
         return view('setup/database', [
             'db_name' => session('setup.db_name'),
             'db_host' => session('setup.db_host'),
