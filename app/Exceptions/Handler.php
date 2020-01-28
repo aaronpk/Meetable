@@ -34,6 +34,10 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        if($exception instanceof \PDOException) {
+            abort(550);
+        }
+
         parent::report($exception);
     }
 
