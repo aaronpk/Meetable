@@ -19,7 +19,7 @@ class AppServiceProvider extends ServiceProvider
             $this->app['request']->server->set('HTTPS', true);
         }
 
-        if(env('X-Forwarded-Proto') == 'https') {
+        if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') {
             $this->app['request']->server->set('HTTPS', true);
         }
     }
