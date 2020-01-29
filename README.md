@@ -284,6 +284,7 @@ Configure your web server to proxy `/img/` to the imageproxy, e.g. for nginx:
 ## Installing on Heroku
 
 ```
+# Make sure to set the organization if you're adding this to an account that is not your personal account
 export HEROKU_ORGANIZATION=
 
 git clone https://github.com/aaronpk/Meetable.git
