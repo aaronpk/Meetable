@@ -147,7 +147,7 @@ class Controller extends BaseController
         }
 
         if(self::is_heroku()) {
-            self::write_config_value($config, 'LOG_CHANNEL', 'stack');
+            self::write_config_value($config, 'LOG_CHANNEL', 'stderr');
 
             // Remove comments
             $heroku = preg_replace('/#.+\n/m', '', $config);

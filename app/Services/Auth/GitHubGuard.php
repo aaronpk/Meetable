@@ -66,7 +66,7 @@ class GitHubGuard extends CustomGuard {
             if(env('GITHUB_ADMIN_USERS')) {
                 $adminUsers = explode(' ', env('GITHUB_ADMIN_USERS'));
                 if(in_array(session('GITHUB_LOGIN'), $adminUsers)) {
-                    $user->admin = true;
+                    $user->is_admin = true;
                 }
             }
 
