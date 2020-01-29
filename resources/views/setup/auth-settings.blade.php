@@ -12,6 +12,8 @@
       <form action="{{ route('setup.save-auth-settings') }}" method="post">
 
         <p>By default people will log in to this application with a GitHub account. You will need to go <a href="https://github.com/settings/developers" target="_new">create a GitHub OAuth application</a> and provide the client ID and secret here.</p>
+        <p>In the GitHub application settings, use the following as the callback URL in the application settings:</p>
+        <p><code>{{ session('setup.app_url') }}/auth/github</code></p>
 
         <div class="field">
           <label class="label">GitHub Client ID</label>
