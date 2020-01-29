@@ -290,41 +290,32 @@ git clone https://github.com/aaronpk/Meetable.git
 
 cd Meetable
 
-composer install
-
 heroku git:remote -a your-heroku-app-name
-
-heroku config:set APP_KEY=`php artisan key:generate --show`
 
 # Add MySQL
 heroku addons:create cleardb:punch
 
-# Pull the parts out of the database URL that was added 
-heroku config | grep CLEARDB_DATABASE_URL
+# Deploy the app to Heroku
+git push heroku master
 
-heroku config:set DB_USERNAME=
-heroku config:set DB_PASSWORD=
-heroku config:set DB_HOST=
-heroku config:set DB_DATABASE=
+# Visit the app in your browser and continue the setup there
+# Once you finish the setup walkthrough, it will give you a series of `heroku config:set` commands to run
+# Run all the provided `heroku config:set` commands...
 
-# Set config variables for everything you need to set from .env.template
+heroku config:set ...
 ...
-
-# Make sure we can view the Laravel logs
-heroku config:set LOG_CHANNEL=stderr
-
-# Run the database migrations
-heroku run php artisan migrate
 
 # Set up a cron job to run the worker
 # Add the scheduler add-on
 heroku addons:create scheduler:standard
+
 # Configure it
 heroku addons:open scheduler
+
 # Add this command to the scheduler:
 # php artisan queue:work --stop-when-empty
 
-# Watch the logs:
+# If you need to, watch the logs:
 heroku logs --tail
 ```
 
