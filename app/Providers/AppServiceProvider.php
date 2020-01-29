@@ -18,6 +18,10 @@ class AppServiceProvider extends ServiceProvider
         if($this->app->environment('production') && parse_url(env('APP_URL'), PHP_URL_SCHEME) == 'https') {
             $this->app['request']->server->set('HTTPS', true);
         }
+
+        if(env('X-Forwarded-Proto') == 'https') {
+            $this->app['request']->server->set('HTTPS', true);
+        }
     }
 
     /**
