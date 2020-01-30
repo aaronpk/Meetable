@@ -17,7 +17,6 @@ class Setting extends Model
         // Load all settings into the cache
         $settings = Setting::get();
         foreach($settings as $s) {
-            Log::info($s);
             self::$cached[$s->id] = $s->value;
         }
 
