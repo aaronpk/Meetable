@@ -42,7 +42,7 @@
           <div class="control">
             <input class="input" type="text" name="github_admin_users" value="{{ session('setup.github_admin_users') }}">
           </div>
-          <p class="help">Provide a space-separated list of GitHub usernames for users who you want to be site admins.</p>
+          <p class="help">Provide a space-separated list of GitHub usernames for users who you want to be site admins. Make sure to include yourself in this list!</p>
         </div>
 
         <button type="submit" class="button is-primary">Continue</button>

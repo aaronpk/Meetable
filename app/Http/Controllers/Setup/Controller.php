@@ -142,7 +142,7 @@ class Controller extends BaseController
             self::write_config_value($config, strtoupper($k), session('setup.'.$k));
         }
 
-        foreach(['app_name', 'app_url', 'googlemaps_api_key'] as $k) {
+        foreach(['app_name', 'app_url'] as $k) {
             self::write_config_value($config, strtoupper($k), session('setup.'.$k));
         }
 

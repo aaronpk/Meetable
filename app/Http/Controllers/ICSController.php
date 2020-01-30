@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\Tag;
+use App\Event, App\Tag, App\Setting;
 use DateTime, DateTimeZone;
 use DB, Log;
 
@@ -78,7 +78,7 @@ class ICSController extends BaseController
             Log::warning('Rendered ics feed with no date for event '.$event->id);
         }
 
-        if(env('SHOW_RSVPS_IN_ICS')) {
+        if(Setting::value('SHOW_RSVPS_IN_ICS')) {
             $summary = $event->name;
 
             $rsvps = [];

@@ -16,7 +16,7 @@
 
         <p>Click the button below only after you've created the file.</p>
 
-        <a href="/" class="button is-primary">Continue</a>
+        <a href="/setup/database" class="button is-primary">Continue</a>
       </div>
     </article>
 

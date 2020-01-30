@@ -1,5 +1,9 @@
 @extends('layouts/main')
 
+@php
+use App\Setting;
+@endphp
+
 @section('scripts')
 @if(env('GOOGLEMAPS_API_KEY'))
 <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLEMAPS_API_KEY') }}&libraries=places"></script>
@@ -186,7 +190,7 @@ form h2.subtitle {
         <div class="help">provide a link to the event's main website if any</div>
     </div>
 
-    @if(env('ENABLE_TICKET_URL'))
+    @if(Setting::value('enable_ticket_url'))
     <div class="field">
         <label class="label">Registration URL</label>
         <input class="input" type="url" autocomplete="off" name="tickets_url" value="{{ $event->tickets_url }}">

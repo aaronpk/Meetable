@@ -5,7 +5,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\Response, App\User;
+use App\Event, App\Response, App\User, App\Setting;
 use App\Events\WebmentionReceived;
 use Illuminate\Support\Str;
 use Auth;
@@ -15,7 +15,7 @@ use p3k\XRay;
 class WebmentionController extends BaseController
 {
     public function webmention() {
-        if(!env('ENABLE_WEBMENTION_RESPONSES'))
+        if(!Setting::value('enable_webmention_responses'))
             return abort(404);
 
         // Process synchronously for now so people have an easier time debuggong,
@@ -91,7 +91,7 @@ class WebmentionController extends BaseController
     }
 
     public function get() {
-        if(!env('ENABLE_WEBMENTION_RESPONSES'))
+        if(!Setting::value('enable_webmention_responses'))
             return abort(404);
 
         return view('webmention');

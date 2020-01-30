@@ -1,3 +1,6 @@
+@php
+use App\Setting;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -18,19 +21,18 @@
 
     <link href="/assets/style.css" rel="stylesheet">
 
-    @if(env('FAVICON_URL'))
-        <link rel="shortcut icon" href="{{ env('FAVICON_URL') }}" type="image/vnd.microsoft.icon" />
+    @if($favicon=Setting::value('favicon_url'))
+        <link rel="shortcut icon" href="{{ $favicon }}">
     @endif
 
-    @if(env('GA_ID'))
+    @if($ga_id=Setting::value('ga_id'))
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('GA_ID') }}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga_id }}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      gtag('config', '{{ env('GA_ID') }}');
+      gtag('config', '{{ $ga_id }}');
     </script>
     @endif
 </head>
@@ -40,9 +42,9 @@
         <div class="navbar-brand">
             <span class="navbar-item">
                 <a href="{{ route('index') }}" class="navbar-logo">
-                @if(env('LOGO_URL'))
-                    <img src="{{ env('LOGO_URL') }}" style="width: {{ env('LOGO_WIDTH') }};
-                        {{ env('LOGO_HEIGHT') ? 'height: '.env('LOGO_HEIGHT').'; max-height: '.env('LOGO_HEIGHT') : '' }}">
+                @if($logo_url=Setting::value('logo_url'))
+                    <img src="{{ $logo_url }}" style="{{ ($w=Setting::value('logo_width')) ? 'width: '.$w : '' }};
+                        {{ ($h=Setting::value('logo_height')) ? 'height: '.$h.'; max-height: '.$h : '' }}">
                 @else
                     {{ env('APP_NAME') }}
                 @endif
@@ -58,7 +60,7 @@
 
         <div id="navbarBasicExample" class="navbar-menu">
             <div class="navbar-start">
-                @if(env('LOGO_URL'))
+                @if(Setting::value('logo_url'))
                     <a class="navbar-item" href="{{ route('index') }}">Upcoming Events</a>
                 @endif
                 <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
@@ -67,14 +69,14 @@
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endcan
             </div>
-            @if(env('AUTH_SHOW_LOGIN') == 'true' || env('AUTH_SHOW_LOGOUT') == 'true' || Gate::allows('manage-site'))
+            @if(Setting::value('auth_show_login') || Setting::value('auth_show_logout') || Gate::allows('manage-site'))
             <div class="navbar-end">
                 @can('manage-site')
                     <a class="navbar-item" href="{{ route('settings') }}">Settings</a>
                 @endcan
-                @if(Auth::user() && env('AUTH_SHOW_LOGOUT') == 'true')
+                @if(Auth::user() && Setting::value('auth_show_logout'))
                     <a class="navbar-item" href="{{ route('logout') }}">Log Out</a>
-                @elseif(!Auth::user() && env('AUTH_SHOW_LOGIN') == 'true')
+                @elseif(!Auth::user() && Setting::value('auth_show_login'))
                     <a class="navbar-item" href="{{ route('login') }}">Log In</a>
                 @endif
             </div>

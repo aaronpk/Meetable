@@ -2,14 +2,26 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use DB, Auth;
+use DB, Auth, Log;
 
 class Setting extends Model
 {
+    protected $keyType = 'string';
+
+    static $cached = [];
 
     public static function value($id) {
-        $setting = self::where('id', $id)->first();
-        return $setting ? $setting->value : null;
+        if(isset(self::$cached[$id]))
+            return self::$cached[$id];
+
+        // Load all settings into the cache
+        $settings = Setting::get();
+        foreach($settings as $s) {
+            Log::info($s);
+            self::$cached[$s->id] = $s->value;
+        }
+
+        return self::$cached[$id] ?? null;
     }
 
     public static function html_value($id) {
