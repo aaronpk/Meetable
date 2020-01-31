@@ -19,7 +19,7 @@ class SettingsController extends BaseController
 
     public function post() {
         $properties = ['add_an_event', 'logo_url', 'logo_width', 'logo_height', 'favicon_url',
-            'ga_id', ];
+            'ga_id', 'home_meta_description', 'home_social_image_url'];
         foreach($properties as $id) {
             Setting::set($id, request($id));
         }

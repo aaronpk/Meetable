@@ -71,6 +71,7 @@ class Controller extends BaseController
             'month' => $month,
             'day' => $day,
             'tags' => $tags,
+            'home' => (!$year && !$month && !$day)
         ]);
     }
 

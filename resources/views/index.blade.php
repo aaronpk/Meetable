@@ -1,6 +1,31 @@
 @extends('layouts/main')
 
+@php
+use App\Setting;
+@endphp
+
+@section('headtags')
+@if(isset($home) && $home)
+@if(Setting::value('home_social_image_url') || Setting::value('home_meta_description'))
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ env('APP_NAME') }}">
+@if(Setting::value('home_meta_description'))
+<meta property="og:description" content="{{ Setting::value('home_meta_description') }}">
+<meta property="description" content="{{ Setting::value('home_meta_description') }}">
+@endif
+<meta property="og:url" content="{{ route('index') }}">
+@if(Setting::value('home_social_image_url'))
+<meta property="og:image" content="{{ Setting::value('home_social_image_url') }}">
+@endif
+<meta name="twitter:card" content="summary_large_image">
+
+@endif
+@endif
+@endsection
+
 @section('content')
+
 <style>
 .event-list .subtitle.month {
     font-size: 1.5em;

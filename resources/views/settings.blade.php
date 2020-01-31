@@ -64,7 +64,7 @@ use App\Setting;
     <div class="field">
       <div class="control">
         <label class="label">Logo URL</label>
-        <input class="input" type="text" value="{{ Setting::value('logo_url') }}" name="logo_url">
+        <input class="input" type="url" value="{{ Setting::value('logo_url') }}" name="logo_url">
       </div>
       <p class="help">Provide the URL to a logo to show in the top left corner of the website. If blank, just the website name will be displayed.</p>
     </div>
@@ -85,10 +85,27 @@ use App\Setting;
     <div class="field">
         <div class="control">
             <label class="label">Favicon URL</label>
-            <input class="input" type="text" value="{{ Setting::value('favicon_url') }}" name="favicon_url">
+            <input class="input" type="url" value="{{ Setting::value('favicon_url') }}" name="favicon_url">
         </div>
         <p class="help">Provide the URL to a favicon to use on the website.</p>
     </div>
+
+    <div class="field">
+      <div class="control">
+        <label class="label">Home Page Social Image</label>
+        <input class="input" type="url" value="{{ Setting::value('home_social_image_url') }}" name="home_social_image_url">
+      </div>
+      <p class="help">Provide the URL to an image to use for the home page social sharing card. This will not be displayed on the website, it will only appear in Twitter/Slack/Facebook previews of the home page.</p>
+    </div>
+
+    <div class="field">
+      <div class="control">
+        <label class="label">Home Page Meta Description</label>
+        <input class="input" type="text" value="{{ Setting::value('home_meta_description') }}" name="home_meta_description">
+      </div>
+      <p class="help">This text will be used as the meta description of the home page, as well as the description for Twitter/Facebook cards.</p>
+    </div>
+
 
     <div class="field">
         <label class="label">
