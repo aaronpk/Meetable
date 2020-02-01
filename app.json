@@ -6,7 +6,8 @@
   "addons": [
     "heroku-redis",
     {
-      "plan": "cleardb:ignite"
+      "plan": "cleardb:ignite",
+      "as": "DATABASE"
     }
   ],
   "env": {
