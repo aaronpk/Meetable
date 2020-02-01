@@ -111,11 +111,32 @@ class Controller extends BaseController
             session(['setup.'.$p => request($p)]);
         }
 
+        // If we're on Heroku, let them choose which auth method to use
+        // TODO: always redirect here if we add a third provider
+        if(self::is_heroku()) {
+            return redirect(route('setup.auth-method'));
+        } else {
+            session(['setup.auth_method' => 'github']);
+            return redirect(route('setup.auth-settings'));
+        }
+    }
+
+    public function auth_method() {
+        // Check that app name is set, or go back a step
+        if(!session('setup.app_name')) {
+            return redirect(route('setup.app-settings'));
+        }
+
+        return view('setup/auth-method');
+    }
+
+    public function save_auth_method() {
+        session(['setup.auth_method' => request('method')]);
         return redirect(route('setup.auth-settings'));
     }
 
     public function auth_settings() {
-        // Check that DB settings are here, or go back a step
+        // Check that app name is set, or go back a step
         if(!session('setup.app_name')) {
             return redirect(route('setup.app-settings'));
         }
@@ -123,12 +144,32 @@ class Controller extends BaseController
         return view('setup/auth-settings');
     }
 
+    public function register_heroku_app() {
+        $hostname = parse_url(session('setup.app_url'), PHP_URL_HOST);
+        if(!preg_match('/(.+)\.herokuapp\.com/', $hostname, $match))
+            return response()->json(['error' => 'invalid app URL']);
+        $app_name = $match[1];
+
+        $ch = curl_init('https://meetable.org/register.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'name' => session('setup.app_name'),
+            'app_name' => $app_name,
+            'remote_ip' => $_SERVER['REMOTE_ADDR'],
+        ]));
+        $data = json_decode(curl_exec($ch), true);
+
+        return response()->json($data);
+    }
+
     public function save_auth_settings() {
         $properties = ['github_client_id', 'github_client_secret',
             'github_allowed_users', 'github_admin_users',
+            'heroku_client_id', 'heroku_client_secret',
         ];
         foreach($properties as $p) {
-            session(['setup.'.$p => request($p)]);
+            if(request($p))
+                session(['setup.'.$p => request($p)]);
         }
 
         return redirect(route('setup.save-config'));
@@ -165,9 +206,16 @@ class Controller extends BaseController
             self::write_config_value($config, 'AWS_ROOT', HerokuS3::get_aws_root_from_env());
         }
 
-        self::write_config_value($config, 'AUTH_METHOD', 'github');
-        foreach(['github_client_id', 'github_client_secret', 'github_allowed_users', 'github_admin_users'] as $k) {
-            self::write_config_value($config, strtoupper($k), session('setup.'.$k));
+        if(session('setup.auth_method') == 'heroku') {
+            self::write_config_value($config, 'AUTH_METHOD', 'heroku');
+            foreach(['heroku_client_id', 'heroku_client_secret'] as $k) {
+                self::write_config_value($config, strtoupper($k), session('setup.'.$k));
+            }
+        } else {
+            self::write_config_value($config, 'AUTH_METHOD', 'github');
+            foreach(['github_client_id', 'github_client_secret', 'github_allowed_users', 'github_admin_users'] as $k) {
+                self::write_config_value($config, strtoupper($k), session('setup.'.$k));
+            }
         }
 
         foreach(['app_name', 'app_url'] as $k) {

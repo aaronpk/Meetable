@@ -26,10 +26,6 @@
           <p class="help">The base URL of this website, without a trailing slash</p>
         </div>
 
-        @if(\App\Http\Controllers\Setup\Controller::is_heroku())
-
-        @endif
-
         <button type="submit" class="button is-primary">Continue</button>
 
         {{ csrf_field() }}
