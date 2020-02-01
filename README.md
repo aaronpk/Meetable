@@ -315,6 +315,9 @@ heroku git:remote -a your-heroku-app-name
 # Add MySQL
 heroku addons:create cleardb:ignite --as=DATABASE
 
+# [Optional] Add Redis
+heroku addons:create heroku-redis:hobby-dev
+
 # Deploy the app to Heroku
 git push heroku master
 
