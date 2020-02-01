@@ -96,9 +96,10 @@ class GitHubController extends BaseController
         }
 
         // Create the user record if it doesn't yet exist
-        $user = User::where('url', $userdata['html_url'])->first();
+        $user = User::where('identifier', $userdata['id'])->first();
         if(!$user) {
             $user = new User;
+            $user->identifier = $userdata['id'];
             $user->url = $userdata['html_url'];
             $user->photo = $user->downloadProfilePhoto($userdata['avatar_url']);
         }
@@ -116,7 +117,7 @@ class GitHubController extends BaseController
 
         // Now set the session data to make this user logged-in
         session([
-            'GITHUB_USER' => $userdata['html_url'],
+            'GITHUB_USER' => $userdata['id'],
         ]);
 
         if(session('AUTH_RETURN_TO')) {

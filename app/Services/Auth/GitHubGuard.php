@@ -47,15 +47,15 @@ class GitHubGuard extends CustomGuard {
     public function user() {
         static $cached = false;
 
-        $url = session('GITHUB_USER');
+        $id = session('GITHUB_USER');
 
-        if(!$url)
+        if(!$id)
           return null;
 
-        if($cached && $cached->url == $url)
+        if($cached && $cached->identifier == $id)
             return $cached;
 
-        $user = User::where('url', $url)->first();
+        $user = User::where('identifier', $id)->first();
 
         $cached = $user;
         return $user;

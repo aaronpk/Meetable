@@ -95,21 +95,26 @@ class HerokuController extends BaseController
         // default will only let the one user who set up the app log in.
         if(User::count() == 0) {
             $user = new User;
-            $user->url = 'heroku://'.$userdata['id'];
+            $user->identifier = $userdata['id'];
             $user->name = $userdata['name'];
+            $user->email = $userdata['email'];
             $user->photo = $gravatar_url;
             $user->api_token = Str::random(80);
             $user->is_admin = 1;
             $user->save();
         } else {
             // Check if this user already exists
-            $user = User::where('url', 'heroku://'.$userdata['id'])->first();
+            $user = User::where('identifier', $userdata['id'])->first();
             if(!$user) {
                 return view('auth/heroku-error', [
                     'error' => 'User Not Allowed',
                     'error_description' => 'Sorry, you are not in the list of allowed users for this website.',
                 ]);
             }
+            $user->name = $userdata['name'];
+            $user->email = $userdata['email'];
+            $user->photo = $gravatar_url;
+            $user->save();
         }
 
 

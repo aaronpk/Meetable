@@ -47,21 +47,40 @@ class VouchGuard extends CustomGuard {
     public function user() {
         static $cached = false;
 
-        $url = $this->request->server->get('HTTP_REMOTE_USER');
+        $username = $this->request->server->get('HTTP_REMOTE_USER');
 
-        if(!$url)
+        if(!$username)
           return null;
 
-        if($cached && $cached->url == $url)
+        if($cached && $cached->identifier == $username)
             return $cached;
 
-        list($user, $created) = $this->getUserFromURL($url);
+        list($user, $created) = $this->getUserFromUsername($username);
 
         if($created)
             event(new UserCreated($user));
 
         $cached = $user;
         return $user;
+    }
+
+    protected function getUserFromUsername($username) {
+        $user = User::where('identifier', $username)->first();
+
+        $created = false;
+
+        if(!$user) {
+            $user = new User();
+            $user->identifier = $username;
+            // If the username is a URL, add it as the URL field
+            if(\p3k\url\is_url($username))
+                $user->url = $username;
+            $user->api_token = Str::random(80);
+            $user->save();
+            $created = true;
+        }
+
+        return [$user, $created];
     }
 
     public function id() {

@@ -52,10 +52,10 @@ class HerokuGuard extends CustomGuard {
         if(!$userid)
           return null;
 
-        if($cached && $cached->url == 'heroku://'.$userid)
+        if($cached && $cached->identifier == $userid)
             return $cached;
 
-        $user = User::where('url', 'heroku://'.$userid)->first();
+        $user = User::where('identifier', $userid)->first();
 
         $cached = $user;
         return $user;
