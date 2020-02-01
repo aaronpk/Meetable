@@ -169,6 +169,9 @@ class Controller extends BaseController
                 if (!empty(env('REDIS_SESSION'))) {
                     self::write_config_value($config, 'SESSION_DRIVER', 'redis');
                 }
+                if (!empty(env('REDIS_CACHE'))) {
+                    self::write_config_value($config, 'CACHE_DRIVER', 'redis');
+                }
             }
             else {
                 self::write_config_value($config, 'QUEUE_CONNECTION', 'database');
