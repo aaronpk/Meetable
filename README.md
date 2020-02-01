@@ -296,7 +296,7 @@ cd Meetable
 heroku git:remote -a your-heroku-app-name
 
 # Add MySQL
-heroku addons:create cleardb:punch
+heroku addons:create cleardb:ignite --as=DATABASE
 
 # Deploy the app to Heroku
 git push heroku master
