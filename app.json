@@ -4,6 +4,38 @@
   "keywords": ["events", "community"],
   "repository": "https://github.com/aaronpk/Meetable",
   "addons": [
-      "heroku-redis"
+    "heroku-redis",
+    {
+      "plan": "cleardb:ignite"
+    }
+  ],
+  "env": {
+  },
+  "environments": {
+    "review": {
+      "env": {
+        "APP_DEBUG": {
+          "value": "true"
+        },
+        "APP_ENV": {
+          "value": "local"
+        }
+      }
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    },
+    "scheduler": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/php"
+    }
   ]
 }
