@@ -8,6 +8,9 @@
     {
       "plan": "cleardb:ignite",
       "as": "DATABASE"
+    },
+    {
+      "plan": "cloudcube:free"
     }
   ],
   "env": {

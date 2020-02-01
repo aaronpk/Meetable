@@ -1,5 +1,7 @@
 <?php
 
+use App\Helpers\HerokuS3;
+
 return [
 
     /*
@@ -57,13 +59,13 @@ return [
 
         's3' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
+            'key' => env('AWS_ACCESS_KEY_ID', env('CLOUDCUBE_ACCESS_KEY_ID')),
+            'secret' => env('AWS_SECRET_ACCESS_KEY', env('CLOUDCUBE_SECRET_ACCESS_KEY')),
+            'region' => env('AWS_DEFAULT_REGION', HerokuS3::get_default_aws_region()),
+            'bucket' => env('AWS_BUCKET', HerokuS3::get_aws_bucket_from_env()),
+            'url' => env('AWS_URL', HerokuS3::get_aws_url_from_env()),
+            'root' => env('AWS_ROOT', HerokuS3::get_aws_root_from_env()),
         ],
-
     ],
 
 ];
