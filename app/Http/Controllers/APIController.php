@@ -86,6 +86,10 @@ class APIController extends BaseController
         ]);
     }
 
+    public function(Request $request) {
+        return $request->user();
+    }
+
     private function error($error, $code=400) {
         return response()->json([
             'error' => $error

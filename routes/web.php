@@ -21,7 +21,7 @@ Route::get('/', 'Controller@index')->name('index');
 ######
 ## SETUP ROUTES
 ## If they hit reload after setup, send them back to the home page
-Route::get('/setup/save', function(){ return redirect('/'); });
+Route::get('/setup/save', 'Setup\Controller@redirect_after_complete');
 ## Create the database here
 Route::get('/setup/database', 'Setup\Controller@create_database')->name('setup.create-database');
 ######

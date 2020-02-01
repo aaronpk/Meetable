@@ -218,6 +218,10 @@ class Controller extends BaseController
         return view('setup/error');
     }
 
+    public function redirect_after_complete() {
+        return redirect('/');
+    }
+
     private static function write_config_value(&$config, $key, $value) {
         if(strpos($value, ' '))
             $value = '"'.$value.'"';
