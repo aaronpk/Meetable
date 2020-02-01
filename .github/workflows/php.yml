@@ -8,11 +8,11 @@ jobs:
     - name: Install PHP
       uses: shivammathur/setup-php@master
       with:
-        php-version: 7.2
-        extensions: imagick pdo redis pcntl
+        php-version: 7.3
+        extensions: imagick redis pcntl
     - name: Validate composer.json and composer.lock
       run: composer validate
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
     - name: Run test suite
-      run: php7.2 vendor/bin/phpunit
+      run: php7.3 vendor/bin/phpunit
