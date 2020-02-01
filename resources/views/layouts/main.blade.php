@@ -69,14 +69,14 @@ use App\Setting;
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endcan
             </div>
-            @if(Setting::value('auth_show_login') || Setting::value('auth_show_logout') || Gate::allows('manage-site'))
+            @if(!Setting::value('auth_hide_login') || !Setting::value('auth_hide_logout') || Gate::allows('manage-site'))
             <div class="navbar-end">
                 @can('manage-site')
                     <a class="navbar-item" href="{{ route('settings') }}">Settings</a>
                 @endcan
-                @if(Auth::user() && Setting::value('auth_show_logout'))
+                @if(Auth::user() && !Setting::value('auth_hide_logout'))
                     <a class="navbar-item" href="{{ route('logout') }}">Log Out</a>
-                @elseif(!Auth::user() && Setting::value('auth_show_login'))
+                @elseif(!Auth::user() && !Setting::value('auth_hide_login'))
                     <a class="navbar-item" href="{{ route('login') }}">Log In</a>
                 @endif
             </div>

@@ -109,15 +109,15 @@ use App\Setting;
 
     <div class="field">
         <label class="label">
-            <input type="checkbox" name="auth_show_login" value="1" {{ Setting::value('auth_show_login') ? 'checked="checked"' : ''}}>
-            Show Log In Button
+            <input type="checkbox" name="auth_hide_login" value="1" {{ Setting::value('auth_hide_login') ? 'checked="checked"' : ''}}>
+            Hide Log In Button
         </label>
     </div>
 
     <div class="field">
         <label class="label">
-            <input type="checkbox" name="auth_show_logout" value="1" {{ Setting::value('auth_show_logout') ? 'checked="checked"' : ''}}>
-            Show Log Out Button
+            <input type="checkbox" name="auth_hide_logout" value="1" {{ Setting::value('auth_hide_logout') ? 'checked="checked"' : ''}}>
+            Hide Log Out Button
         </label>
     </div>
 
