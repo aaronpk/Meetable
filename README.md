@@ -159,6 +159,23 @@ If you want to configure a list of allowed users, define them as a space-separat
 GITHUB_ALLOWED_USERS=user1 user2 user3
 ```
 
+#### Heroku Authentication
+
+You can use Heroku's OAuth to log in to this site. This is intended to be used to quickstart the Heroku deploy button, and is really only meant to be used when a single user will be logging in, since it's somewhat difficult to configure after the initial setup.
+
+If you are using the Heroku deploy button then this will all be configured automatically. If you'd like to set it up manually, the instructions are below.
+
+You'll need to create a Heroku OAuth app, which you can do [from the command line](https://devcenter.heroku.com/articles/platform-api-reference#oauth-client-create). Set the redirect URL to `https://events.example.org/auth/heroku`. You'll need the client ID and secret that are provided after creating the app.
+
+```
+AUTH_METHOD=heroku
+HEROKU_CLIENT_ID=
+HEROKU_CLIENT_SECRET=
+```
+
+There are no other config options to set permissions. The first user to log in will be the site admin. No other users will be able to log in after that. If you'd like, you can manually add Heroku user IDs to the database if you really do want other Heroku users to log in.
+
+
 #### Vouch Proxy
 
 In this configuration, this project provides no authentication mechanism itself. Instead, it relies on the web server being able to authenticate users somehow, and setting an environment variable when users are logged in.
