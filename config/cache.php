@@ -18,6 +18,7 @@ return [
     |
     */
 
+    // Default to file cache since that's most likely to work before any intentional config is set
     'default' => env('CACHE_DRIVER', 'file'),
 
     /*

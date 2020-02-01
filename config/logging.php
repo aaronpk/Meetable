@@ -17,7 +17,8 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    // Default to stderr on Heroku if not set
+    'default' => env('LOG_CHANNEL', isset($_ENV['DYNO']) ? 'stderr' : 'stack'),
 
     /*
     |--------------------------------------------------------------------------

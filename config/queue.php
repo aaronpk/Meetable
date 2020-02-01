@@ -13,6 +13,7 @@ return [
     |
     */
 
+    // Default to sync driver since that will always work in every environment, even if it's a bit slow
     'default' => env('QUEUE_CONNECTION', 'sync'),
 
     /*
