@@ -11,7 +11,6 @@ if(!file_exists(__DIR__.'/../vendor/autoload.php')) {
 
 require __DIR__.'/../vendor/autoload.php';
 
-
 // Load the .env file if it exists
 $dotenv = Dotenv\Dotenv::create(__DIR__.'/..');
 if(file_exists(__DIR__.'/../.env')) {
@@ -20,11 +19,11 @@ if(file_exists(__DIR__.'/../.env')) {
 
 // Check for environment variables and trigger the setup flow if it doesn't exist
 if(!getenv('APP_NAME')) {
-    // Setting the APP_NAME to 'Meetable Installer' will trigger `routes/web.php` to
-    // define the setup routes instead of app routes
     $_ENV['APP_NAME'] = 'Meetable Installer';
     // Use a temporary fixed APP_KEY during installation
     $_ENV['APP_KEY'] = 'base64:v7ZDOfJbqzXdbbJ/3GYSAP+B4jm3rMlrWiNutsaQYEE=';
+    // Setting the MEETABLE_SETUP to true will trigger `routes/web.php` to
+    // define the setup routes instead of app routes
     define('MEETABLE_SETUP', true);
 }
 

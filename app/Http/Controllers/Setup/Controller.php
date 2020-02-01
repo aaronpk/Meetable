@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Encryption\Encrypter;
 use DateTime, DateTimeZone, Exception;
 use Illuminate\Support\Facades\Schema;
-use Artisan;
+use Artisan, DB;
 
 class Controller extends BaseController
 {
@@ -29,8 +29,8 @@ class Controller extends BaseController
     }
 
     public function database() {
-        // Check for a Heroku ClearDB config string and set that as the defaults
-        if($url = getenv('CLEARDB_DATABASE_URL')) {
+        // Check for an existing DATABASE_URL config string and set that as the defaults
+        if($url = env('DATABASE_URL')) {
             $db = parse_url($url);
             session([
                 'setup.db_name' => substr($db['path'], 1),
@@ -49,9 +49,12 @@ class Controller extends BaseController
     }
 
     public function test_database() {
-        // Attempt to connect to the database with the provided credentials
+        // Attempt to connect to the database with the provided credentials or the defined DB URL
         try {
-            $db = new \PDO('mysql:dbname='.request('db_name').';host='.request('db_host'),
+            if(env('DATABASE_URL'))
+                DB::raw('SELECT VERSION();');
+            else
+                $db = new \PDO('mysql:dbname='.request('db_name').';host='.request('db_host'),
                 request('db_username'), request('db_password'));
             $success = true;
         } catch(\PDOException $e) {
@@ -72,13 +75,20 @@ class Controller extends BaseController
 
         } else {
 
-            // Store the DB connection info in the session for later
-            session([
-                'setup.db_name' => request('db_name'),
-                'setup.db_host' => request('db_host'),
-                'setup.db_username' => request('db_username'),
-                'setup.db_password' => request('db_password'),
-            ]);
+            if(request('db_name')) {
+                // Store the DB connection info in the session for later
+                session([
+                    'setup.db_name' => request('db_name'),
+                    'setup.db_host' => request('db_host'),
+                    'setup.db_username' => request('db_username'),
+                    'setup.db_password' => request('db_password'),
+                    'setup.db_complete' => true,
+                ]);
+            } else {
+                session([
+                    'setup.db_complete' => true
+                ]);
+            }
 
             return redirect(route('setup.app-settings'));
         }
@@ -86,7 +96,7 @@ class Controller extends BaseController
 
     public function app_settings() {
         // Check that DB settings are here, or go back a step
-        if(!session('setup.db_name')) {
+        if(!session('setup.db_complete')) {
             return redirect(route('setup.database'));
         }
 
@@ -129,13 +139,20 @@ class Controller extends BaseController
         $app_key = 'base64:'.base64_encode(Encrypter::generateKey('AES-256-CBC'));
         self::write_config_value($config, 'APP_KEY', $app_key);
 
-        self::write_config_value($config, 'APP_DEBUG', 'false');
-        self::write_config_value($config, 'APP_ENV', 'production');
-
-        self::write_config_value($config, 'DB_HOST', session('setup.db_host'));
-        self::write_config_value($config, 'DB_DATABASE', session('setup.db_name'));
-        self::write_config_value($config, 'DB_USERNAME', session('setup.db_username'));
-        self::write_config_value($config, 'DB_PASSWORD', session('setup.db_password'));
+        if(env('DATABASE_URL')) {
+            // If a DATABASE_URL env is defined, don't set any database configs
+            self::comment_config_value($config, 'DB_CONNECTION', '');
+            self::comment_config_value($config, 'DB_HOST', '');
+            self::comment_config_value($config, 'DB_DATABASE', '');
+            self::comment_config_value($config, 'DB_USERNAME', '');
+            self::comment_config_value($config, 'DB_PASSWORD', '');
+            self::comment_config_value($config, 'DB_PORT', '');
+        } else {
+            self::write_config_value($config, 'DB_HOST', session('setup.db_host'));
+            self::write_config_value($config, 'DB_DATABASE', session('setup.db_name'));
+            self::write_config_value($config, 'DB_USERNAME', session('setup.db_username'));
+            self::write_config_value($config, 'DB_PASSWORD', session('setup.db_password'));
+        }
 
         self::write_config_value($config, 'AUTH_METHOD', 'github');
         foreach(['github_client_id', 'github_client_secret', 'github_allowed_users', 'github_admin_users'] as $k) {
@@ -147,7 +164,7 @@ class Controller extends BaseController
         }
 
         if(self::is_heroku()) {
-            self::write_config_value($config, 'LOG_CHANNEL', 'stderr');
+            self::write_config_value($config, 'QUEUE_CONNECTION', 'database');
 
             // Remove comments
             $heroku = preg_replace('/#.+\n/m', '', $config);
@@ -205,11 +222,15 @@ class Controller extends BaseController
         if(strpos($value, ' '))
             $value = '"'.$value.'"';
 
-        $config = preg_replace('/^'.$key.'=.*/m', $key.'='.$value, $config, -1, $count);
+        $config = preg_replace('/^'.$key.'=.*/m', $key.'='.$value, $config, 1, $count);
         // If nothing matched, then find commented out lines and uncomment them
         if($count == 0) {
-            $config = preg_replace('/^# '.$key.'=.*/m', $key.'='.$value, $config, -1, $count);
+            $config = preg_replace('/^# '.$key.'=.*/m', $key.'='.$value, $config, 1, $count);
         }
+    }
+
+    private static function comment_config_value(&$config, $key) {
+        $config = preg_replace('/^'.$key.'=/m', '# '.$key.'=', $config, -1, $count);
     }
 
     public static function is_heroku() {

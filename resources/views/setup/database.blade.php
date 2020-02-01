@@ -5,7 +5,7 @@
 
   <article class="message" style="width: 600px;">
     <div class="message-header">
-      <p>Enter your database details</p>
+        <p>Enter your database details</p>
     </div>
     <div class="message-body content">
 
