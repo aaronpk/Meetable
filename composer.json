@@ -10,6 +10,9 @@
     "require": {
         "php": "^7.2",
         "ext-imagick": "*",
+        "ext-pdo": "*",
+        "ext-redis": "*",
+        "ext-pcntl": "*",
         "doctrine/dbal": "^2.9",
         "eluceo/ical": "^0.16",
         "fideloper/proxy": "^4.0",

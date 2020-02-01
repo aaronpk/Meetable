@@ -1,5 +1,7 @@
 # Meetable
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
 Meetable is a minimal events aggregator website.
 
 You can see a live version of this project at:
@@ -281,7 +283,7 @@ Configure your web server to proxy `/img/` to the imageproxy, e.g. for nginx:
 ```
 
 
-## Installing on Heroku
+## Installing on Heroku manually
 
 ```
 # Make sure to set the organization if you're adding this to an account that is not your personal account
@@ -305,19 +307,6 @@ git push heroku master
 
 heroku config:set ...
 ...
-
-# Set up a cron job to run the worker
-# Add the scheduler add-on
-heroku addons:create scheduler:standard
-
-# Configure it
-heroku addons:open scheduler
-
-# Add this command to the scheduler:
-# php artisan queue:work --stop-when-empty
-
-# If you need to, watch the logs:
-heroku logs --tail
 ```
 
 
