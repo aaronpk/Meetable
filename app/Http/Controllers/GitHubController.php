@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller as BaseController;
 use DateTime, DateTimeZone, Exception;
 use DB;
 use App\User;
+use Illuminate\Support\Str;
 
 class GitHubController extends BaseController
 {
@@ -96,12 +97,13 @@ class GitHubController extends BaseController
         }
 
         // Create the user record if it doesn't yet exist
-        $user = User::where('identifier', $userdata['id'])->first();
+        $user = User::where('identifier', $userdata['html_url'])->first();
         if(!$user) {
             $user = new User;
-            $user->identifier = $userdata['id'];
+            $user->identifier = $userdata['html_url'];
             $user->url = $userdata['html_url'];
             $user->photo = $user->downloadProfilePhoto($userdata['avatar_url']);
+            $user->api_token = Str::random(80);
         }
 
         $user->name = $userdata['name'];
@@ -117,7 +119,7 @@ class GitHubController extends BaseController
 
         // Now set the session data to make this user logged-in
         session([
-            'GITHUB_USER' => $userdata['id'],
+            'GITHUB_USER' => $userdata['html_url'],
         ]);
 
         if(session('AUTH_RETURN_TO')) {
