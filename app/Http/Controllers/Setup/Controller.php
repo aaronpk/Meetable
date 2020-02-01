@@ -11,6 +11,8 @@ use DateTime, DateTimeZone, Exception;
 use Illuminate\Support\Facades\Schema;
 use Artisan, DB;
 
+use App\Helpers\HerokuS3;
+
 class Controller extends BaseController
 {
 
@@ -152,6 +154,15 @@ class Controller extends BaseController
             self::write_config_value($config, 'DB_DATABASE', session('setup.db_name'));
             self::write_config_value($config, 'DB_USERNAME', session('setup.db_username'));
             self::write_config_value($config, 'DB_PASSWORD', session('setup.db_password'));
+        }
+
+        if(!empty(env('CLOUDCUBE_URL'))) {
+            self::write_config_value($config, 'FILESYSTEM_DRIVER', 's3');
+            self::write_config_value($config, 'AWS_ACCESS_KEY_ID', env('CLOUDCUBE_ACCESS_KEY_ID'));
+            self::write_config_value($config, 'AWS_SECRET_ACCESS_KEY', env('CLOUDCUBE_SECRET_ACCESS_KEY'));
+            self::write_config_value($config, 'AWS_DEFAULT_REGION', HerokuS3::get_default_aws_region());
+            self::write_config_value($config, 'AWS_BUCKET', HerokuS3::get_aws_bucket_from_env());
+            self::write_config_value($config, 'AWS_ROOT', HerokuS3::get_aws_root_from_env());
         }
 
         self::write_config_value($config, 'AUTH_METHOD', 'github');
