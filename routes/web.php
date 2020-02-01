@@ -3,8 +3,7 @@
 // Check whether setup has been completed and define installer routes if not
 if(defined('MEETABLE_SETUP')) {
 
-Route::get('/', 'Setup\Controller@index')->name('setup.redirect');
-Route::get('/setup', 'Setup\Controller@setup')->name('setup.setup');
+Route::get('/', 'Setup\Controller@setup')->name('setup');
 Route::get('/setup/db', 'Setup\Controller@database')->name('setup.database');
 Route::post('/setup/db-test', 'Setup\Controller@test_database')->name('setup.test-database');
 Route::get('/setup/app-settings', 'Setup\Controller@app_settings')->name('setup.app-settings');

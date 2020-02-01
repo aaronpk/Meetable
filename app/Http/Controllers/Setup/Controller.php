@@ -16,10 +16,6 @@ use App\Helpers\HerokuS3;
 class Controller extends BaseController
 {
 
-    public function index() {
-        return redirect(route('setup.setup'));
-    }
-
     public function setup() {
         // Check permissions of the storage folder
         if(!is_writable(__DIR__.'/../../../../storage/app/.gitignore')
