@@ -4,7 +4,6 @@
   "keywords": ["events", "community"],
   "repository": "https://github.com/aaronpk/Meetable",
   "addons": [
-    "heroku-redis",
     {
       "plan": "cleardb:ignite",
       "as": "DATABASE"

@@ -262,13 +262,6 @@ ALLOW_MANAGE_SITE=admins
 
 Currently `ALLOW_MANAGE_EVENTS` enables access to everything around events, including creating, editing, and deleting events, as well as adding and deleting responses.
 
-You can choose whether to accept comments, RSVPs, and photos via [Webmention](https://webmention.net) in the config file.
-
-```
-ENABLE_WEBMENTION_RESPONSES=true
-ENABLE_WEBMENTION_RESPONSES=false
-```
-
 
 ### Images
 
@@ -315,7 +308,7 @@ heroku git:remote -a your-heroku-app-name
 # Add MySQL
 heroku addons:create cleardb:ignite --as=DATABASE
 
-# Add CloudCube
+# Add CloudCube (AWS S3 storage)
 heroku addons:create cloudcube:free
 
 # Deploy the app to Heroku
