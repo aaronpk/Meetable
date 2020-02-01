@@ -315,6 +315,9 @@ heroku git:remote -a your-heroku-app-name
 # Add MySQL
 heroku addons:create cleardb:ignite --as=DATABASE
 
+# Add CloudCube
+heroku addons:create cloudcube:free
+
 # Deploy the app to Heroku
 git push heroku master
 
