@@ -64,7 +64,6 @@ return [
             'url' => env('AWS_URL', HerokuS3::get_aws_url_from_env()),
             'root' => env('AWS_ROOT', HerokuS3::get_aws_root_from_env()),
         ],
-
     ],
 
 ];
@@ -79,6 +78,18 @@ function get_url_without_path($url, $path=null) {
     return substr($url, 0, strlen($url) - strlen($path));
 }
 
+function get_url_host($url) {
+    $parsed = parse_url($url);
+    return array_key_exists('host', $parsed) ? $parsed['host'] : '';
+}
+
+function get_url_domain_parts($url) {
+    return array_filter(
+        explode('.', get_url_host($url)),
+        function($item) { return !empty($item); }
+    );
+}
+
 function get_aws_bucket_from_env() {
     $value = basename(get_url_path(env('AWS_URL')));
     return empty($value) ? null : $value;
@@ -87,4 +98,21 @@ function get_aws_url_from_env() {
     $path = get_url_path(env('AWS_URL'));
     $value = get_url_without_path(env('AWS_URL'), $path);
     return empty($value) ? null : $value;
+}
+
+function get_default_aws_region() {
+    $domainParts = get_url_domain_parts(env('AWS_URL'));
+    if(count($domainParts) == '4') {
+        return get_default_cloudcube_region($domainParts[0]);
+    }
+    return 'us-east-1';
+}
+function get_default_cloudcube_region($region) {
+    switch($region) {
+        case 'cloud-cube-eu':
+            return 'eu-west-1';
+        case 'cloud-cube-jp':
+            return 'ap-northeast-1';
+    }
+    return 'us-east-1';
 }
