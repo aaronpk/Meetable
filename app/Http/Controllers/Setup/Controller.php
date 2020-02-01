@@ -164,8 +164,12 @@ class Controller extends BaseController
         }
 
         if(self::is_heroku()) {
-            self::write_config_value($config, 'QUEUE_CONNECTION', 'database');
-
+            if (!empty(env('REDIS_URL'))) {
+                self::write_config_value($config, 'QUEUE_CONNECTION', 'redis');
+            }
+            else {
+                self::write_config_value($config, 'QUEUE_CONNECTION', 'database');
+            }
             // Remove comments
             $heroku = preg_replace('/#.+\n/m', '', $config);
 
