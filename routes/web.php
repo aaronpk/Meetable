@@ -15,7 +15,9 @@ Route::post('/setup/register-heroku-app', 'Setup\Controller@register_heroku_app'
 Route::get('/setup/auth-settings', 'Setup\Controller@auth_settings')->name('setup.auth-settings');
 Route::post('/setup/auth-settings', 'Setup\Controller@save_auth_settings')->name('setup.save-auth-settings');
 Route::get('/setup/save', 'Setup\Controller@save_config')->name('setup.save-config');
+Route::get('/setup/push-heroku-config', 'Setup\Controller@push_heroku_config')->name('setup.push-heroku-config');
 Route::get('/setup/database', 'Setup\Controller@create_database_error')->name('setup.create-database');
+Route::get('/setup/heroku-complete', 'Setup\Controller@heroku_config_complete')->name('setup.heroku-config-complete');
 
 } else {
 
@@ -27,6 +29,7 @@ Route::get('/', 'Controller@index')->name('index');
 Route::get('/setup/save', 'Setup\Controller@redirect_after_complete');
 ## Create the database here
 Route::get('/setup/database', 'Setup\Controller@create_database')->name('setup.create-database');
+Route::get('/setup/heroku-complete', 'Setup\Controller@heroku_config_complete')->name('setup.heroku-config-complete');
 ######
 
 

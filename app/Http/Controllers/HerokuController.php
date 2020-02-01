@@ -20,7 +20,6 @@ class HerokuController extends BaseController
         $params = [
             'response_type' => 'code',
             'client_id' => env('HEROKU_CLIENT_ID'),
-            'redirect_uri' => route('heroku-oauth-redirect'),
             'state' => $state,
             'scope' => 'identity',
         ];
@@ -52,7 +51,6 @@ class HerokuController extends BaseController
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
             'grant_type' => 'authorization_code',
             'code' => request('code'),
-            'redirect_uri' => route('heroku-oauth-redirect'),
             'client_id' => env('HEROKU_CLIENT_ID'),
             'client_secret' => env('HEROKU_CLIENT_SECRET'),
         ]));

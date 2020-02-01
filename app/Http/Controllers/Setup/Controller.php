@@ -150,7 +150,7 @@ class Controller extends BaseController
             return response()->json(['error' => 'invalid app URL']);
         $app_name = $match[1];
 
-        $ch = curl_init('https://meetable.org/register.php');
+        $ch = curl_init('https://meetable.org/heroku/register.php');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
             'name' => session('setup.app_name'),
@@ -242,8 +242,19 @@ class Controller extends BaseController
             }, $lines);
             $heroku = implode("\n", $lines);
 
+            $heroku_app = false;
+            if(preg_match('~//([^\.]+)\.herokuapp\.com~', session('setup.app_url'), $match)) {
+                $heroku_app = $match[1];
+            }
+
+            session([
+                'setup.heroku_config' => $heroku,
+                'setup.heroku_app' => $heroku_app,
+            ]);
+
             return view('setup/heroku-config', [
                 'config' => $heroku,
+                'heroku_app' => $heroku_app,
             ]);
         } else {
 
@@ -257,6 +268,22 @@ class Controller extends BaseController
                 return view('setup/config-success');
             }
         }
+    }
+
+    public function push_heroku_config() {
+        // Push the config to the configure tool and redirect there
+        $ch = curl_init('https://meetable.org/heroku/configure.php');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+            'app_name' => session('setup.heroku_app'),
+            'config' => session('setup.heroku_config'),
+        ]));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $data = json_decode(curl_exec($ch), true);
+        return redirect($data['url']);
+    }
+
+    public function heroku_config_complete() {
+        return view('setup/heroku-config-complete');
     }
 
     // This is run after the environment is created so that the database settings are loaded
