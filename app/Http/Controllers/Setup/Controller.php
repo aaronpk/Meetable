@@ -166,6 +166,9 @@ class Controller extends BaseController
         if(self::is_heroku()) {
             if (!empty(env('REDIS_URL'))) {
                 self::write_config_value($config, 'QUEUE_CONNECTION', 'redis');
+                if (!empty(env('REDIS_SESSION'))) {
+                    self::write_config_value($config, 'SESSION_DRIVER', 'redis');
+                }
             }
             else {
                 self::write_config_value($config, 'QUEUE_CONNECTION', 'database');
