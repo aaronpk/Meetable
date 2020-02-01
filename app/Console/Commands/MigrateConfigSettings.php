@@ -1,19 +1,16 @@
 <?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Console\Commands;
+use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use App\Setting;
 
-class MigrateSettingsToDb extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class MigrateConfigSettings extends Command {
+
+    protected $signature = 'migrate:settings';
+    protected $description = 'Migrate config settings from .env to the database';
+
+    public function handle() {
+
         $migrated = false;
 
         $properties = ['LOGO_URL', 'LOGO_WIDTH', 'LOGO_HEIGHT', 'FAVICON_URL', 'GA_ID'];
@@ -40,18 +37,8 @@ class MigrateSettingsToDb extends Migration
                 $migrated = true;
         }
 
-        if($migrated) {
-            Log::info('You can delete the following entries from your .env file:');
-            Log::info(implode(', ', array_merge($properties, $checkboxes, $passwords)));
-        }
-    }
+        $this->info('You can delete the following entries from your .env file:');
+        $this->info(implode(', ', array_merge($properties, $checkboxes, $passwords)));
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
     }
 }
