@@ -6,6 +6,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use DateTime, DateTimeZone, Exception;
 use DB;
+use App\User;
 
 class GitHubController extends BaseController
 {
@@ -94,12 +95,28 @@ class GitHubController extends BaseController
             }
         }
 
+        // Create the user record if it doesn't yet exist
+        $user = User::where('url', $userdata['html_url'])->first();
+        if(!$user) {
+            $user = new User;
+            $user->url = $userdata['html_url'];
+            $user->photo = $user->downloadProfilePhoto($userdata['avatar_url']);
+        }
+
+        $user->name = $userdata['name'];
+
+        if(env('GITHUB_ADMIN_USERS')) {
+            $adminUsers = explode(' ', env('GITHUB_ADMIN_USERS'));
+            if(in_array($userdata['login'], $adminUsers)) {
+                $user->is_admin = true;
+            }
+        }
+
+        $user->save();
+
         // Now set the session data to make this user logged-in
         session([
             'GITHUB_USER' => $userdata['html_url'],
-            'GITHUB_LOGIN' => $userdata['login'],
-            'GITHUB_USER_NAME' => $userdata['name'],
-            'GITHUB_USER_PHOTO' => $userdata['avatar_url'],
         ]);
 
         if(session('AUTH_RETURN_TO')) {

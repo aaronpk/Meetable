@@ -37,27 +37,25 @@ class HerokuGuard extends CustomGuard {
     }
 
     public function check() {
-        $url = session('HEROKU_USERID');
-        return $url == true;
+        return session('HEROKU_USERID') == true;
     }
 
     public function guest() {
-        $url = session('HEROKU_USERID');
-        return $url != true;
+        return session('HEROKU_USERID') != true;
     }
 
     public function user() {
         static $cached = false;
 
-        $url = session('HEROKU_USERID');
+        $userid = session('HEROKU_USERID');
 
-        if(!$url)
+        if(!$userid)
           return null;
 
-        if($cached && $cached->url == $url)
+        if($cached && $cached->url == 'heroku://'.$userid)
             return $cached;
 
-        $user = User::where('url', 'heroku://'.$url)->first();
+        $user = User::where('url', 'heroku://'.$userid)->first();
 
         $cached = $user;
         return $user;

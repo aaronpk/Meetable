@@ -37,13 +37,11 @@ class GitHubGuard extends CustomGuard {
     }
 
     public function check() {
-        $url = session('GITHUB_USER');
-        return $url == true;
+        return session('GITHUB_USER') == true;
     }
 
     public function guest() {
-        $url = session('GITHUB_USER');
-        return $url != true;
+        return session('GITHUB_USER') != true;
     }
 
     public function user() {
@@ -57,21 +55,7 @@ class GitHubGuard extends CustomGuard {
         if($cached && $cached->url == $url)
             return $cached;
 
-        list($user, $created) = $this->getUserFromURL($url);
-
-        if($created) {
-            $user->name = session('GITHUB_USER_NAME');
-            $user->photo = $user->downloadProfilePhoto(session('GITHUB_USER_PHOTO'));
-
-            if(env('GITHUB_ADMIN_USERS')) {
-                $adminUsers = explode(' ', env('GITHUB_ADMIN_USERS'));
-                if(in_array(session('GITHUB_LOGIN'), $adminUsers)) {
-                    $user->is_admin = true;
-                }
-            }
-
-            $user->save();
-        }
+        $user = User::where('url', $url)->first();
 
         $cached = $user;
         return $user;
