@@ -18,10 +18,19 @@
 
 </section>
 <script>
-setTimeout(function(){
-
-    window.location = "/";
-
-}, 8*1000);
+function checkIfComplete() {
+    setTimeout(function(){
+        $.get('/setup/heroku-in-progress', function(response){
+            if(response.setup == 'finished') {
+                setTimeout(function(){
+                    window.location = "/";
+                }, 500);
+            } else {
+                checkIfComplete();
+            }
+        });
+    }, 2000);
+}
+checkIfComplete();
 </script>
 @endsection

@@ -17,6 +17,7 @@ Route::get('/setup/save', 'Setup\Controller@save_config')->name('setup.save-conf
 Route::get('/setup/push-heroku-config', 'Setup\Controller@push_heroku_config')->name('setup.push-heroku-config');
 Route::get('/setup/database', 'Setup\Controller@create_database_error')->name('setup.create-database');
 Route::get('/setup/heroku-complete', 'Setup\Controller@heroku_config_complete')->name('setup.heroku-config-complete');
+Route::get('/setup/heroku-in-progress', 'Setup\Controller@heroku_in_progress')->name('setup.heroku-in-progres');
 
 } else {
 
@@ -29,6 +30,7 @@ Route::get('/setup/save', 'Setup\Controller@redirect_after_complete');
 ## Create the database here
 Route::get('/setup/database', 'Setup\Controller@create_database')->name('setup.create-database');
 Route::get('/setup/heroku-complete', 'Setup\Controller@heroku_config_complete')->name('setup.heroku-config-complete');
+Route::get('/setup/heroku-in-progress', 'Setup\Controller@heroku_finished')->name('setup.heroku-in-progres');
 ######
 
 

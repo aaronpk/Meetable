@@ -282,6 +282,18 @@ class Controller extends BaseController
         return view('setup/heroku-config-complete');
     }
 
+    public function heroku_in_progress() {
+        return response()->json([
+            'setup' => 'in-progress'
+        ]);
+    }
+
+    public function heroku_finished() {
+        return response()->json([
+            'setup' => 'finished'
+        ]);
+    }
+
     // This is run after the environment is created so that the database settings are loaded
     public function create_database() {
         // Only allow this to run if the database has not already been created
