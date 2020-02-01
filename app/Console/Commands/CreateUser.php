@@ -14,6 +14,7 @@ class CreateUser extends Command {
         $url = $this->argument('url');
 
         $user = new User();
+        $user->identifier = $url;
         $user->url = $url;
         $user->api_token = Str::random(80);
         $user->save();
