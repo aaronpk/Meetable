@@ -2,7 +2,7 @@
 
 @section('headtags')
 
-@if(env('ENABLE_WEBMENTION_RESPONSES'))
+@if(\App\Setting::value('enable_webmention_responses'))
 <link rel="webmention" href="{{ route('webmention') }}">
 @endif
 
