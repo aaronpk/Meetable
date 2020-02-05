@@ -113,6 +113,9 @@ class ICSController extends BaseController
         $vEvent->setCreated(new DateTime($event->created_at));
         $vEvent->setModified(new DateTime($event->updated_at));
 
+        $vEvent->setUrl($event->absolute_permalink());
+        $vEvent->setUniqueId(parse_url(env('APP_URL'), PHP_URL_HOST).'/'.$event->key);
+
         $vEvent->setMsBusyStatus('free');
 
         $vCalendar->addComponent($vEvent);
