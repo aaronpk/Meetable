@@ -316,10 +316,18 @@ class Event extends Model
     }
 
     public function is_past() {
-        if($this->end_date) {
-            $date = new DateTime($this->end_date.' '.$this->end_time);
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
         } else {
-            $date = new DateTime($this->start_date.' '.($this->end_time ?: $this->start_time));
+            // Show "I'm going" unless the event is for sure past.
+            // Fall back to last timezone.
+            $tz = new DateTimeZone('-12:00');
+        }
+
+        if($this->end_date) {
+            $date = new DateTime($this->end_date.' '.$this->end_time, $tz);
+        } else {
+            $date = new DateTime($this->start_date.' '.($this->end_time ?: $this->start_time), $tz);
         }
 
         $now = new DateTime();
