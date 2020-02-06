@@ -5,8 +5,8 @@ use App\Setting;
 @endphp
 
 @section('scripts')
-@if(env('GOOGLEMAPS_API_KEY'))
-<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLEMAPS_API_KEY') }}&libraries=places"></script>
+@if(Setting::value('googlemaps_api_key'))
+<script src="https://maps.googleapis.com/maps/api/js?key={{ Setting::value('googlemaps_api_key') }}&libraries=places"></script>
 <script src="/assets/bulmahead.js"></script>
 <script src="/assets/mapsearch.js"></script>
 @endif
@@ -96,7 +96,7 @@ form h2.subtitle {
 
     <h2 class="subtitle">Where will the event take place?</h2>
 
-    @if(env('GOOGLEMAPS_API_KEY'))
+    @if(Setting::value('googlemaps_api_key'))
         <div class="field">
             <div class="dropdown" style="display: block;">
                 <div class="dropdown-trigger" style="">
