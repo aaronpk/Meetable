@@ -81,12 +81,12 @@ class WebmentionController extends BaseController
 
         event(new WebmentionReceived($response));
 
-        if(request()->wantsJson()) {
+        if(request('from') == 'browser') {
+            return redirect($event->permalink().'#rsvps');
+        } else {
             return response()->json([
                 'result' => 'accepted'
             ]);
-        } else {
-            return redirect($event->permalink().'#rsvps');
         }
     }
 

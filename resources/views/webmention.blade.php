@@ -28,6 +28,7 @@
         </div>
 
         <button class="button is-primary" type="submit">Send Webmention</button>
+        <input type="hidden" name="from" value="browser">
 
         {{ csrf_field() }}
     </form>
