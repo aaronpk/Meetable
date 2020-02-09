@@ -19,7 +19,7 @@
 
                     <span class="avatar">
                         @if($response->author()['photo'])
-                            <img src="@image_proxy($response->author()['photo'], '96x96,sc')" width="48" class="photo">
+                            <img src="{{ $response->author_photo() }}" width="48" class="photo">
                         @endif
                         <span class="author-details">
                             <a href="{{ $response->author()['url'] }}" class="author-name">{{ $response->author()['name'] ?? p3k\url\display_url($response->author()['url']) }}</a>

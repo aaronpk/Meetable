@@ -289,7 +289,7 @@
                     <li>
                         <span class="avatar">
                             @if($comment->author()['photo'])
-                                <img src="@image_proxy($comment->author()['photo'], '96x96,sc')" width="48" class="photo">
+                                <img src="{{ $comment->author_photo() }}" width="48" class="photo">
                             @endif
                             <span class="author-details">
                                 <a href="{{ $comment->author()['url'] }}" class="author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>

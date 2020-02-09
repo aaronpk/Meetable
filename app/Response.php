@@ -57,10 +57,6 @@ class Response extends Model
         }
     }
 
-    public function author_photo_square() {
-        return Event::image_proxy($this->author_photo(), '96x96,sc');
-    }
-
     public function link() {
         return $this->url ?: $this->source_url;
     }

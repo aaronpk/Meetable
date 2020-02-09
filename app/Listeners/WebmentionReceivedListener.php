@@ -5,6 +5,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Storage, Log;
 use App\Events\WebmentionReceived;
+use Image;
 
 class WebmentionReceivedListener implements ShouldQueue {
 
@@ -28,13 +29,13 @@ class WebmentionReceivedListener implements ShouldQueue {
         // If there is an author photo, download it and rewrite the URL
         if($response->author_photo) {
             $changed = true;
-            $response->author_photo = $this->download($response, $response->author_photo);
+            $response->author_photo = $this->download($response, $response->author_photo, 150, 150);
         }
 
         $response->save();
     }
 
-    private function download($response, $url) {
+    private function download($response, $url, $w=null, $h=null) {
         Log::info('Downloading image '.$url);
 
         $filename = 'public/responses/'.$response->event->id.'/'.md5($url).'.jpg';
@@ -42,15 +43,38 @@ class WebmentionReceivedListener implements ShouldQueue {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $temp = curl_exec($ch);
+        curl_setopt($ch, CURLOPT_USERAGENT, \App\Helpers\HTTP::user_agent());
+        $original_image = curl_exec($ch);
 
-        Storage::put($filename, $temp);
-        Storage::setVisibility($filename, 'public');
+        if($original_image && curl_errno($ch) == 0) {
+            if($w && $h) {
+                try {
+                    $image = Image::make($original_image);
+                    $image->fit($w, $h);
 
-        $photo_url = Storage::url($filename);
-        Log::info('  saved as '.$photo_url);
+                    Storage::put($filename, $image->stream('jpg', 80));
+                    Storage::setVisibility($filename, 'public');
 
-        return $photo_url;
+                    $photo_url = Storage::url($filename);
+                    Log::info('  saved as '.$photo_url);
+
+                    return $photo_url;
+                } catch(\Exception $e) {
+                    Log::error('  reading image at '.$url.' failed: '.$e->getMessage());
+                }
+            } else {
+                Storage::put($filename, $original_image);
+                Storage::setVisibility($filename, 'public');
+
+                $photo_url = Storage::url($filename);
+                Log::info('  saved as '.$photo_url);
+
+                return $photo_url;
+            }
+        } else {
+            Log::error('  download failed: '.curl_error($ch));
+            return $url;
+        }
     }
 
 }
