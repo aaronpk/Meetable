@@ -257,16 +257,16 @@ class EventController extends BaseController
     public function save_alt_text(Event $event) {
         Gate::authorize('manage-event', $event);
 
-        $response = Response::where('event_id', $event->id)->where('id', request('response_id'))->first();
+        $photo = ResponsePhoto::where('event_id', $event->id)->where('id', request('photo_id'))->first();
 
-        if(!$response) {
+        if(!$photo) {
             return response()->json([
                 'result' => 'error',
             ]);
         }
 
-        $response->set_photo_alt(request('url'), request('alt'));
-        $response->save();
+        $photo->alt = request('alt');
+        $photo->save();
 
         return response()->json([
             'result' => 'ok',
