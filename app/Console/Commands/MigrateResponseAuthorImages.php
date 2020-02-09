@@ -6,7 +6,7 @@ use Log, Storage;
 use App\User, App\Event, App\Response;
 use Image;
 
-class MigrateUserImages extends Command {
+class MigrateResponseAuthorImages extends Command {
 
     protected $signature = 'migrate:response_author_images';
     protected $description = 'Migrate response author images to new URLs';
