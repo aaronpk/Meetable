@@ -10,10 +10,6 @@ class Event extends Model
 {
     use SoftDeletes;
 
-    protected $casts = [
-        'photo_order' => 'array',
-    ];
-
     protected $hidden = [
         'id',
     ];
@@ -39,25 +35,16 @@ class Event extends Model
         }
     }
 
-    public static function image_proxy($url, $opts) {
-        // https://github.com/willnorris/imageproxy
-        $urlToSign = $url.'#'.$opts;
-        $key = env('IMAGE_PROXY_KEY') ?: env('APP_KEY');
-        $sig = strtr(base64_encode(hash_hmac('sha256', $urlToSign, $key, 1)), '/+' , '_-');
-        $base = env('IMAGE_PROXY_BASE') ?: '/img/';
-        return $base.$opts.',s'.$sig.'/'.$url;
-    }
-
-    public function cover_image_cropped() {
-        if(!$this->cover_image)
-            return '';
-
-        return $this->cover_image;
-    }
-
     public function responses() {
         return $this->hasMany('\App\Response')
             ->where('approved', true)
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function photos() {
+        return $this->hasMany('\App\ResponsePhoto')
+            ->where('approved', true)
+            ->orderBy('sort_order', 'asc')
             ->orderBy('created_at', 'desc');
     }
 
@@ -127,43 +114,6 @@ class Event extends Model
 
     public function rsvps_remote() {
         return $this->responses()->where('rsvp', 'remote')->orderBy('created_at', 'desc');
-    }
-
-    public function photos() {
-        return $this->responses()->whereNotNull('photos')->orderBy('created_at');
-    }
-
-    public function num_photos() {
-        $num = 0;
-        $responses = $this->photos()->get();
-        foreach($responses as $response) {
-            $num += count($response->photos);
-        }
-        return $num;
-    }
-
-    public function photo_urls() {
-        $data = [];
-        foreach($this->photos()->get() as $photo) {
-            foreach($photo->photos as $u) {
-                $data[$u] = $photo;
-            }
-        }
-        $urls = [];
-        if($this->photo_order) {
-            foreach($this->photo_order as $u) {
-                if(array_key_exists($u, $data)) {
-                    $urls[] = [$u, $data[$u]];
-                    unset($data[$u]);
-                }
-            }
-        }
-        if(count($data)) {
-            foreach($data as $u=>$photo) {
-                $urls[] = [$u, $photo];
-            }
-        }
-        return $urls;
     }
 
     public function blog_posts() {
@@ -452,10 +402,9 @@ class Event extends Model
             $data['endDate'] = $end;
 
         if($this->cover_image) {
-            $data['image'] = $this->cover_image_cropped();
-        } elseif($this->photo_urls()) {
-            $urls = $this->photo_urls();
-            $data['image'] = self::image_proxy($urls[0][0], '1600x0');
+            $data['image'] = $this->cover_image;
+        } elseif($this->has_photos()) {
+            $data['image'] = $this->photos[0]->full_url;
         }
 
         if($this->tickets_url) {

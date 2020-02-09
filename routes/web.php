@@ -61,9 +61,6 @@ Route::get('/logout', 'AuthController@logout')->name('logout');
 Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
 Route::get('/auth/heroku', 'HerokuController@callback')->name('heroku-oauth-redirect');
 
-Route::get('/img/{settings}/{image}', 'ImageController@render')
-  ->where(['image' => '.+']);
-
 Route::get('/{key}', 'Controller@event_shorturl');
 
 Route::middleware('auth')->group(function(){

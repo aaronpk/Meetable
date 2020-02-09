@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\EventRevision, App\Tag, App\Response;
+use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto;
 use Illuminate\Support\Str;
 use Auth, Storage, Gate, Log;
 use Image;
@@ -179,12 +179,6 @@ class EventController extends BaseController
             return redirect($event->permalink().'#error');
         }
 
-        // Save a copy of the file in the download folder
-        $filename = Str::random(30).'.jpg';
-
-        Storage::putFileAs('public/responses/'.$event->id, request('photo'), $filename, 'public');
-        $photo_url = Storage::url('public/responses/'.$event->id.'/'.$filename);
-
         // Create a new stub response to store this photo
         $response = new Response;
         $response->event_id = $event->id;
@@ -192,15 +186,25 @@ class EventController extends BaseController
         $response->approved_by = Auth::user()->id;
         $response->approved_at = date('Y-m-d H:i:s');
         $response->created_by = Auth::user()->id;
-        $response->photos = [$photo_url];
-
-        if(request('alt')) {
-            $response->photo_alt = [
-                $photo_url => request('alt')
-            ];
-        }
-
         $response->save();
+
+
+        // Save a copy of the file in the download folder
+        $filename = Str::random(30).'.jpg';
+        $full_filename = 'public/responses/'.$event->id.'/'.$filename;
+        Storage::putFileAs('public/responses/'.$event->id, request('photo'), $filename, 'public');
+        $photo_url = Storage::url($full_filename);
+
+        Log::info('Uploaded file stored as '.$full_filename.' at URL '.$photo_url);
+
+        $photo = ResponsePhoto::create($response, [
+            'original_filename' => $full_filename,
+            'original_url' => $photo_url,
+            'alt' => request('alt'),
+            'approved' => true,
+        ]);
+
+        $photo->createResizedImages(Image::make(request('photo')));
 
         return redirect($event->permalink().'#photos');
     }
@@ -208,8 +212,11 @@ class EventController extends BaseController
     public function set_photo_order(Event $event) {
         Gate::authorize('manage-event', $event);
 
-        $event->photo_order = request('order');
-        $event->save();
+        foreach(request('order') as $order=>$photo_id) {
+            $photo = ResponsePhoto::where('event_id', $event->id)->where('id', $photo_id)->first();
+            $photo->sort_order = $order;
+            $photo->save();
+        }
 
         return response()->json([
             'result' => 'ok'
@@ -229,6 +236,7 @@ class EventController extends BaseController
 
     public function get_response_details(Event $event, Response $response) {
         Gate::authorize('manage-event', $event);
+        $response->photos; // load photos so they are part of the response
         return response()->json($response);
     }
 
@@ -237,6 +245,9 @@ class EventController extends BaseController
 
         $id = $response->id;
         $response->delete();
+
+        ResponsePhoto::where('response_id', $id)->delete();
+
         return response()->json([
             'result' => 'ok',
             'response_id' => $id,

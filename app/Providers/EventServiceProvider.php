@@ -23,6 +23,10 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\WebmentionReceivedListener::class,
         ],
 
+        'App\Events\ResizeImages' => [
+            \App\Listeners\ResizeImagesListener::class,
+        ],
+
         'App\Events\UserCreated' => [
             \App\Listeners\UserCreatedListener::class,
         ],

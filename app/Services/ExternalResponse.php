@@ -1,7 +1,9 @@
 <?php
 namespace App\Services;
 
-use App\User;
+use App\User, App\Response, App\ResponsePhoto;
+use Log, Storage;
+use App\Events\ResizeImages;
 
 class ExternalResponse {
 
@@ -36,13 +38,6 @@ class ExternalResponse {
             $response->content_html = null;
         }
 
-        if(isset($data['photo'])) {
-            // A background job will be queued to download these photos
-            $response->photos = $data['photo'];
-        } else {
-            $response->photos = null;
-        }
-
         foreach(['name', 'photo', 'url'] as $prop) {
             if(isset($data['author'][$prop])) {
                 $response->{'author_'.$prop} = $data['author'][$prop];
@@ -51,7 +46,7 @@ class ExternalResponse {
             }
         }
 
-        if(isset($data['author']['url'])) {
+        if(isset($data['rsvp']) && isset($data['author']['url'])) {
             // Set the rsvp_user_id if source URL domain matches the author URL domain
             if(\p3k\url\host_matches($url, $data['author']['url'])) {
                 // Check if there is a user with this URL
@@ -60,6 +55,18 @@ class ExternalResponse {
                     $response->rsvp_user_id = $rsvpUser->id;
                 }
             }
+        }
+    }
+
+    public static function createPhotoRecords(&$response, $photos) {
+        foreach($photos as $url) {
+            $photo = ResponsePhoto::create($response, [
+                'source_url' => $url,
+                'alt' => null,
+                'approved' => $response->approved,
+            ]);
+            // Queue a job to resize the images
+            event(new ResizeImages($photo));
         }
     }
 

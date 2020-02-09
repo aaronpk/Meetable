@@ -14,7 +14,7 @@
 <meta property="og:title" content="{{ $event->name }}">
 <meta property="og:url" content="{{ $event->absolute_permalink() }}">
 @if($event->cover_image)
-<meta property="og:image" content="{{ $event->cover_image_cropped() }}">
+<meta property="og:image" content="{{ $event->cover_image }}">
 <meta name="twitter:card" content="summary_large_image">
 @endif
 @endsection
@@ -76,7 +76,7 @@
 
     @if($event->cover_image)
         <div class="cover-image">
-            <img src="{{ $event->cover_image_cropped() }}" class="u-featured" style="max-width: 720px; width: 100%;">
+            <img src="{{ $event->cover_image }}" class="u-featured" style="max-width: 720px; width: 100%;">
         </div>
     @endif
 
@@ -229,8 +229,8 @@
     @if($event->has_photos())
         <div class="responses photos" id="photos">
             <ul class="photo-album">
-                @foreach($event->photo_urls() as $p)
-                    <li data-photo-url="{{ $p[0] }}"><a href="@image_proxy($p[0], '1600x0')" class="u-photo photo-popup" data-original-url="{{ $p[1]->photo_original_url() }}" data-author-name="{{ $p[1]->photo_author_name() }}" data-alt-text="{{ $p[1]->photo_alt_text($p[0]) }}" data-response-id="{{ $p[1]->id }}" data-photo-url="{{ $p[0] }}"><img src="@image_proxy($p[0], '230x230,sc')" width="230" height="230" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}" class="square"><img src="@image_proxy($p[0], '710x0')" class="full" alt="{{ $p[1]->photo_alt_text($p[0]) }}" title="{{ $p[1]->photo_alt_text($p[0]) }}"></a></li>
+                @foreach($event->photos as $p)
+                    <li data-photo-id="{{ $p->id }}"><a href="{{ $p->full_url }}" class="u-photo photo-popup" data-original-url="{{ $p->response->photo_original_url() }}" data-author-name="{{ $p->response->photo_author_name() }}" data-alt-text="{{ $p->alt }}" data-response-id="{{ $p->response_id }}" data-photo-id="{{ $p->id }}"><img src="{{ $p->square_url }}" width="230" height="230" alt="{{ $p->alt }}" title="{{ $p->alt }}" class="square"><img src="{{ $p->large_url }}" class="full" alt="{{ $p->alt }}" title="{{ $p->alt }}"></a></li>
                  @endforeach
             </ul>
         </div>
@@ -253,7 +253,7 @@
                         </div>
                     </div>
                     <input type="hidden" id="response_id">
-                    <input type="hidden" id="photo_url">
+                    <input type="hidden" id="photo_id">
                     @endcan
                     <p class="original-source">via <a href=""></a></p>
                 </div>
@@ -319,12 +319,12 @@
             $(".photo-album").sortable({
                 placeholder: "ui-state-highlight",
                 stop: function(event, ui) {
-                    var photoURLs = $(".photo-album li").map(function(){
-                        return $(this).data("photo-url");
+                    var photoIDs = $(".photo-album li").map(function(){
+                        return $(this).data("photo-id");
                     }).get();
                     $.post("{{ route('set-photo-order', $event) }}", {
                         _token: $("input[name=_token]").val(),
-                        order: photoURLs
+                        order: photoIDs
                     }, function(response){
                         console.log(response);
                     });

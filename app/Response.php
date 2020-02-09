@@ -9,12 +9,6 @@ class Response extends Model
 {
     use SoftDeletes;
 
-    # https://laravel.com/docs/5.7/eloquent-mutators#array-and-json-casting
-    protected $casts = [
-        'photos' => 'array',
-        'photo_alt' => 'array',
-    ];
-
     protected $hidden = [
         'id', 'event_id', 'rsvp_user_id', 'created_by', 'approved_by',
     ];
@@ -29,6 +23,11 @@ class Response extends Model
 
     public function approvedBy() {
         return $this->belongsTo('\App\User', 'approved_by', 'id');
+    }
+
+    public function photos() {
+        return $this->hasMany('App\ResponsePhoto')
+            ->where('approved', true);
     }
 
     public function author() {
@@ -59,17 +58,6 @@ class Response extends Model
 
     public function link() {
         return $this->url ?: $this->source_url;
-    }
-
-    public function photo_alt_text($url) {
-        // Returns the alt text for the given photo URL
-        if(is_array($this->photos) && in_array($url, $this->photos)) {
-            if(is_array($this->photo_alt) && array_key_exists($url, $this->photo_alt)) {
-                return $this->photo_alt[$url];
-            }
-        } else {
-            return null;
-        }
     }
 
     public function set_photo_alt($url, $alt) {

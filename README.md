@@ -38,7 +38,6 @@ When logged in, you can add photos directly to an event page. Event pages also a
 * [Composer](https://getcomposer.org)
 * MySQL
 * Optional: Redis
-* Optional: [imageproxy](https://github.com/willnorris/imageproxy)
 
 ### Installation
 
@@ -261,36 +260,6 @@ ALLOW_MANAGE_SITE=admins
 ```
 
 Currently `ALLOW_MANAGE_EVENTS` enables access to everything around events, including creating, editing, and deleting events, as well as adding and deleting responses.
-
-
-### Images
-
-By default, this project will handle its own image resizing itself. Uploaded files are resized on the fly as needed and a cached copy is stored locally.
-
-If you want to offload image resizing onto a separate component, install [go imageproxy](https://github.com/willnorris/imageproxy) and run it at its own path in the web server.
-
-Run go imageproxy with a config such as:
-
-```
-imageproxy \
-  -cache memory:500 \
-  -cache /path/to/storage/cache \
-  -baseURL https://events.example.org/ \
-  -signatureKey 1234 \
-  -allowHosts events.example.org \
-  -referrers \*.example.org \
-  -addr 127.0.0.1:8090
-```
-
-Make sure to replace the URL in this example with your own
-
-Configure your web server to proxy `/img/` to the imageproxy, e.g. for nginx:
-
-```
-  location /img/ {
-    proxy_pass http://localhost:8090/;
-  }
-```
 
 
 ## Installing on Heroku manually

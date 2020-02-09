@@ -70,7 +70,7 @@
                     <div class="photos">
                         <ul class="photo-album admin">
                             @foreach($response->photos as $p)
-                                <li><a href="{{ $response->link() }}"><img src="@image_proxy($p, '230x230,sc')" width="230" height="230" class="square"></a></li>
+                                <li><a href="{{ $response->link() }}"><img src="{{ $p->square_url }}" width="230" height="230" class="square"></a></li>
                              @endforeach
                         </ul>
                     </div>
@@ -256,7 +256,7 @@ $(function(){
                 $("#response-"+field).val(response[field]);
             });
             if(response.photos) {
-                $("#response-photos").val(response.photos.join("\n\n"));
+                $("#response-photos").val(response.photos.map(function(p){ return p.original_url; }).join("\n\n"));
             } else {
                 $("#response-photos").val("");
             }

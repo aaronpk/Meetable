@@ -49,14 +49,14 @@ $(function(){
     var author_name = $(evt.currentTarget).data("author-name");
     var alt_text = $(evt.currentTarget).data("alt-text");
     var response_id = $(evt.currentTarget).data("response-id");
-    var photo_url = $(evt.currentTarget).data("photo-url");
+    var photo_id = $(evt.currentTarget).data("photo-id");
     evt.preventDefault();
     $("#photo-preview img").attr("src", src);
     $("#photo-preview .original-source a").attr("href", source_url);
     $("#photo-preview .original-source a").text(author_name);
     $("#photo-preview .photo-alt-text").val(alt_text)
     $("#photo-preview #response_id").val(response_id)
-    $("#photo-preview #photo_url").val(photo_url)
+    $("#photo-preview #photo_id").val(photo_id)
     $("#photo-preview").addClass("is-active");
   });
 
@@ -70,10 +70,10 @@ $(function(){
     $.post("/event/"+$("#event_id").val()+"/responses/save_alt_text", {
         _token: csrf_token(),
         response_id: $("#response_id").val(),
-        url: $("#photo-preview #photo_url").val(),
+        photo_id: $("#photo-preview #photo_id").val(),
         alt: $("#photo-preview .photo-alt-text").val()
     }, function(){
-        var photo_url = $("#photo-preview #photo_url").val();
+        var photo_id = $("#photo-preview #photo_id").val();
         $("a.active-photo").data("alt-text", $("#photo-preview .photo-alt-text").val());
         $("#photo-preview .control.has-icons-right").removeClass("is-loading");
         $("#photo-preview .hidden.icon").removeClass("hidden");

@@ -66,6 +66,7 @@ class WebmentionController extends BaseController
             }
         }
 
+        $response->approved = false;
         // If the webmention is from a user who has logged in, approve it immediately
         $users = User::where('url', 'like', '%'.parse_url($sourceURL, PHP_URL_HOST).'%')->get();
         foreach($users as $user) {
@@ -78,6 +79,9 @@ class WebmentionController extends BaseController
         \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $sourceURL);
 
         $response->save();
+
+        if(isset($source['photo']))
+            \App\Services\ExternalResponse::createPhotoRecords($response, $source['photo']);
 
         event(new WebmentionReceived($response));
 

@@ -79,6 +79,9 @@ class APIController extends BaseController
 
         $response->save();
 
+        if(isset($source['photo']))
+            \App\Services\ExternalResponse::createPhotoRecords($response, $source['photo']);
+
         event(new WebmentionReceived($response));
 
         return response()->json([
