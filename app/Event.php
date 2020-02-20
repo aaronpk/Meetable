@@ -402,7 +402,7 @@ class Event extends Model
             $data['endDate'] = $end;
 
         if($this->cover_image) {
-            $data['image'] = $this->cover_image;
+            $data['image'] = $this->cover_image_absolute_url();
         } elseif($this->has_photos()) {
             $data['image'] = $this->photos[0]->full_url;
         }
@@ -420,6 +420,15 @@ class Event extends Model
         }
 
         return json_encode($data, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
+    }
+
+    public function cover_image_absolute_url() {
+        // Return the absolute URL for the cover image, which is required by Twitter/FB
+        // If the URL does not already start with http, assume it's stored locally and add the app URL
+        if(!preg_match('/^https?:\/\//', $this->cover_image))
+            return env('APP_URL').$this->cover_image;
+
+        return $this->cover_image;
     }
 
     public static function used_timezones() {

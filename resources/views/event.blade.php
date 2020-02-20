@@ -14,7 +14,7 @@
 <meta property="og:title" content="{{ $event->name }}">
 <meta property="og:url" content="{{ $event->absolute_permalink() }}">
 @if($event->cover_image)
-<meta property="og:image" content="{{ $event->cover_image }}">
+<meta property="og:image" content="{{ $event->cover_image_absolute_url() }}">
 <meta name="twitter:card" content="summary_large_image">
 @endif
 @endsection
