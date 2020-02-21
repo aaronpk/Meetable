@@ -1,7 +1,7 @@
 <?php
 
 // Check whether setup has been completed and define installer routes if not
-if(defined('MEETABLE_SETUP')) {
+if(defined('MEETABLE_SETUP')):
 
 Route::get('/', 'Setup\Controller@setup')->name('setup');
 Route::get('/setup/db', 'Setup\Controller@database')->name('setup.database');
@@ -19,7 +19,7 @@ Route::get('/setup/database', 'Setup\Controller@create_database_error')->name('s
 Route::get('/setup/heroku-complete', 'Setup\Controller@heroku_config_complete')->name('setup.heroku-config-complete');
 Route::get('/setup/heroku-in-progress', 'Setup\Controller@heroku_in_progress')->name('setup.heroku-in-progres');
 
-} else {
+else:
 
 Route::get('/', 'Controller@index')->name('index');
 
@@ -100,4 +100,4 @@ Route::middleware('auth')->group(function(){
 
 });
 
-}
+endif; // setup
