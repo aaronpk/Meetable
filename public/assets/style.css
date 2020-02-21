@@ -160,6 +160,11 @@
     margin-bottom: 0.5em;
 }
 
+.event .responses.likes li {
+    float: left;
+    margin-bottom: 0;
+}
+
 .event .blog_posts .post-name {
     font-size: 1.2em;
     font-weight: bold;

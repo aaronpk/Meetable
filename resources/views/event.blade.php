@@ -172,29 +172,46 @@
         @endforeach
     </div>
 
+    @if($event->has_likes())
+        <div class="responses likes" id="likes">
+            <ul>
+                <li><span class="icon" style="width:48px; height:48px;">@icon(star)</span></li>
+                @foreach($event->likes as $like)
+                    <li>@include('components/like-avatar', ['like' => $like])</li>
+                @endforeach
+            </ul>
+            <div style="clear: left;"></div>
+        </div>
+    @endif
+
     @if($event->rsvps_enabled && ($event->has_rsvps() || Auth::user()))
         <div class="responses rsvps" id="rsvps">
-            <h2 class="subtitle">RSVPs</h2>
-
-            @if(Auth::user())
-                @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
-                    <div class="buttons has-addons">
-                        <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">
-                            {{ $event->is_past() ? 'I Went' : 'I\'m Going!' }}
-                        </button>
-                        <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(minus-circle)</button>
-                    </div>
-                @else
-                    <div class="buttons has-addons">
-                        <button id="rsvp-button" class="button is-light" data-action="{{ route('event-rsvp', $event->id) }}">
-                            {{ $event->is_past() ? 'I Went' : 'I\'m Going!' }}
-                        </button>
-                        @if($event->rsvp_string_for_user(Auth::user()) == 'no')
-                            <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(minus-circle)</button>
+            <div class="level">
+                <div class="level-left">
+                    <h2 class="subtitle">RSVPs</h2>
+                </div>
+                <div class="level-right">
+                    @if(Auth::user())
+                        @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
+                            <div class="buttons has-addons">
+                                <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">
+                                    {{ $event->is_past() ? 'I Went' : 'I\'m Going!' }}
+                                </button>
+                                <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(minus-circle)</button>
+                            </div>
+                        @else
+                            <div class="buttons has-addons">
+                                <button id="rsvp-button" class="button is-light" data-action="{{ route('event-rsvp', $event->id) }}">
+                                    {{ $event->is_past() ? 'I Went' : 'I\'m Going!' }}
+                                </button>
+                                @if($event->rsvp_string_for_user(Auth::user()) == 'no')
+                                    <button id="rsvp-delete" class="button is-pressed is-danger is-light" data-action="{{ route('event-rsvp-delete', $event->id) }}">@icon(minus-circle)</button>
+                                @endif
+                            </div>
                         @endif
-                    </div>
-                @endif
-            @endif
+                    @endif
+                </div>
+            </div>
 
             <ul>
                 @foreach($event->rsvps_yes as $rsvp)
