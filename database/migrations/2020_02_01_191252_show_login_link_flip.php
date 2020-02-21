@@ -14,16 +14,12 @@ class ShowLoginLinkFlip extends Migration
      */
     public function up()
     {
-        if(Setting::value('auth_show_login'))
-            Setting::set('auth_hide_login', 0);
-        else
-            Setting::set('auth_hide_login', 1);
+       if(Setting::value('auth_show_login') !== null)
+            Setting::set('auth_hide_login', !Setting::value('auth_show_login'));
         DB::delete('DELETE FROM settings WHERE id = "auth_show_login"');
 
-        if(Setting::value('auth_show_logout'))
-            Setting::set('auth_hide_logout', 0);
-        else
-            Setting::set('auth_hide_logout', 1);
+        if(Setting::value('auth_show_logout') !== null)
+            Setting::set('auth_hide_logout', !Setting::value('auth_show_logout'));
         DB::delete('DELETE FROM settings WHERE id = "auth_show_logout"');
     }
 
@@ -34,16 +30,12 @@ class ShowLoginLinkFlip extends Migration
      */
     public function down()
     {
-        if(Setting::value('auth_hide_login'))
-            Setting::set('auth_show_login', 0);
-        else
-            Setting::set('auth_show_login', 1);
+        if(Setting::value('auth_hide_login') !== null)
+            Setting::set('auth_show_login', !Setting::value('auth_hide_login'));
         DB::delete('DELETE FROM settings WHERE id = "auth_hide_login"');
 
-        if(Setting::value('auth_hide_logout'))
-            Setting::set('auth_show_logout', 0);
-        else
-            Setting::set('auth_show_logout', 1);
+        if(Setting::value('auth_hide_logout') !== null)
+            Setting::set('auth_show_logout', !Setting::value('auth_hide_logout'));
         DB::delete('DELETE FROM settings WHERE id = "auth_hide_logout"');
     }
 }
