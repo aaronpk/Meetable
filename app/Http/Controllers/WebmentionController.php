@@ -52,6 +52,17 @@ class WebmentionController extends BaseController
             return $this->error("There was a problem parsing the source URL");
         }
 
+        // Drop reposts of everything, including reposts of the event and also of responses to the event
+        if($source['post-type'] == 'repost') {
+            if(request('from') == 'browser') {
+                return $this->error('Reposts are not accepted');
+            } else {
+                return response()->json([
+                    'result' => 'rejected',
+                ]);
+            }
+        }
+
         $response = Response::where('event_id', $event->id)
           ->withTrashed()
           ->where('source_url', $sourceURL)->first();
