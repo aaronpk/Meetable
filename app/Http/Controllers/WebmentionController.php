@@ -103,7 +103,7 @@ class WebmentionController extends BaseController
     }
 
     private function error($error, $code=400) {
-        if(request()->wantsJson()) {
+        if(request('from') != 'browser') {
             return response()->json([
                 'error' => $error,
                 'source' => request('source'),

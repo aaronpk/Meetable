@@ -87,6 +87,9 @@ Route::middleware('auth')->group(function(){
     Route::get('/event/{event}/responses/{response}.json', 'EventController@get_response_details')->name('get-response-details');
     Route::post('/event/{event}/responses/save_alt_text', 'EventController@save_alt_text')->name('save-alt-text');
 
+    Route::get('/event/{event}/moderate', 'EventController@moderate_responses')->name('moderate-responses');
+    Route::post('/event/{event}/moderate/{response}/approve', 'EventController@approve_response')->name('approve-response');
+
     Route::post('/event/{event}/rsvp', 'EventResponseController@save_rsvp')->name('event-rsvp');
     Route::post('/event/{event}/rsvp_delete', 'EventResponseController@delete_rsvp')->name('event-rsvp-delete');
 

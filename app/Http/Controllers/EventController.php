@@ -234,6 +234,17 @@ class EventController extends BaseController
         ]);
     }
 
+    public function moderate_responses(Event $event) {
+        Gate::authorize('manage-event', $event);
+
+        $responses = $event->pending_responses()->get();
+
+        return view('moderate-responses', [
+            'event' => $event,
+            'responses' => $responses,
+        ]);
+    }
+
     public function get_response_details(Event $event, Response $response) {
         Gate::authorize('manage-event', $event);
         $response->photos; // load photos so they are part of the response
@@ -251,6 +262,20 @@ class EventController extends BaseController
         return response()->json([
             'result' => 'ok',
             'response_id' => $id,
+        ]);
+    }
+
+    public function approve_response(Event $event, Response $response) {
+        Gate::authorize('manage-event', $event);
+
+        $response->approved = true;
+        $response->approved_by = Auth::user()->id;
+        $response->approved_at = date('Y-m-d H:i:s');
+        $response->save();
+
+        return response()->json([
+            'result' => 'ok',
+            'response_id' => $response->id,
         ]);
     }
 

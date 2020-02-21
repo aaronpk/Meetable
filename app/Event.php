@@ -41,6 +41,17 @@ class Event extends Model
             ->orderBy('created_at', 'desc');
     }
 
+    public function pending_responses() {
+        return $this->hasMany('\App\Response')
+            ->where('approved', false)
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function num_pending_responses() {
+        return $this->pending_responses
+            ->count();
+    }
+
     public function photos() {
         return $this->hasMany('\App\ResponsePhoto')
             ->where('approved', true)

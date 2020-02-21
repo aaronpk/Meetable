@@ -60,6 +60,12 @@
                         <span class="icon">@icon(comment)</span>
                         <span>Edit Responses</span>
                     </a>
+                    @if($num=$event->num_pending_responses())
+                    <a class="dropdown-item" href="{{ route('moderate-responses', $event) }}">
+                        <span class="icon">@icon(comment)</span>
+                        <span>Moderate Responses {!! $num ? "<span class='badge'>($num)</span>" : '' !!}</span>
+                    </a>
+                    @endif
                 </div>
             </div>
         </div>

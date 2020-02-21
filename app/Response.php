@@ -56,8 +56,27 @@ class Response extends Model
         }
     }
 
+    public function author_display_name() {
+        $author = $this->author();
+
+        if(!empty($author['name']))
+            return $author['name'];
+
+        if(!empty($author['url']))
+            return \p3k\url\display_url($author['url']);
+
+        return \p3k\url\display_url($this->link());
+    }
+
     public function link() {
         return $this->url ?: $this->source_url;
+    }
+
+    public function rsvp_link() {
+        $author = $this->author();
+        if(!empty($author['url']))
+            return $author['url'];
+        return $this->link();
     }
 
     public function set_photo_alt($url, $alt) {
@@ -116,6 +135,13 @@ class Response extends Model
     public function setRsvpAttribute($value) {
         $value = strtolower($value);
         $this->attributes['rsvp'] = in_array($value, ['yes','no','maybe','remote']) ? $value : null;
+    }
+
+    public function getDataAttribute() {
+        if(!$this->attributes['data'])
+            return '';
+
+        return json_encode(json_decode($this->attributes['data']), JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
     }
 
 }

@@ -1,10 +1,10 @@
-<span class="avatar">
+<span class="avatar" id="response-{{ $rsvp->id }}">
     @if($rsvp->author_photo())
         <img src="{{ $rsvp->author_photo() }}" width="48" class="photo">
     @endif
-    @if($rsvp->author()['url'])
-        <a href="{{ $rsvp->source_url ?: $rsvp->author()['url'] }}">{{ $rsvp->author()['name'] ?: p3k\url\display_url($rsvp->author()['url']) }}</a>
+    @if($rsvp->rsvp_link())
+        <a href="{{ $rsvp->rsvp_link() }}">{{ $rsvp->author_display_name() }}</a>
     @else
-        {{ $rsvp->author()['name'] }}
+        {{ $rsvp->author_display_name() }}
     @endif
 </span>
