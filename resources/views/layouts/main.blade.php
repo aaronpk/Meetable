@@ -67,7 +67,12 @@ use App\Response;
                 <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
                 <a class="navbar-item" href="{{ route('tags') }}">Discover</a>
                 @can('create-event')
-                    <a class="navbar-item" href="{{ route('moderate-all-responses') }}">Moderate Responses {!! ($num=Response::where('approved', 0)->count()) ? "(<span class='pending-response-count'>$num</span>)" : "" !!}</a>
+                    @if(Setting::value('enable_webmention_responses'))
+                        <a class="navbar-item" href="{{ route('moderate-all-responses') }}">
+                            Moderate Responses
+                            {!! ($num=Response::where('approved', 0)->count()) ? "(<span class='pending-response-count'>$num</span>)" : "" !!}
+                        </a>
+                    @endif
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endcan
             </div>
