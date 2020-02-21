@@ -21,7 +21,7 @@ class RefreshAllWebmentions extends Command {
 
             $event = Event::where('id', $webmention->event_id)->first();
 
-            $targetURL = $event->permalink();
+            $targetURL = $event->absolute_permalink();
 
             $xray = new XRay();
             $data = $xray->parse($webmention->source_url, [
