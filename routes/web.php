@@ -82,13 +82,13 @@ Route::middleware('auth')->group(function(){
 
     Route::post('/event/cover_image', 'EventController@upload_event_cover_image')->name('upload-event-cover-image');
 
-    Route::get('/event/{event}/responses', 'EventController@edit_responses')->name('edit-responses');
-    Route::post('/event/{event}/responses/{response}/delete', 'EventController@delete_response')->name('delete-response');
-    Route::get('/event/{event}/responses/{response}.json', 'EventController@get_response_details')->name('get-response-details');
-    Route::post('/event/{event}/responses/save_alt_text', 'EventController@save_alt_text')->name('save-alt-text');
+    Route::get('/event/{event}/responses', 'ResponseController@edit_responses')->name('edit-responses');
+    Route::post('/event/{event}/responses/{response}/delete', 'ResponseController@delete_response')->name('delete-response');
+    Route::get('/event/{event}/responses/{response}.json', 'ResponseController@get_response_details')->name('get-response-details');
+    Route::post('/event/{event}/responses/save_alt_text', 'ResponseController@save_alt_text')->name('save-alt-text');
 
-    Route::get('/event/{event}/moderate', 'EventController@moderate_responses')->name('moderate-responses');
-    Route::post('/event/{event}/moderate/{response}/approve', 'EventController@approve_response')->name('approve-response');
+    Route::get('/event/{event}/moderate', 'ResponseController@moderate_responses')->name('moderate-responses');
+    Route::post('/event/{event}/moderate/{response}/approve', 'ResponseController@approve_response')->name('approve-response');
 
     Route::post('/event/{event}/rsvp', 'EventResponseController@save_rsvp')->name('event-rsvp');
     Route::post('/event/{event}/rsvp_delete', 'EventResponseController@delete_rsvp')->name('event-rsvp-delete');
