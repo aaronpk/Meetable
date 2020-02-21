@@ -1,5 +1,6 @@
 @php
 use App\Setting;
+use App\Response;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -66,6 +67,7 @@ use App\Setting;
                 <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
                 <a class="navbar-item" href="{{ route('tags') }}">Discover</a>
                 @can('create-event')
+                    <a class="navbar-item" href="{{ route('moderate-all-responses') }}">Moderate Responses {!! ($num=Response::where('approved', 0)->count()) ? "(<span class='pending-response-count'>$num</span>)" : "" !!}</a>
                     <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
                 @endcan
             </div>

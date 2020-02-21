@@ -63,6 +63,7 @@ class ResponseController extends BaseController
         return response()->json([
             'result' => 'ok',
             'response_id' => $id,
+            'pending' => Response::where('approved', 0)->count(),
         ]);
     }
 
@@ -77,6 +78,7 @@ class ResponseController extends BaseController
         return response()->json([
             'result' => 'ok',
             'response_id' => $response->id,
+            'pending' => Response::where('approved', 0)->count(),
         ]);
     }
 

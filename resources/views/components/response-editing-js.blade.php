@@ -7,6 +7,7 @@ $(function(){
             _token: csrf_token()
         }, function(response){
             $("#response-"+response.response_id).remove();
+            $(".pending-response-count").text(response.pending);
         });
     });
 
@@ -16,6 +17,7 @@ $(function(){
             _token: csrf_token()
         }, function(response){
             $("#response-"+response.response_id).remove();
+            $(".pending-response-count").text(response.pending);
         });
     });
 
