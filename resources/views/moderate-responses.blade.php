@@ -6,7 +6,9 @@
 <div class="content">
     <h1>Pending Responses</h1>
 
+    @if(isset($event))
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
+    @endif
 
     <p>Deleting a response will prevent that webmention URL from ever appearing again even if it is re-sent.</p>
 </div>
@@ -16,6 +18,17 @@
     <ul>
         @foreach($responses as $response)
             <li id="response-{{ $response->id }}">
+                @if(!isset($event))
+                    <h3 class="subtitle">
+                        <a href="{{ $response->event->permalink() }}">
+                            {{ $response->event->name }}
+                        </a>
+                        <br>
+                        @icon(calendar-alt)
+                        {!! $response->event->date_summary() !!}
+                    </h3>
+                @endif
+
                 <div class="level" style="margin-bottom: 0; align-items: start;">
                   <div class="level-left">
                     @include('components/response-author', ['response' => $response])
@@ -24,15 +37,15 @@
 
                     <div class="buttons has-addons with-dropdown">
 
-                        <a class="button view-response-details" href="{{ route('get-response-details', [$event, $response]) }}">
+                        <a class="button view-response-details" href="{{ route('get-response-details', [$response->event, $response]) }}">
                             <span class="icon">@icon(info-circle)</span>
                             <span>View Details</span>
                         </a>
-                        <a class="button is-primary approve-response" href="{{ route('approve-response', [$event, $response]) }}">
+                        <a class="button is-primary approve-response" href="{{ route('approve-response', [$response->event, $response]) }}">
                             <span class="icon">@icon(check)</span>
                             <span>Approve</span>
                         </a>
-                        <a class="button is-danger delete-response" href="{{ route('delete-response', [$event, $response]) }}">
+                        <a class="button is-danger delete-response" href="{{ route('delete-response', [$response->event, $response]) }}">
                             <span class="icon">@icon(trash)</span>
                             <span>Delete</span>
                         </a>

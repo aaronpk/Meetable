@@ -25,6 +25,16 @@ class ResponseController extends BaseController
         ]);
     }
 
+    public function moderate_all_responses() {
+        Gate::authorize('create-event');
+
+        $responses = Response::where('approved', 0)->get();
+
+        return view('moderate-responses', [
+            'responses' => $responses,
+        ]);
+    }
+
     public function moderate_responses(Event $event) {
         Gate::authorize('manage-event', $event);
 
