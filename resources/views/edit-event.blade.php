@@ -46,6 +46,10 @@ use App\Setting;
 
 <div class="content">
     <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
+
+    @if($event->id)
+        <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
+    @endif
 </div>
 
 @if($mode == 'create')
