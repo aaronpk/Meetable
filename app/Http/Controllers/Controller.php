@@ -23,9 +23,15 @@ class Controller extends BaseController
         } elseif($year) {
             $events = Event::whereYear('start_date', $year);
         } elseif($only_future) {
-            $events = Event::where(function($query){
-                $query->where('start_date', '>=', date('Y-m-d'))
-                      ->orWhere('end_date', '>=', date('Y-m-d'));
+            // Use last possible timezone when finding events on the same day.
+            // This will incorrectly show some events that have passed in some far forward timezones.
+            // All-day events don't have timezone info anyway, so that's the best we can do.
+            $now = new DateTime('now', new DateTimeZone('-12:00'));
+            $nowDate = $now->format('Y-m-d');
+
+            $events = Event::where(function($query)use($nowDate){
+                $query->where('start_date', '>=', $nowDate)
+                      ->orWhere('end_date', '>=', $nowDate);
             });
         } else {
             $events = new Event();
@@ -143,8 +149,12 @@ class Controller extends BaseController
 
     public function archive() {
 
+        // Use furthest ahead timezone to find past events.
+        // This will incorrectly show some current events that are in far negative timezones, but that's fine.
+        $now = new DateTime('now', new DateTimeZone('+12:00'));
+
         $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name')
-            ->where('start_date', '<', date('Y-m-d'))
+            ->where('start_date', '<', $now->format('Y-m-d'))
             ->orderBy('start_date', 'desc')
             ->get();
 
