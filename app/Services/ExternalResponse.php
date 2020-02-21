@@ -7,7 +7,7 @@ use App\Events\ResizeImages;
 
 class ExternalResponse {
 
-    public static function setResponsePropertiesFromXRayData(&$response, $data, $url) {
+    public static function setResponsePropertiesFromXRayData(&$response, $data, $sourceURL, $targetURL) {
         if(isset($data['published'])) {
             $response->published = date('Y-m-d H:i:s', strtotime($data['published']));
         }
@@ -24,6 +24,10 @@ class ExternalResponse {
             $response->rsvp = strtolower($data['rsvp']);
         } else {
             $response->rsvp = null;
+        }
+
+        if(isset($data['like-of']) && in_array($targetURL, $data['like-of'])) {
+            $response->is_like = true;
         }
 
         if(isset($data['content']['text'])) {
@@ -48,7 +52,7 @@ class ExternalResponse {
 
         if(isset($data['rsvp']) && isset($data['author']['url'])) {
             // Set the rsvp_user_id if source URL domain matches the author URL domain
-            if(\p3k\url\host_matches($url, $data['author']['url'])) {
+            if(\p3k\url\host_matches($sourceURL, $data['author']['url'])) {
                 // Check if there is a user with this URL
                 $rsvpUser = User::where('url', $data['author']['url'])->first();
                 if($rsvpUser) {
@@ -56,6 +60,11 @@ class ExternalResponse {
                 }
             }
         }
+
+        if(!empty($data['post-type']))
+            $response->post_type = $data['post-type'];
+
+        $response->data = json_encode($data);
     }
 
     public static function createPhotoRecords(&$response, $photos) {

@@ -76,7 +76,7 @@ class WebmentionController extends BaseController
             }
         }
 
-        \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $sourceURL);
+        \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $sourceURL, $targetURL);
 
         $response->save();
 
@@ -89,7 +89,8 @@ class WebmentionController extends BaseController
             return redirect($event->permalink().'#rsvps');
         } else {
             return response()->json([
-                'result' => 'accepted'
+                'result' => 'accepted',
+                'data' => json_decode($response->data),
             ]);
         }
     }

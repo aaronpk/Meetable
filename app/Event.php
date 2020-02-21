@@ -96,6 +96,10 @@ class Event extends Model
         return $this->comments->count();
     }
 
+    public function has_likes() {
+        return $this->likes->count();
+    }
+
     public function rsvps() {
         return $this->responses()->whereIn('rsvp', ['yes','no','maybe','remote'])->orderBy('created_at', 'desc');
     }
@@ -122,6 +126,10 @@ class Event extends Model
 
     public function comments() {
         return $this->responses()->whereNull('name')->whereNotNull('content_text')->orderBy('created_at', 'desc');
+    }
+
+    public function likes() {
+        return $this->responses()->where('is_like', 1)->orderBy('created_at', 'asc');
     }
 
     public function permalink() {
