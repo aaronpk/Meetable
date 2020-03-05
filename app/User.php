@@ -44,9 +44,10 @@ class User extends Authenticatable
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERAGENT, \App\Helpers\HTTP::user_agent());
         $original_image = curl_exec($ch);
+        $err = curl_errno($ch);
         curl_close($ch);
 
-        if($original_image && curl_errno($ch) == 0) {
+        if($original_image && $err == 0) {
             // Resize to 150px square
             try {
                 $image = Image::make($original_image);
