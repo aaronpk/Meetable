@@ -53,10 +53,10 @@ class Event extends Model
     }
 
     public function photos() {
-        return $this->hasMany('\App\ResponsePhoto')
+        return $this->hasManyThrough('\App\ResponsePhoto', '\App\Response')
             ->where('approved', true)
             ->orderBy('sort_order', 'asc')
-            ->orderBy('created_at', 'desc');
+            ->orderBy('response_photos.created_at', 'desc');
     }
 
     public function rsvp_for_user(User $user) {

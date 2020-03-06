@@ -52,7 +52,7 @@ use App\Setting;
     @endif
 </div>
 
-@if($mode == 'create')
+@if($mode == 'create' && !$errors->any())
     @if($message = \App\Setting::html_value('add_an_event'))
         <article class="message is-primary">
             <div class="message-body content">{!! $message !!}</div>
@@ -66,20 +66,33 @@ form h2.subtitle {
 }
 </style>
 
+@if($errors->any())
+    <div class="message is-danger">
+        <div class="message-body content">
+            <p><b>There was a problem creating the event</b></p>
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    </div>
+@endif
+
 <form action="{{ $form_action }}" method="post" class="event-form">
 
     <h2 class="subtitle">What's the name of the event?</h2>
 
     <div class="field">
-        <input class="input" type="text" autocomplete="off" name="name" value="{{ $event->name }}">
+        <input class="input @error('name') is-danger @enderror" type="text" autocomplete="off" name="name" value="{{ old('name') ?: $event->name }}" required>
     </div>
 
     <!-- cover photo will be cropped to 1440x640 -->
     <h2 class="subtitle">Add a cover image (optional)</h2>
 
-    <div id="cover-photo-preview" class="{{ $event->cover_image ? '' : 'hidden' }} has-delete">
+    <div id="cover-photo-preview" class="{{ (old('cover_image') ?: $event->cover_image) ? '' : 'hidden' }} has-delete">
         <button class="delete"></button>
-        <img src="{{ $event->cover_image }}" width="720" height="320">
+        <img src="{{ (old('cover_image') ?: $event->cover_image) }}" width="720" height="320">
     </div>
 
     <div class="field" id="upload-cover-field">
@@ -121,25 +134,25 @@ form h2.subtitle {
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">Venue</label>
-            <input class="input" type="text" autocomplete="off" name="location_name" value="{{ $event->location_name }}">
+            <input class="input" type="text" autocomplete="off" name="location_name" value="{{ old('location_name') ?: $event->location_name }}">
         </div>
         <div class="control is-expanded">
             <label class="label">Address</label>
-            <input class="input" type="text" autocomplete="off" name="location_address" value="{{ $event->location_address }}">
+            <input class="input" type="text" autocomplete="off" name="location_address" value="{{ old('location_address') ?: $event->location_address }}">
         </div>
     </div>
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">City</label>
-            <input class="input" type="text" autocomplete="off" name="location_locality" value="{{ $event->location_locality }}">
+            <input class="input" type="text" autocomplete="off" name="location_locality" value="{{ old('location_locality') ?: $event->location_locality }}">
         </div>
         <div class="control is-expanded">
             <label class="label">State</label>
-            <input class="input" type="text" autocomplete="off" name="location_region" value="{{ $event->location_region }}">
+            <input class="input" type="text" autocomplete="off" name="location_region" value="{{ old('location_region') ?: $event->location_region }}">
         </div>
         <div class="control is-expanded">
             <label class="label">Country</label>
-            <input class="input" type="text" autocomplete="off" name="location_country" value="{{ $event->location_country }}">
+            <input class="input" type="text" autocomplete="off" name="location_country" value="{{ old('location_country') ?: $event->location_country }}">
         </div>
     </div>
 
@@ -148,12 +161,12 @@ form h2.subtitle {
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">Start Date</label>
-            <input class="input" type="date" name="start_date" autocomplete="off" value="{{ $event->start_date }}">
+            <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: $event->start_date }}" required>
         </div>
 
         <div class="control is-expanded">
             <label class="label">End Date (optional)</label>
-            <input class="input" type="date" name="end_date" autocomplete="off" value="{{ $event->end_date }}">
+            <input class="input" type="date" name="end_date" autocomplete="off" value="{{ old('end_date') ?: $event->end_date }}">
             <div class="help">for multi-day events</div>
         </div>
     </div>
@@ -161,13 +174,13 @@ form h2.subtitle {
     <div class="field is-grouped is-grouped-multiline" id="time-fields">
         <div class="control is-expanded">
             <label class="label">Start Time (optional)</label>
-            <input class="input" type="time" name="start_time" autocomplete="off" value="{{ $event->start_time ?: '' }}">
+            <input class="input" type="time" name="start_time" autocomplete="off" value="{{ old('start_time') ?: $event->start_time }}">
             <div class="help">leave start time blank for multi-day events</div>
         </div>
 
         <div class="control is-expanded">
             <label class="label">End Time (optional)</label>
-            <input class="input" type="time" name="end_time" autocomplete="off" value="{{ $event->end_time ?: '' }}">
+            <input class="input" type="time" name="end_time" autocomplete="off" value="{{ old('end_time') ?: $event->end_time }}">
             <div class="help">leave end time blank for multi-day events</div>
         </div>
     </div>
@@ -178,7 +191,7 @@ form h2.subtitle {
             <div class="select is-fullwidth">
                 <select name="timezone">
                     @foreach(\App\Event::timezones() as $tz)
-                        <option value="{{ $tz }}" {{ $event->timezone == $tz ? 'selected' : '' }} {{ $tz == '──────────' ? 'disabled' : '' }}>{{ $tz }}</option>
+                        <option value="{{ $tz }}" {{ (old('timezone') ?: $event->timezone) == $tz ? 'selected' : '' }} {{ $tz == '──────────' ? 'disabled' : '' }}>{{ $tz }}</option>
                     @endforeach
                 </select>
             </div>
@@ -190,35 +203,35 @@ form h2.subtitle {
 
     <div class="field">
         <label class="label">Website</label>
-        <input class="input" type="url" autocomplete="off" name="website" value="{{ $event->website }}">
+        <input class="input" type="url" autocomplete="off" name="website" value="{{ old('website') ?: $event->website }}">
         <div class="help">provide a link to the event's main website if any</div>
     </div>
 
     @if(Setting::value('enable_ticket_url'))
     <div class="field">
         <label class="label">Registration URL</label>
-        <input class="input" type="url" autocomplete="off" name="tickets_url" value="{{ $event->tickets_url }}">
+        <input class="input" type="url" autocomplete="off" name="tickets_url" value="{{ old('tickets_url') ?: $event->tickets_url }}">
         <div class="help">if the event requires registration, link to the registration page here. this will also disable RSVPs on this website.</div>
     </div>
     @endif
 
     <div class="field">
         <label class="label">Description</label>
-        <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ $event->description }}</textarea>
+        <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ old('description') ?: $event->description }}</textarea>
         <div class="help">markdown and HTML are supported</div>
     </div>
 
     <div class="field">
         <label class="label">Tags</label>
-        <input class="input" type="text" name="tags" value="{{ $event->tags_string() }}" autocomplete="off">
+        <input class="input" type="text" name="tags" value="{{ old('tags') ?: $event->tags_string() }}" autocomplete="off">
         <div class="help">space separated, lowercase</div>
     </div>
 
     <button class="button is-primary" type="submit">Save</button>
 
-    <input type="hidden" name="latitude" value="{{ $event->latitude }}">
-    <input type="hidden" name="longitude" value="{{ $event->longitude }}">
-    <input type="hidden" name="cover_image" id="cover-photo-filename" value="{{ $event->cover_image }}">
+    <input type="hidden" name="latitude" value="{{ old('latitude') ?: $event->latitude }}">
+    <input type="hidden" name="longitude" value="{{ old('longitude') ?: $event->longitude }}">
+    <input type="hidden" name="cover_image" id="cover-photo-filename" value="{{ old('cover_image') ?: $event->cover_image }}">
 
     {{ csrf_field() }}
 </form>
@@ -275,6 +288,8 @@ $(function(){
         }
     });
 
+    $("input[name=start_time]").change();
+
     $("input[name=end_date]").on('change', function(){
         if($(this).val()) {
             $("#time-fields").addClass('hidden');
@@ -282,6 +297,8 @@ $(function(){
             $("#time-fields").removeClass('hidden');
         }
     });
+
+    $("input[name=end_date]").change();
 
 });
 </script>

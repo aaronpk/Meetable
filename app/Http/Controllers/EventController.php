@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto;
 use Illuminate\Support\Str;
@@ -27,8 +28,14 @@ class EventController extends BaseController
         ]);
     }
 
-    public function create_event() {
+    public function create_event(Request $request) {
         Gate::authorize('create-event');
+
+        // Check for required fields: name, start_date
+        $request->validate([
+            'name' => 'required',
+            'start_date' => 'required|date_format:Y-m-d'
+        ]);
 
         $event = new Event();
         $event->name = request('name');
@@ -201,7 +208,6 @@ class EventController extends BaseController
             'original_filename' => $full_filename,
             'original_url' => $photo_url,
             'alt' => request('alt'),
-            'approved' => true,
         ]);
 
         $photo->createResizedImages(Image::make(request('photo')));

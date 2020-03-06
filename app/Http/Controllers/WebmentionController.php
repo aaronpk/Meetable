@@ -77,7 +77,9 @@ class WebmentionController extends BaseController
             }
         }
 
+        // Reset approval on updates, requiring moderation again
         $response->approved = false;
+
         // If the webmention is from a user who has logged in, approve it immediately
         $users = User::where('url', 'like', '%'.parse_url($sourceURL, PHP_URL_HOST).'%')->get();
         foreach($users as $user) {
@@ -91,8 +93,7 @@ class WebmentionController extends BaseController
 
         $response->save();
 
-        if(isset($source['photo']))
-            \App\Services\ExternalResponse::createPhotoRecords($response, $source['photo']);
+        \App\Services\ExternalResponse::setPhotoRecords($response, $source['photo'] ?? false);
 
         event(new WebmentionReceived($response));
 

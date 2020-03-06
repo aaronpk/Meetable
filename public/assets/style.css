@@ -297,3 +297,8 @@ ul.photo-album li {
 
 
 
+@media(max-width: 768px) {
+    .level-right .dropdown.is-right .dropdown-menu {
+        right: auto;
+    }
+}

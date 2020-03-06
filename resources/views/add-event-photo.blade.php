@@ -31,7 +31,7 @@
     </div>
 
     <div class="field">
-        <input class="input photo-alt-text" type="text" placeholder="alt text" name="alt">
+        <textarea class="textarea photo-alt-text" name="alt" rows="3" placeholder="alt text"></textarea>
     </div>
 
 
