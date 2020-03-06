@@ -91,8 +91,7 @@ class WebmentionController extends BaseController
 
         $response->save();
 
-        if(isset($source['photo']))
-            \App\Services\ExternalResponse::createPhotoRecords($response, $source['photo']);
+        \App\Services\ExternalResponse::setPhotoRecords($response, $source['photo'] ?? false);
 
         event(new WebmentionReceived($response));
 

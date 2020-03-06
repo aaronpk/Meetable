@@ -67,15 +67,37 @@ class ExternalResponse {
         $response->data = json_encode($data);
     }
 
-    public static function createPhotoRecords(&$response, $photos) {
+    public static function setPhotoRecords(&$response, $photos) {
+
+        if(!$photos) {
+            // Delete all existing photos
+            ResponsePhoto::where('response_id', $response->id)->delete();
+            return;
+        }
+
         foreach($photos as $url) {
-            $photo = ResponsePhoto::create($response, [
-                'source_url' => $url,
-                'alt' => null,
-                'approved' => $response->approved,
-            ]);
-            // Queue a job to resize the images
+            // Check if this photo already exists
+            $exists = ResponsePhoto::where('response_id', $response->id)
+              ->where('source_url', $url)
+              ->first();
+            if(!$exists) {
+                $photo = ResponsePhoto::create($response, [
+                    'source_url' => $url,
+                    'alt' => null,
+                ]);
+            } else {
+                $photo = $exists;
+            }
+            // Queue a job to resize the images, including re-running this for updates
             event(new ResizeImages($photo));
+        }
+
+        // Check if there are any records for photos that no longer exist in the post
+        $existing = ResponsePhoto::where('response_id', $response->id)->get();
+        foreach($existing as $photo) {
+            if(!in_array($photo->source_url, $photos)) {
+                $photo->delete();
+            }
         }
     }
 

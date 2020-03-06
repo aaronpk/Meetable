@@ -26,8 +26,7 @@ class Response extends Model
     }
 
     public function photos() {
-        return $this->hasMany('App\ResponsePhoto')
-            ->where('approved', true);
+        return $this->hasMany('App\ResponsePhoto');
     }
 
     public function author() {
