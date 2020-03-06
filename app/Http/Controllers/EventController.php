@@ -201,7 +201,6 @@ class EventController extends BaseController
             'original_filename' => $full_filename,
             'original_url' => $photo_url,
             'alt' => request('alt'),
-            'approved' => true,
         ]);
 
         $photo->createResizedImages(Image::make(request('photo')));
