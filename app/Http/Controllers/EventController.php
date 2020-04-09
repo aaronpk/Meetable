@@ -195,10 +195,15 @@ class EventController extends BaseController
         $response->created_by = Auth::user()->id;
         $response->save();
 
+        $ext = 'jpg';
+        // If a png is uploaded, change the extension to png
+        if(request('photo')->extension() == 'png')
+            $ext = 'png';
+
+        $filename = Str::random(30).'.'.$ext;
+        $full_filename = 'public/responses/'.$event->id.'/'.$filename;
 
         // Save a copy of the file in the download folder
-        $filename = Str::random(30).'.jpg';
-        $full_filename = 'public/responses/'.$event->id.'/'.$filename;
         Storage::putFileAs('public/responses/'.$event->id, request('photo'), $filename, 'public');
         $photo_url = Storage::url($full_filename);
 
