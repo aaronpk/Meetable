@@ -20,7 +20,7 @@
     <div class="field">
         <div class="file is-boxed">
             <label class="file-label" style="width: 100%">
-                <input id="file-input-field" class="file-input" type="file" name="photo" accept=".jpg,image/jpeg">
+                <input id="file-input-field" class="file-input" type="file" name="photo" accept=".jpg,image/jpeg,.png,image/png">
                 <span class="file-cta" id="drop-area">
                     <span class="file-icon">@icon(upload)</span>
                     <span class="file-label">Choose a photo...</span>
