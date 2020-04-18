@@ -156,6 +156,22 @@ class Event extends Model
         return env('APP_URL').$this->permalink();
     }
 
+    public function sort_date() {
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+        } else {
+            // Events without a timezone will be sorted as if they were in UTC
+            $tz = new DateTimeZone('UTC');
+        }
+        if($this->start_time) {
+            $sort_date = new DateTime($this->start_date.' '.$this->start_time, $tz);
+        } else {
+            $sort_date = new DateTime($this->start_date, $tz);
+        }
+        $sort_date = $sort_date->setTimeZone(new DateTimeZone('UTC'));
+        return $sort_date;
+    }
+
     public function is_multiday() {
         return $this->end_date && $this->end_date != $this->start_date;
     }

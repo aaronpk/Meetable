@@ -195,7 +195,7 @@ form h2.subtitle {
                     @endforeach
                 </select>
             </div>
-            <div class="help">only used when there is a start/end time</div>
+            <div class="help">provide a timezone for online events and to help sort events on the same day</div>
         </div>
     </div>
 

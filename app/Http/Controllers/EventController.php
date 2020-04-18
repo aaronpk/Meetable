@@ -63,6 +63,8 @@ class EventController extends BaseController
         if(request('end_time'))
             $event->end_time = date('H:i:00', strtotime(request('end_time')));
 
+        $event->sort_date = $event->sort_date();
+
         $event->description = request('description');
         $event->website = request('website');
         $event->tickets_url = request('tickets_url');
@@ -131,6 +133,8 @@ class EventController extends BaseController
         foreach($properties as $p) {
             $event->{$p} = request($p) ?: null;
         }
+
+        $event->sort_date = $event->sort_date();
 
         // Generate a new slug
         $event->slug = Event::slug_from_name($event->name);

@@ -38,9 +38,9 @@ class Controller extends BaseController
         }
 
         if($only_future)
-            $events = $events->orderBy('start_date');
+            $events = $events->orderBy('sort_date');
         else
-            $events = $events->orderBy('start_date', 'desc');
+            $events = $events->orderBy('sort_date', 'desc');
 
         return $events;
     }
@@ -155,7 +155,7 @@ class Controller extends BaseController
 
         $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name')
             ->where('start_date', '<', $now->format('Y-m-d'))
-            ->orderBy('start_date', 'desc')
+            ->orderBy('sort_date', 'desc')
             ->get();
 
         $data = [];
