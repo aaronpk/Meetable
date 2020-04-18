@@ -124,7 +124,7 @@ class EventController extends BaseController
 
         // Save a snapshot of the previous state
         $revision = new EventRevision;
-        $fixed_properties = ['key','slug','created_by','last_modified_by','photo_order'];
+        $fixed_properties = ['key','slug','created_by','last_modified_by'];
         foreach(array_merge($properties, $fixed_properties) as $p) {
             $revision->{$p} = $event->{$p} ?: null;
         }
