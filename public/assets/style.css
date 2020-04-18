@@ -133,25 +133,15 @@
     font-size: 0.75em;
 }
 
-.event .rsvps ul {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
-@media(max-width: 420px) {
-    .event .rsvps ul {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
 .event .responses li .avatar {
     display: flex;
     align-items: center;
     margin-bottom: 0.5em;
 }
 
-.event .responses li .avatar img.photo {
-    width: 48px;
+.event .responses li .avatar .photo {
+    width: 30px;
+    height: 30px;
     border-radius: 4px;
     margin-right: 0.5em;
 }
