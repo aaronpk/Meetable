@@ -75,6 +75,12 @@ class ExternalResponse {
             return;
         }
 
+        // Never add photos from RSVP posts. We haven't seen any valid reasons for photos attached to RSVPs yet.
+        // This prevents some accidental photos from being added when the markup on e.g. wordpress sites is bad.
+        // Run this after deleting existing photos to make sure edits work right too.
+        if($response->rsvp)
+            return;
+
         foreach($photos as $url) {
             // Check if this photo already exists
             $exists = ResponsePhoto::where('response_id', $response->id)
