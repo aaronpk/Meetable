@@ -216,6 +216,12 @@ form h2.subtitle {
     @endif
 
     <div class="field">
+        <label class="label">Code of Conduct</label>
+        <input class="input" type="text" autocomplete="off" name="code_of_conduct_url" value="{{ old('code_of_conduct_url') ?: $event->code_of_conduct_url }}">
+        <div class="help">provide one or more URLs to codes of conduct that are applicable to this event</div>
+    </div>
+
+    <div class="field">
         <label class="label">Description</label>
         <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ old('description') ?: $event->description }}</textarea>
         <div class="help">markdown and HTML are supported</div>

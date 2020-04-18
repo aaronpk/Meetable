@@ -162,6 +162,20 @@
         </div>
     @endif
 
+    @if($event->code_of_conduct_url)
+        <div class="code-of-conduct segment with-icon">
+            <span class="icon">@icon(gavel)</span>
+            <span class="text">
+                <span class="coc-title">Code of Conduct</span>
+                @foreach($event->code_of_conduct_urls() as $url)
+                    <a href="{{ $url }}" title="{{ $url }}" class="coc-url">
+                        {{ strlen($url) > 80 ?  parse_url($url, PHP_URL_HOST) : \p3k\url\display_url($url) }}
+                    </a>
+                @endforeach
+            </span>
+        </div>
+    @endif
+
     <div class="e-content description segment content">
         {!! $event->html() !!}
     </div>

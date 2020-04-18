@@ -79,7 +79,7 @@
     margin-bottom: 1rem;
 }
 
-.event .date.segment, .event .location.segment, .event .website.segment {
+.event .date.segment, .event .location.segment, .event .website.segment, .event .code-of-conduct.segment {
     font-size: 1.5em;
     line-height: 1.2em;
 }
@@ -91,14 +91,22 @@
         margin-bottom: 1rem;
     }
 
-    .event .date.segment, .event .location.segment, .event .website.segment {
+    .event .date.segment, .event .location.segment, .event .website.segment, .event .code-of-conduct.segment {
         font-size: 1.2em;
         line-height: 1.2em;
     }
 }
 
-.event .website.segment {
+.event .website.segment, .event .code-of-conduct.segment {
     overflow: hidden;
+}
+
+.event .code-of-conduct.segment .text span, .event .code-of-conduct.segment .text a {
+    display: block;
+}
+
+.event .code-of-conduct.segment .text .coc-url {
+    font-size: 0.75em;
 }
 
 .event .segment.with-icon {

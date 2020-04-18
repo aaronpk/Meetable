@@ -68,6 +68,7 @@ class EventController extends BaseController
         $event->description = request('description');
         $event->website = request('website');
         $event->tickets_url = request('tickets_url');
+        $event->code_of_conduct_url = request('code_of_conduct_url');
 
         $event->cover_image = request('cover_image');
 
@@ -118,7 +119,7 @@ class EventController extends BaseController
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
             'latitude', 'longitude', 'timezone',
-            'website', 'tickets_url', 'description', 'cover_image',
+            'website', 'tickets_url', 'code_of_conduct_url', 'description', 'cover_image',
         ];
 
         // Save a snapshot of the previous state

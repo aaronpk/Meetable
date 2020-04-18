@@ -156,6 +156,12 @@ class Event extends Model
         return env('APP_URL').$this->permalink();
     }
 
+    public function code_of_conduct_urls() {
+        if(!$this->code_of_conduct_url) return [];
+
+        return explode(' ', $this->code_of_conduct_url);
+    }
+
     public function sort_date() {
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
