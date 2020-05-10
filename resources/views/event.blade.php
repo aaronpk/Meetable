@@ -176,6 +176,21 @@
         </div>
     @endif
 
+    @if($event->meeting_url && !$event->is_past())
+        <div class="website segment with-icon">
+            <span class="icon">@icon(video)</span>
+            <span>
+                @if($event->is_starting_soon())
+                    <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
+                        Join the Online Meeting
+                    </a>
+                @else
+                    The meeting link will be shown 15 minutes before the event
+                @endif
+            </span>
+        </div>
+    @endif
+
     <div class="e-content description segment content">
         {!! $event->html() !!}
     </div>

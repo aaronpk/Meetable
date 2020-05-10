@@ -209,9 +209,9 @@ class Event extends Model
         }
     }
 
-    public function start_datetime_local() {
+    public function start_datetime_local($format='Ymd\THi') {
         $start_date = new DateTime($this->start_date.' '.$this->start_time);
-        return $start_date->format('Ymd\THi');
+        return $start_date->format($format);
     }
 
     public function display_date() {
@@ -251,6 +251,14 @@ class Event extends Model
         }
 
         return $str;
+    }
+
+    public function duration_minutes() {
+        list($start, $end) = $this->start_and_end_dates();
+        if(!$end)
+            return null;
+
+        return (strtotime($end) - strtotime($start)) / 60;
     }
 
     public function weekday() {
@@ -304,6 +312,27 @@ class Event extends Model
         $end_html = $end ? '<data class="dt-end" value="' . $end . '"></data>' : '';
 
         return $start_html . $end_html;
+    }
+
+    public function is_starting_soon() {
+        if($this->is_past())
+            return false;
+
+        // Return true if the event is starting in 15 minutes or less
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+        } else {
+            // Fall back to earliest timezone, not ideal, but we shouldn't be creating zoom
+            // meetings for events without a timezone anyway
+            $tz = new DateTimeZone('-12:00');
+        }
+
+        // Events using this should also usually have a start time set
+        $date = new DateTime($this->start_date.' '.$this->start_time, $tz);
+
+        $now = new DateTime();
+
+        return $now->format('U') > ($date->format('U') - 60*15);
     }
 
     public function is_past() {

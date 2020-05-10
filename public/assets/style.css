@@ -300,3 +300,17 @@ ul.photo-album li {
         right: auto;
     }
 }
+
+
+.pulsing-yellow {
+    -webkit-animation: pulsing-yellow-glow .7s infinite alternate;
+}
+
+@-webkit-keyframes pulsing-yellow-glow {
+    to {
+        text-shadow: 0 0 10px #FFC000;
+        color: #0945a5;
+    }
+}
+
+

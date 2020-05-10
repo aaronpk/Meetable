@@ -7,10 +7,11 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto;
+use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto, App\Setting;
 use Illuminate\Support\Str;
 use Auth, Storage, Gate, Log;
 use Image;
+use App\Services\Zoom;
 
 
 class EventController extends BaseController
@@ -69,11 +70,20 @@ class EventController extends BaseController
         $event->website = request('website');
         $event->tickets_url = request('tickets_url');
         $event->code_of_conduct_url = request('code_of_conduct_url');
+        $event->meeting_url = request('meeting_url');
 
         $event->cover_image = request('cover_image');
 
         $event->created_by = Auth::user()->id;
         $event->last_modified_by = Auth::user()->id;
+
+        // Schedule a Zoom meeting
+        if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
+            $event->meeting_url = Zoom::schedule_meeting($event);
+            if(!$event->meeting_url) {
+                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The event was not saved.']);
+            }
+        }
 
         $event->save();
 
@@ -119,7 +129,8 @@ class EventController extends BaseController
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
             'latitude', 'longitude', 'timezone',
-            'website', 'tickets_url', 'code_of_conduct_url', 'description', 'cover_image',
+            'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url',
+            'description', 'cover_image',
         ];
 
         // Save a snapshot of the previous state
@@ -139,6 +150,14 @@ class EventController extends BaseController
 
         // Generate a new slug
         $event->slug = Event::slug_from_name($event->name);
+
+        // Schedule a zoom meeting if requested
+        if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
+            $event->meeting_url = Zoom::schedule_meeting($event);
+            if(!$event->meeting_url) {
+                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+            }
+        }
 
         $event->last_modified_by = Auth::user()->id;
         $event->save();
