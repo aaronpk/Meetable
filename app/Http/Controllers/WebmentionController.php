@@ -34,6 +34,10 @@ class WebmentionController extends BaseController
             return $this->error('Target URL was not a valid event URL. Webmentions are only supported to event URLs.', 200);
         }
 
+        if($event->status == 'cancelled') {
+            return $this->error('Webmentions are not accepted to cancelled events', 200);
+        }
+
         $sourceURL = request('source');
 
         $xray = new XRay();

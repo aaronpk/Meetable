@@ -35,7 +35,8 @@ class EventController extends BaseController
         // Check for required fields: name, start_date
         $request->validate([
             'name' => 'required',
-            'start_date' => 'required|date_format:Y-m-d'
+            'start_date' => 'required|date_format:Y-m-d',
+            'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
         ]);
 
         $event = new Event();
@@ -65,6 +66,8 @@ class EventController extends BaseController
             $event->end_time = date('H:i:00', strtotime(request('end_time')));
 
         $event->sort_date = $event->sort_date();
+
+        $event->status = request('status');
 
         $event->description = request('description');
         $event->website = request('website');
@@ -122,13 +125,19 @@ class EventController extends BaseController
         ]);
     }
 
-    public function save_event(Event $event) {
+    public function save_event(Request $request, Event $event) {
         Gate::authorize('manage-event', $event);
+
+        $request->validate([
+            'name' => 'required',
+            'start_date' => 'required|date_format:Y-m-d',
+            'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
+        ]);
 
         $properties = [
             'name', 'start_date', 'end_date', 'start_time', 'end_time',
             'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
-            'latitude', 'longitude', 'timezone',
+            'latitude', 'longitude', 'timezone', 'status',
             'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url',
             'description', 'cover_image',
         ];

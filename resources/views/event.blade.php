@@ -86,12 +86,12 @@
         </div>
     @endif
 
-    <h1 class="p-name event-name">{{ $event->name }}</h1>
+    <h1 class="p-name event-name">{!! $event->status_tag() !!}{{ $event->name }}</h1>
 
     <div class="date segment with-icon">
         <span class="icon">@icon(clock)</span>
         <span>
-            <div>{!! $event->display_date() !!}</div>
+            <div>{{ $event->status == 'postponed' ? 'TBD, originally ' : '' }}{!! $event->display_date() !!}</div>
             @if(!$event->is_multiday() && $event->display_time())
                 <div class="time">
                     {!! $event->weekday() !!}
@@ -104,7 +104,7 @@
                 </div>
             @endif
             {!! $event->mf2_date_html() !!}
-            @if(!$event->is_past())
+            @if(!$event->is_past() && !in_array($event->status, ['cancelled','postponed']))
             <div class="add-to-calendar">
                 <div class="dropdown is-hoverable">
                     <div class="dropdown-trigger">
@@ -220,7 +220,7 @@
                     <h2 class="subtitle">RSVPs</h2>
                 </div>
                 <div class="level-right">
-                    @if(Auth::user())
+                    @if(Auth::user() && $event->status == 'confirmed')
                         @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
                             <div class="buttons has-addons">
                                 <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">

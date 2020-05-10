@@ -42,7 +42,7 @@ a.title:hover, a.subtitle:hover {
                                 {{ date('M j', strtotime($event->start_date)) }}
                                 &bull;
                                 <a href="{{ $event->permalink() }}" class="u-url p-name">
-                                    {{ $event->name }}
+                                    {!! $event->status_text() !!}{{ $event->name }}
                                 </a>
 
                                 <data style="display: none;">

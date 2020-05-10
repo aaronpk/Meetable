@@ -79,6 +79,29 @@
     margin-bottom: 1rem;
 }
 
+/* event status tags */
+.event .event-name {
+    display: flex;
+    align-items: center;
+}
+.event .event-name .status.tag {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+.event-list h3 a {
+    display: flex;
+    align-items: center;
+}
+.event-list .status.tag {
+    margin-right: .5em;
+}
+.status.tag .lower {
+    text-transform: lowercase;
+}
+
+
+
 .event .date.segment, .event .location.segment, .event .website.segment, .event .code-of-conduct.segment {
     font-size: 1.5em;
     line-height: 1.2em;

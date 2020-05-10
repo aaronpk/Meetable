@@ -1,7 +1,7 @@
 @extends('layouts/main')
 
 @php
-use App\Setting;
+use App\Setting, App\Event;
 @endphp
 
 @section('scripts')
@@ -254,6 +254,20 @@ form h2.subtitle {
         <input class="input" type="text" name="tags" value="{{ old('tags') ?: $event->tags_string() }}" autocomplete="off">
         <div class="help">space separated, lowercase</div>
     </div>
+
+    <div class="field">
+        <div class="control is-expanded">
+            <label class="label">Status</label>
+            <div class="select is-fullwidth">
+                <select name="status">
+                    @foreach(Event::$STATUSES as $s=>$t)
+                    <option value="{{ $s }}" {{ (old('status') ?: $event->status) == $s ? 'selected' : '' }}>{{ $t }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
 
     <button class="button is-primary" type="submit">Save</button>
 

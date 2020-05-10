@@ -20,6 +20,13 @@ class Event extends Model
 
     private static $US_NAMES = ['US', 'USA', 'United States'];
 
+    public static $STATUSES = [
+        'confirmed' => 'Confirmed',
+        'tentative' => 'Tentative',
+        'postponed' => 'Postponed',
+        'cancelled' => 'Cancelled',
+    ];
+
     public static function slug_from_name($name) {
         return preg_replace('/--+/', '-', mb_ereg_replace('[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+', '-', mb_strtolower($name)));
     }
@@ -353,6 +360,37 @@ class Event extends Model
         $now = new DateTime();
 
         return $date->format('U') < $now->format('U');
+    }
+
+    public function status_tag() {
+        if($this->status == 'confirmed')
+            return '';
+
+        switch($this->status) {
+            case 'cancelled':
+              $icon = 'exclamation-triangle';
+              $class = 'danger';
+              break;
+            case 'postponed':
+            case 'tentative':
+              $icon = 'question-circle';
+              $class = 'warning';
+              break;
+        }
+
+        return '<span class="status tag is-'.$class.'">'
+            .'<svg class="svg-icon" style="margin-right:5px;"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#'.$icon.'"></use></svg>'
+            .substr(strtoupper($this->status), 0, 1)
+            .'<span class="lower">'.substr(strtoupper($this->status), 1).'</span>'
+            .'<span class="hidden">:</span>'
+            .'</span> ';
+    }
+
+    public function status_text() {
+        if($this->status == 'confirmed')
+            return '';
+
+        return strtoupper($this->status).': ';
     }
 
     public function location_summary() {
