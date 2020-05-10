@@ -69,7 +69,7 @@ form h2.subtitle {
 @if($errors->any())
     <div class="message is-danger">
         <div class="message-body content">
-            <p><b>There was a problem creating the event</b></p>
+            <p><b>There was a problem {{ $mode == 'create' ? 'creating' : 'saving' }} the event</b></p>
             <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
