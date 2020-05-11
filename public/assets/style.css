@@ -25,6 +25,9 @@
 .navbar a.navbar-logo {
     line-height: 0;
 }
+.navbar-link:not(.is-arrowless)::after {
+    border-color: #888;
+}
 
 .has-delete {
     position: relative;
