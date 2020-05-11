@@ -134,6 +134,10 @@
         <div class="p-location h-card">
             <div class="p-name">{{ $event->location_name }}</div>
             <div>{!! $event->location_summary_with_mf2() !!}</div>
+            @if($event->latitude && $event->longitude)
+                <data class="p-latitude" value="{{ $event->latitude }}"></data>
+                <data class="p-longitude" value="{{ $event->longitude }}"></data>
+            @endif
         </div>
     </div>
     @endif
