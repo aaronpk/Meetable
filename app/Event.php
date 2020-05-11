@@ -543,7 +543,7 @@ class Event extends Model
         return Event::select('timezone')
             ->whereNotNull('timezone')
             ->groupBy('timezone')
-            ->orderBy('timezone')
+            ->orderBy(DB::raw('COUNT(id)'), 'DESC')
             ->get();
     }
 
