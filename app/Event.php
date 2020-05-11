@@ -91,7 +91,12 @@ class Event extends Model
         return array_map(function($t){ return $t->tag; }, $this->tags->all());
     }
 
+    public $temp_tag_string;
+
     public function tags_string() {
+        if($this->temp_tag_string)
+            return $this->temp_tag_string;
+
         $tags = [];
         foreach($this->tags as $t)
             $tags[] = $t->tag;
@@ -566,4 +571,20 @@ class Event extends Model
 
         return $timezones;
     }
+
+    // Since converting from -07:00 to America/Los_Angeles is a fuzzy concept,
+    // let's skew the conversion based on the most frequently used timezones in the database.
+    public static function timezone_name_from_offset(string $offset, DateTime $date) {
+        $timezones = self::timezones();
+        foreach($timezones as $tz) {
+            try {
+                $timezone = new DateTimeZone($tz);
+                $seconds = $timezone->getOffset($date);
+                if(\p3k\date\tz_seconds_to_offset($seconds) == $offset)
+                    return $tz;
+            } catch(\Exception $e) {}
+        }
+        return null;
+    }
+
 }

@@ -11,7 +11,7 @@ use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto, App\
 use Illuminate\Support\Str;
 use Auth, Storage, Gate, Log;
 use Image;
-use App\Services\Zoom;
+use App\Services\Zoom, App\Services\EventParser;
 
 
 class EventController extends BaseController
@@ -21,11 +21,29 @@ class EventController extends BaseController
     public function new_event() {
         Gate::authorize('create-event');
 
-        $event = new Event;
+        $event = null;
+
+        // If a URL is given in the query string, fetch that URL and look for event data, pre-populating the fields here
+        if(request('url')) {
+            $event = EventParser::eventFromURL(request('url'));
+        }
+
+        if(!$event) {
+            $event = new Event;
+        }
+
         return view('edit-event', [
             'event' => $event,
             'mode' => 'create',
             'form_action' => route('create-event'),
+        ]);
+    }
+
+    public function import_event() {
+        Gate::authorize('create-event');
+
+        return view('import-event', [
+            'form_action' => route('new-event'),
         ]);
     }
 
