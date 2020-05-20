@@ -20,7 +20,10 @@ class ExternalResponse {
             }
         }
 
-        if(isset($data['rsvp'])) {
+        if(isset($data['rsvp'])
+            // Only set the RSVP property if the in-reply-to URL matches the target
+            && isset($data['in-reply-to']) && in_array($targetURL, $data['in-reply-to'])
+        ) {
             $response->rsvp = strtolower($data['rsvp']);
         } else {
             $response->rsvp = null;
