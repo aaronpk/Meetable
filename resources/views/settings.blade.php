@@ -169,6 +169,26 @@ use App\Setting;
 
     <br>
 
+    <div class="field is-grouped is-grouped-multiline">
+        <div class="control is-expanded">
+            <label class="label">Zoom Email</label>
+            <input class="input" type="email" value="{{ Setting::value('zoom_email') }}" name="zoom_email" autocomplete="off">
+        </div>
+
+        <div class="control is-expanded">
+            <label class="label">Zoom API Key</label>
+            <input class="input" type="password" value="{{ Setting::value('zoom_api_key') ? '********' : '' }}" name="zoom_api_key" autocomplete="off">
+        </div>
+
+        <div class="control is-expanded">
+            <label class="label">Zoom API Secret</label>
+            <input class="input" type="password" value="{{ Setting::value('zoom_api_secret') ? '********' : '' }}" name="zoom_api_secret" autocomplete="off">
+        </div>
+    </div>
+    <p class="help">Create a <a href="https://marketplace.zoom.us/docs/guides/build/jwt-app">JWT Zoom Application</a> and enter the credentials above to give people the option of scheduling a Zoom meeting when creating an event. Enter the email address of the Zoom account you want to use to schedule the meetings.</p>
+
+    <br><br>
+
     <button class="button is-primary" type="submit">Save All Settings</button>
 
     <br><br>

@@ -25,6 +25,9 @@
 .navbar a.navbar-logo {
     line-height: 0;
 }
+.navbar-link:not(.is-arrowless)::after {
+    border-color: #888;
+}
 
 .has-delete {
     position: relative;
@@ -79,7 +82,30 @@
     margin-bottom: 1rem;
 }
 
-.event .date.segment, .event .location.segment, .event .website.segment {
+/* event status tags */
+.event .event-name {
+    display: flex;
+    align-items: center;
+}
+.event .event-name .status.tag {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+.event-list h3 a {
+    display: flex;
+    align-items: center;
+}
+.event-list .status.tag {
+    margin-right: .5em;
+}
+.status.tag .lower {
+    text-transform: lowercase;
+}
+
+
+
+.event .date.segment, .event .location.segment, .event .website.segment, .event .code-of-conduct.segment {
     font-size: 1.5em;
     line-height: 1.2em;
 }
@@ -91,14 +117,22 @@
         margin-bottom: 1rem;
     }
 
-    .event .date.segment, .event .location.segment, .event .website.segment {
+    .event .date.segment, .event .location.segment, .event .website.segment, .event .code-of-conduct.segment {
         font-size: 1.2em;
         line-height: 1.2em;
     }
 }
 
-.event .website.segment {
+.event .website.segment, .event .code-of-conduct.segment {
     overflow: hidden;
+}
+
+.event .code-of-conduct.segment .text span, .event .code-of-conduct.segment .text a {
+    display: block;
+}
+
+.event .code-of-conduct.segment .text .coc-url {
+    font-size: 0.75em;
 }
 
 .event .segment.with-icon {
@@ -133,25 +167,15 @@
     font-size: 0.75em;
 }
 
-.event .rsvps ul {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-}
-
-@media(max-width: 420px) {
-    .event .rsvps ul {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
 .event .responses li .avatar {
     display: flex;
     align-items: center;
     margin-bottom: 0.5em;
 }
 
-.event .responses li .avatar img.photo {
-    width: 48px;
+.event .responses li .avatar .photo {
+    width: 30px;
+    height: 30px;
     border-radius: 4px;
     margin-right: 0.5em;
 }
@@ -302,3 +326,17 @@ ul.photo-album li {
         right: auto;
     }
 }
+
+
+.pulsing-yellow {
+    -webkit-animation: pulsing-yellow-glow .7s infinite alternate;
+}
+
+@-webkit-keyframes pulsing-yellow-glow {
+    to {
+        text-shadow: 0 0 10px #FFC000;
+        color: #0945a5;
+    }
+}
+
+

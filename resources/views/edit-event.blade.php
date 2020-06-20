@@ -1,7 +1,7 @@
 @extends('layouts/main')
 
 @php
-use App\Setting;
+use App\Setting, App\Event;
 @endphp
 
 @section('scripts')
@@ -69,7 +69,7 @@ form h2.subtitle {
 @if($errors->any())
     <div class="message is-danger">
         <div class="message-body content">
-            <p><b>There was a problem creating the event</b></p>
+            <p><b>There was a problem {{ $mode == 'create' ? 'creating' : 'saving' }} the event</b></p>
             <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -156,6 +156,28 @@ form h2.subtitle {
         </div>
     </div>
 
+
+    <h2 class="subtitle">Virtual Event?</h2>
+
+    @if(Setting::value('zoom_api_key'))
+    <div class="field">
+        <label class="checkbox">
+            <input type="checkbox" name="create_zoom_meeting" value="1">
+            Schedule a Zoom Meeting
+        </label>
+        <div class="help">check the box above to schedule a zoom meeting for this event. the meeting url will be shown on the event page 15 minutes before the start. note: the host will need to log in to zoom as {{ Setting::value('zoom_email') }} to start the meeting.</div>
+    </div>
+    @endif
+
+    <div class="field" id="meeting-url-field">
+        <label class="label">Meeting URL</label>
+        <input class="input @error('meeting_url') is-danger @enderror" type="url" autocomplete="off" name="meeting_url" value="{{ old('meeting_url') ?: $event->meeting_url }}">
+        <div class="help">enter a url to join the virtual meeting. this will be shown only 15 minutes before the event start, and hidden afterwards</div>
+    </div>
+
+
+
+
     <h2 class="subtitle">When is the event?</h2>
 
     <div class="field is-grouped is-grouped-multiline">
@@ -173,7 +195,7 @@ form h2.subtitle {
 
     <div class="field is-grouped is-grouped-multiline" id="time-fields">
         <div class="control is-expanded">
-            <label class="label">Start Time (optional)</label>
+            <label class="label">Start Time <span id="start-time-optional">(optional)</span></label>
             <input class="input" type="time" name="start_time" autocomplete="off" value="{{ old('start_time') ?: $event->start_time }}">
             <div class="help">leave start time blank for multi-day events</div>
         </div>
@@ -187,7 +209,7 @@ form h2.subtitle {
 
     <div class="field hidden" id="timezone-field">
         <div class="control is-expanded">
-            <label class="label">Timezone (optional)</label>
+            <label class="label">Timezone <span id="timezone-optional">(optional)</span></label>
             <div class="select is-fullwidth">
                 <select name="timezone">
                     @foreach(\App\Event::timezones() as $tz)
@@ -195,7 +217,7 @@ form h2.subtitle {
                     @endforeach
                 </select>
             </div>
-            <div class="help">only used when there is a start/end time</div>
+            <div class="help">provide a timezone for online events and to help sort events on the same day</div>
         </div>
     </div>
 
@@ -216,6 +238,12 @@ form h2.subtitle {
     @endif
 
     <div class="field">
+        <label class="label">Code of Conduct</label>
+        <input class="input" type="text" autocomplete="off" name="code_of_conduct_url" value="{{ old('code_of_conduct_url') ?: $event->code_of_conduct_url }}">
+        <div class="help">provide one or more URLs to codes of conduct that are applicable to this event</div>
+    </div>
+
+    <div class="field">
         <label class="label">Description</label>
         <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ old('description') ?: $event->description }}</textarea>
         <div class="help">markdown and HTML are supported</div>
@@ -226,6 +254,20 @@ form h2.subtitle {
         <input class="input" type="text" name="tags" value="{{ old('tags') ?: $event->tags_string() }}" autocomplete="off">
         <div class="help">space separated, lowercase</div>
     </div>
+
+    <div class="field">
+        <div class="control is-expanded">
+            <label class="label">Status</label>
+            <div class="select is-fullwidth">
+                <select name="status">
+                    @foreach(Event::$STATUSES as $s=>$t)
+                    <option value="{{ $s }}" {{ (old('status') ?: $event->status) == $s ? 'selected' : '' }}>{{ $t }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+    </div>
+
 
     <button class="button is-primary" type="submit">Save</button>
 
@@ -299,6 +341,22 @@ $(function(){
     });
 
     $("input[name=end_date]").change();
+
+    $("input[name=create_zoom_meeting]").click(function(){
+        if($(this).is(":checked")) {
+            $("#meeting-url-field").addClass('hidden');
+            // Require time fields
+            $("#timezone-field").removeClass('hidden');
+            $("input[name=start_time]").attr("required","required");
+            $("select[name=timezone]").attr("required","required");
+            $("#start-time-optional, #timezone-optional").addClass("hidden");
+        } else {
+            $("#meeting-url-field").removeClass('hidden');
+            $("input[name=start_time]").removeAttr("required");
+            $("select[name=timezone]").removeAttr("required");
+            $("#start-time-optional, #timezone-optional").removeClass("hidden");
+        }
+    });
 
 });
 </script>

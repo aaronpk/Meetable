@@ -49,7 +49,7 @@ class APIController extends BaseController
             return $this->error($data['error_description']);
         }
 
-        $source = $data['data'];
+        $sourceData = $data['data'];
 
         $response = $event->responses()->where('url', $url)->first();
 
@@ -72,15 +72,15 @@ class APIController extends BaseController
             }
         }
 
-        \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $source, $url);
+        \App\Services\ExternalResponse::setResponsePropertiesFromXRayData($response, $sourceData, $url, $event_url);
 
         // Override url to the url we fetched it from rather than what the page reports
         $response->url = $url;
 
         $response->save();
 
-        if(isset($source['photo']))
-            \App\Services\ExternalResponse::createPhotoRecords($response, $source['photo']);
+        if(isset($sourceData['photo']))
+            \App\Services\ExternalResponse::setPhotoRecords($response, $sourceData['photo']);
 
         event(new WebmentionReceived($response));
 

@@ -20,7 +20,10 @@ class ExternalResponse {
             }
         }
 
-        if(isset($data['rsvp'])) {
+        if(isset($data['rsvp'])
+            // Only set the RSVP property if the in-reply-to URL matches the target
+            && isset($data['in-reply-to']) && in_array($targetURL, $data['in-reply-to'])
+        ) {
             $response->rsvp = strtolower($data['rsvp']);
         } else {
             $response->rsvp = null;
@@ -74,6 +77,12 @@ class ExternalResponse {
             ResponsePhoto::where('response_id', $response->id)->delete();
             return;
         }
+
+        // Never add photos from RSVP posts. We haven't seen any valid reasons for photos attached to RSVPs yet.
+        // This prevents some accidental photos from being added when the markup on e.g. wordpress sites is bad.
+        // Run this after deleting existing photos to make sure edits work right too.
+        if($response->rsvp)
+            return;
 
         foreach($photos as $url) {
             // Check if this photo already exists

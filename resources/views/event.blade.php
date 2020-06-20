@@ -86,12 +86,12 @@
         </div>
     @endif
 
-    <h1 class="p-name event-name">{{ $event->name }}</h1>
+    <h1 class="p-name event-name">{!! $event->status_tag() !!}{{ $event->name }}</h1>
 
     <div class="date segment with-icon">
         <span class="icon">@icon(clock)</span>
         <span>
-            <div>{!! $event->display_date() !!}</div>
+            <div>{{ $event->status == 'postponed' ? 'TBD, originally ' : '' }}{!! $event->display_date() !!}</div>
             @if(!$event->is_multiday() && $event->display_time())
                 <div class="time">
                     {!! $event->weekday() !!}
@@ -104,7 +104,7 @@
                 </div>
             @endif
             {!! $event->mf2_date_html() !!}
-            @if(!$event->is_past())
+            @if(!$event->is_past() && !in_array($event->status, ['cancelled','postponed']))
             <div class="add-to-calendar">
                 <div class="dropdown is-hoverable">
                     <div class="dropdown-trigger">
@@ -134,6 +134,10 @@
         <div class="p-location h-card">
             <div class="p-name">{{ $event->location_name }}</div>
             <div>{!! $event->location_summary_with_mf2() !!}</div>
+            @if($event->latitude && $event->longitude)
+                <data class="p-latitude" value="{{ $event->latitude }}"></data>
+                <data class="p-longitude" value="{{ $event->longitude }}"></data>
+            @endif
         </div>
     </div>
     @endif
@@ -158,6 +162,35 @@
                 <a href="{{ $event->tickets_url }}" title="{{ $event->tickets_url }}">
                     {{ strlen($event->tickets_url) > 40 ?  parse_url($event->tickets_url, PHP_URL_HOST) : \p3k\url\display_url($event->tickets_url) }}
                 </a>
+            </span>
+        </div>
+    @endif
+
+    @if($event->code_of_conduct_url)
+        <div class="code-of-conduct segment with-icon">
+            <span class="icon">@icon(gavel)</span>
+            <span class="text">
+                <span class="coc-title">Code of Conduct</span>
+                @foreach($event->code_of_conduct_urls() as $url)
+                    <a href="{{ $url }}" title="{{ $url }}" class="coc-url">
+                        {{ strlen($url) > 80 ?  parse_url($url, PHP_URL_HOST) : \p3k\url\display_url($url) }}
+                    </a>
+                @endforeach
+            </span>
+        </div>
+    @endif
+
+    @if($event->meeting_url && !$event->is_past())
+        <div class="website segment with-icon">
+            <span class="icon">@icon(video)</span>
+            <span>
+                @if($event->is_starting_soon())
+                    <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
+                        Join the Online Meeting
+                    </a>
+                @else
+                    The meeting link will be shown 15 minutes before the event
+                @endif
             </span>
         </div>
     @endif
@@ -191,7 +224,7 @@
                     <h2 class="subtitle">RSVPs</h2>
                 </div>
                 <div class="level-right">
-                    @if(Auth::user())
+                    @if(Auth::user() && $event->status == 'confirmed')
                         @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
                             <div class="buttons has-addons">
                                 <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">

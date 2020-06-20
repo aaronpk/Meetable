@@ -67,7 +67,7 @@ use App\Setting;
                     <ul>
                     @foreach($events as $event)
                         <li class="event h-event">
-                            <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{{ $event->name }}</a></h3>
+                            <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{!! $event->status_tag() !!}{{ $event->name }}</a></h3>
 
                             <p>{!! $event->date_summary() !!}</p>
 

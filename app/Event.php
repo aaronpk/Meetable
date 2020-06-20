@@ -20,6 +20,13 @@ class Event extends Model
 
     private static $US_NAMES = ['US', 'USA', 'United States'];
 
+    public static $STATUSES = [
+        'confirmed' => 'Confirmed',
+        'tentative' => 'Tentative',
+        'postponed' => 'Postponed',
+        'cancelled' => 'Cancelled',
+    ];
+
     public static function slug_from_name($name) {
         return preg_replace('/--+/', '-', mb_ereg_replace('[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+', '-', mb_strtolower($name)));
     }
@@ -84,7 +91,12 @@ class Event extends Model
         return array_map(function($t){ return $t->tag; }, $this->tags->all());
     }
 
+    public $temp_tag_string;
+
     public function tags_string() {
+        if($this->temp_tag_string)
+            return $this->temp_tag_string;
+
         $tags = [];
         foreach($this->tags as $t)
             $tags[] = $t->tag;
@@ -156,6 +168,28 @@ class Event extends Model
         return env('APP_URL').$this->permalink();
     }
 
+    public function code_of_conduct_urls() {
+        if(!$this->code_of_conduct_url) return [];
+
+        return explode(' ', $this->code_of_conduct_url);
+    }
+
+    public function sort_date() {
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+        } else {
+            // Events without a timezone will be sorted as if they were in UTC
+            $tz = new DateTimeZone('UTC');
+        }
+        if($this->start_time) {
+            $sort_date = new DateTime($this->start_date.' '.$this->start_time, $tz);
+        } else {
+            $sort_date = new DateTime($this->start_date, $tz);
+        }
+        $sort_date = $sort_date->setTimeZone(new DateTimeZone('UTC'));
+        return $sort_date;
+    }
+
     public function is_multiday() {
         return $this->end_date && $this->end_date != $this->start_date;
     }
@@ -187,9 +221,9 @@ class Event extends Model
         }
     }
 
-    public function start_datetime_local() {
+    public function start_datetime_local($format='Ymd\THi') {
         $start_date = new DateTime($this->start_date.' '.$this->start_time);
-        return $start_date->format('Ymd\THi');
+        return $start_date->format($format);
     }
 
     public function display_date() {
@@ -229,6 +263,14 @@ class Event extends Model
         }
 
         return $str;
+    }
+
+    public function duration_minutes() {
+        list($start, $end) = $this->start_and_end_dates();
+        if(!$end)
+            return null;
+
+        return (strtotime($end) - strtotime($start)) / 60;
     }
 
     public function weekday() {
@@ -284,6 +326,27 @@ class Event extends Model
         return $start_html . $end_html;
     }
 
+    public function is_starting_soon() {
+        if($this->is_past())
+            return false;
+
+        // Return true if the event is starting in 15 minutes or less
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+        } else {
+            // Fall back to earliest timezone, not ideal, but we shouldn't be creating zoom
+            // meetings for events without a timezone anyway
+            $tz = new DateTimeZone('-12:00');
+        }
+
+        // Events using this should also usually have a start time set
+        $date = new DateTime($this->start_date.' '.$this->start_time, $tz);
+
+        $now = new DateTime();
+
+        return $now->format('U') > ($date->format('U') - 60*15);
+    }
+
     public function is_past() {
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
@@ -302,6 +365,37 @@ class Event extends Model
         $now = new DateTime();
 
         return $date->format('U') < $now->format('U');
+    }
+
+    public function status_tag() {
+        if($this->status == 'confirmed')
+            return '';
+
+        switch($this->status) {
+            case 'cancelled':
+              $icon = 'exclamation-triangle';
+              $class = 'danger';
+              break;
+            case 'postponed':
+            case 'tentative':
+              $icon = 'question-circle';
+              $class = 'warning';
+              break;
+        }
+
+        return '<span class="status tag is-'.$class.'">'
+            .'<svg class="svg-icon" style="margin-right:5px;"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#'.$icon.'"></use></svg>'
+            .substr(strtoupper($this->status), 0, 1)
+            .'<span class="lower">'.substr(strtoupper($this->status), 1).'</span>'
+            .'<span class="hidden">:</span>'
+            .'</span> ';
+    }
+
+    public function status_text() {
+        if($this->status == 'confirmed')
+            return '';
+
+        return strtoupper($this->status).': ';
     }
 
     public function location_summary() {
@@ -454,7 +548,7 @@ class Event extends Model
         return Event::select('timezone')
             ->whereNotNull('timezone')
             ->groupBy('timezone')
-            ->orderBy('timezone')
+            ->orderBy(DB::raw('COUNT(id)'), 'DESC')
             ->get();
     }
 
@@ -477,4 +571,20 @@ class Event extends Model
 
         return $timezones;
     }
+
+    // Since converting from -07:00 to America/Los_Angeles is a fuzzy concept,
+    // let's skew the conversion based on the most frequently used timezones in the database.
+    public static function timezone_name_from_offset(string $offset, DateTime $date) {
+        $timezones = self::timezones();
+        foreach($timezones as $tz) {
+            try {
+                $timezone = new DateTimeZone($tz);
+                $seconds = $timezone->getOffset($date);
+                if(\p3k\date\tz_seconds_to_offset($seconds) == $offset)
+                    return $tz;
+            } catch(\Exception $e) {}
+        }
+        return null;
+    }
+
 }

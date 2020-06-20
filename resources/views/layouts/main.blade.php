@@ -67,7 +67,12 @@ use App\Response;
                             {!! ($num=Response::where('approved', 0)->count()) ? "(<span class='pending-response-count'>$num</span>)" : "" !!}
                         </a>
                     @endif
-                    <a class="navbar-item" href="{{ route('new-event') }}">Add an Event</a>
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link" href="{{ route('new-event') }}">Add an Event</a>
+                        <div class="navbar-dropdown">
+                            <a class="navbar-item" href="{{ route('import-event') }}">Import from URL</a>
+                        </div>
+                    </div>
                 @endcan
             </div>
             @if(!Setting::value('auth_hide_login') || !Setting::value('auth_hide_logout') || Gate::allows('manage-site'))

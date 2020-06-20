@@ -109,6 +109,18 @@ class ICSController extends BaseController
             $vEvent->setLocation($location);
         }
 
+        switch($event->status) {
+            case 'confirmed':
+              break; // no status needed
+            case 'tentative':
+            case 'postponed':
+              $vEvent->setStatus('TENTATIVE');
+              break;
+            case 'cancelled':
+              $vEvent->setStatus('CANCELLED');
+              break;
+        }
+
         $vEvent->setDtStamp(new DateTime($event->created_at));
         $vEvent->setCreated(new DateTime($event->created_at));
         $vEvent->setModified(new DateTime($event->updated_at));
