@@ -22,20 +22,14 @@ use App\Response;
 
     <link href="/assets/style.css" rel="stylesheet">
 
-    @if($favicon=Setting::value('favicon_url'))
-        <link rel="shortcut icon" href="{{ $favicon }}">
-    @endif
+@if($favicon=Setting::value('favicon_url'))
+    <link rel="shortcut icon" href="{{ $favicon }}">
+@endif
 
-    @if($ga_id=Setting::value('ga_id'))
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ $ga_id }}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '{{ $ga_id }}');
-    </script>
-    @endif
+@if($analytics=Setting::value('analytics'))
+    {!! $analytics !!}
+@endif
+
 </head>
 <body>
 

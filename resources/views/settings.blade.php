@@ -123,7 +123,7 @@ use App\Setting;
 
 
     <br><br>
-    <h2 class="title">API Keys</h2>
+    <h2 class="title">Services</h2>
 
     <div class="field">
       <div class="control">
@@ -131,14 +131,6 @@ use App\Setting;
         <input class="input" type="password" value="{{ Setting::value('googlemaps_api_key') ? '********' : '' }}" name="googlemaps_api_key" autocomplete="off">
       </div>
       <p class="help">In order to search for locations and show maps, you'll need to get a <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Google Maps API key</a></p>
-    </div>
-
-    <div class="field">
-      <div class="control">
-        <label class="label">Google Analytics ID</label>
-        <input class="input" type="text" value="{{ Setting::value('ga_id') }}" name="ga_id">
-      </div>
-      <p class="help">If you'd like to track visits in Google Analytics, provide a Google Analytics property ID</p>
     </div>
 
     <div class="field is-grouped is-grouped-multiline">
@@ -165,8 +157,17 @@ use App\Setting;
         </div>
     </div>
     <p class="help">Create a Twitter app and provide these values in order to be able to quickly add tweets to event pages as comments or photos</p>
+    <br>
 
-    <br><br>
+    <div class="field">
+      <div class="control">
+        <label class="label">Analytics</label>
+        <textarea class="input" name="analytics" style="height:6em">{{ Setting::value('analytics') }}</textarea>
+      </div>
+      <p class="help">Provide your website analytics tracking code here</p>
+    </div>
+
+    <br>
 
     <button class="button is-primary" type="submit">Save All Settings</button>
 
