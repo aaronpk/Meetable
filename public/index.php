@@ -22,6 +22,8 @@ if(!getenv('APP_NAME')) {
     $_ENV['APP_NAME'] = 'Meetable Installer';
     // Use a temporary fixed APP_KEY during installation
     $_ENV['APP_KEY'] = 'base64:v7ZDOfJbqzXdbbJ/3GYSAP+B4jm3rMlrWiNutsaQYEE=';
+    // Use cookie driver for setup, will switch back to database when setup is complete
+    $_ENV['SESSION_DRIVER'] = 'cookie';
     // Setting the MEETABLE_SETUP to true will trigger `routes/web.php` to
     // define the setup routes instead of app routes
     define('MEETABLE_SETUP', true);
