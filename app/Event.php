@@ -347,6 +347,27 @@ class Event extends Model
         return $now->format('U') > ($date->format('U') - 60*15);
     }
 
+    public function is_ongoing() {
+        if($this->is_past())
+            return false;
+
+        // Return true if the event has started
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+        } else {
+            // Fall back to earliest timezone, not ideal, but we shouldn't be creating zoom
+            // meetings for events without a timezone anyway
+            $tz = new DateTimeZone('-12:00');
+        }
+
+        // Events using this should also usually have a start time set
+        $date = new DateTime($this->start_date.' '.$this->start_time, $tz);
+
+        $now = new DateTime();
+
+        return $now->format('U') > $date->format('U');
+    }
+
     public function is_past() {
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
@@ -368,25 +389,37 @@ class Event extends Model
     }
 
     public function status_tag() {
-        if($this->status == 'confirmed')
+        // Live now
+        if($this->is_ongoing()) {
+            $icon = 'play-circle';
+            $class = 'success';
+            $text = 'Live Now';
+        } else if($this->status == 'confirmed') {
             return '';
+        }
 
         switch($this->status) {
             case 'cancelled':
               $icon = 'exclamation-triangle';
               $class = 'danger';
+              $text = 'Cancelled';
               break;
             case 'postponed':
+              $icon = 'question-circle';
+              $class = 'warning';
+              $text = 'Postponed';
+              break;
             case 'tentative':
               $icon = 'question-circle';
               $class = 'warning';
+              $text = 'Tentative';
               break;
         }
 
         return '<span class="status tag is-'.$class.'">'
             .'<svg class="svg-icon" style="margin-right:5px;"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#'.$icon.'"></use></svg>'
-            .substr(strtoupper($this->status), 0, 1)
-            .'<span class="lower">'.substr(strtoupper($this->status), 1).'</span>'
+            .substr(strtoupper($text), 0, 1)
+            .'<span class="lower">'.substr(strtoupper($text), 1).'</span>'
             .'<span class="hidden">:</span>'
             .'</span> ';
     }
