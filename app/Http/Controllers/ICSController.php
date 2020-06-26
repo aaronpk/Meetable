@@ -83,7 +83,7 @@ class ICSController extends BaseController
 
             $rsvps = [];
             foreach($event->rsvps_yes as $rsvp) {
-                if($name = $rsvp->author()['name']) {
+                if($name = $rsvp->author_display_name()) {
                     $words = explode(' ', $name);
                     $rsvps[] = $words[0];
                 }

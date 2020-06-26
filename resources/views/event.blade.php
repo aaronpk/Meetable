@@ -326,7 +326,7 @@
                     <li>
                         <p class="post-name"><a href="{{ $post->link() }}">{{ $post->name }}</a></p>
                         <p>
-                            by <a href="{{ $post->author()['url'] ?: $post->link() }}">{{ $post->author()['name'] ?: parse_url($post->link(), PHP_URL_HOST) }}</a>
+                            by <a href="{{ $post->author_url() }}">{{ $post->author_display_name() }}</a>
                             @if($post->published)
                                 on {{ date('M j, Y', strtotime($post->published)) }}
                             @endif
@@ -344,12 +344,12 @@
                 @foreach($event->comments as $comment)
                     <li>
                         <span class="avatar">
-                            @if($comment->author()['photo'])
+                            @if($comment->author_photo())
                                 <img src="{{ $comment->author_photo() }}" width="48" class="photo">
                             @endif
                             <span class="author-details">
-                                <a href="{{ $comment->author()['url'] }}" class="author-name">{{ $comment->author()['name'] ?? p3k\url\display_url($comment->author()['url']) }}</a>
-                                <a href="{{ $comment->author()['url'] }}" class="author-url">{{ p3k\url\display_url($comment->author()['url']) }}</a>
+                                <a href="{{ $comment->author_url() }}" class="author-name">{{ $comment->author_display_name() }}</a>
+                                <a href="{{ $comment->author_url() }}" class="author-url">{{ p3k\url\display_url($comment->author_url()) }}</a>
                                 @if($comment->rsvp)
                                   <img src="/images/rsvp-{{ $comment->rsvp }}.png" width="79">
                                 @endif

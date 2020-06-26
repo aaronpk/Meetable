@@ -29,42 +29,49 @@ class Response extends Model
         return $this->hasMany('App\ResponsePhoto');
     }
 
-    public function author() {
-        if($this->rsvp_user_id) {
-            $user = User::where('id', $this->rsvp_user_id)->first();
-            return [
-                'name' => $user->name,
-                'photo' => $user->photo,
-                'url' => $user->url,
-            ];
-        } else {
-            return [
-                'name' => $this->author_name,
-                'photo' => $this->author_photo,
-                'url' => $this->author_url,
-            ];
-        }
-    }
-
     public function author_photo() {
         if($this->rsvp_user_id) {
             $user = User::where('id', $this->rsvp_user_id)->first();
-            return $user->photo;
+            return $user->photo ?: $this->author_photo;
         } else {
             return $this->author_photo;
         }
     }
 
     public function author_display_name() {
-        $author = $this->author();
+        if($this->rsvp_user_id) {
+            $user = User::where('id', $this->rsvp_user_id)->first();
+        } else {
+            $user = null;
+        }
 
-        if(!empty($author['name']))
-            return $author['name'];
+        if($user && $user->name) 
+            return $user->name;
 
-        if(!empty($author['url']))
-            return \p3k\url\display_url($author['url']);
+        if($this->author_name)
+            return $this->author_name;
 
-        return \p3k\url\display_url($this->link());
+        // Fall back to domain name if nothing else is available
+        return parse_url($this->author_url($user), PHP_URL_HOST);
+    }
+
+    public function author_url($user=null) {
+        if(!$user) {
+            if($this->rsvp_user_id) {
+                $user = User::where('id', $this->rsvp_user_id)->first();
+            } else {
+                $user = null;
+            }
+        }
+
+        if($user && $user->url)
+            $url = $user->url;
+        elseif($this->author_url)
+            $url = $this->author_url;
+        else
+            $url = $this->link();
+
+        return $url;
     }
 
     public function link() {
@@ -72,9 +79,10 @@ class Response extends Model
     }
 
     public function rsvp_link() {
-        $author = $this->author();
-        if(!empty($author['url']))
-            return $author['url'];
+        if($this->rsvp_user_id) {
+            $user = User::where('id', $this->rsvp_user_id)->first();
+            return $user->url;
+        }
         return $this->link();
     }
 
