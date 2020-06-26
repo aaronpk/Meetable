@@ -208,7 +208,7 @@
     @if($event->has_likes())
         <div class="responses likes" id="likes">
             <ul>
-                <li><span class="icon" style="width:48px; height:48px;">@icon(star)</span></li>
+                <li><span class="icon" style="width:30px; height:30px;">@icon(star)</span></li>
                 @foreach($event->likes as $like)
                     <li>@include('components/like-avatar', ['like' => $like])</li>
                 @endforeach
