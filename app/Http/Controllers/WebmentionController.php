@@ -51,7 +51,7 @@ class WebmentionController extends BaseController
         }
 
         // Handle redirects from source URLs
-        if(isset($data['url']) != $sourceURL) {
+        if(isset($data['url']) && $data['url'] != $sourceURL) {
             // The source URL was a redirect to a new URL. This may happen before or after the new URL has already sent a webmention.
 
             // Check to see if a webmention has already been received from the new URL
@@ -67,11 +67,20 @@ class WebmentionController extends BaseController
                     'result' => 'updated',
                     'description' => 'This source URL redirected to a response that has already been received so this response was deleted'
                 ]);
+            } else {
+                // Check if a webmention has already been received from the old URL
+                $response = Response::where('event_id', $event->id)
+                  ->withTrashed()
+                  ->where('source_url', $sourceURL)->first();
+                if($response) {
+                    // Update the source URL in the database record
+                    $response->source_url = $data['url'];
+                    $response->save();
+                }
+                // If the URL was a redirect, rewrite the source URL to the final URL after the redirect.
+                // When the webmention from the new URL comes in later, it will be treated as an update since it already exists.
+                $sourceURL = $data['url'];
             }
-
-            // If the URL was a redirect, rewrite the source URL to the final URL after the redirect.
-            // When the webmention from the new URL comes in, it will be treated as an update since it already exists.
-            $sourceURL = $data['url'];
         }
 
         $source = $data['data'];
