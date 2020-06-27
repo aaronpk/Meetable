@@ -390,7 +390,7 @@ class Event extends Model
 
     public function status_tag() {
         // Live now
-        if($this->is_ongoing()) {
+        if($this->meeting_url && $this->is_ongoing()) {
             $icon = 'play-circle';
             $class = 'success';
             $text = 'Live Now';
