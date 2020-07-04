@@ -157,25 +157,6 @@ form h2.subtitle {
     </div>
 
 
-    <h2 class="subtitle">Virtual Event?</h2>
-
-    @if(Setting::value('zoom_api_key'))
-    <div class="field">
-        <label class="checkbox">
-            <input type="checkbox" name="create_zoom_meeting" value="1">
-            Schedule a Zoom Meeting
-        </label>
-        <div class="help">check the box above to schedule a zoom meeting for this event. the meeting url will be shown on the event page 15 minutes before the start. note: the host will need to log in to zoom as {{ Setting::value('zoom_email') }} to start the meeting.</div>
-    </div>
-    @endif
-
-    <div class="field" id="meeting-url-field">
-        <label class="label">Meeting URL</label>
-        <input class="input @error('meeting_url') is-danger @enderror" type="url" autocomplete="off" name="meeting_url" value="{{ old('meeting_url') ?: $event->meeting_url }}">
-        <div class="help">enter a url to join the virtual meeting. this will be shown only 15 minutes before the event start, and hidden afterwards</div>
-    </div>
-
-
 
 
     <h2 class="subtitle">When is the event?</h2>
@@ -241,6 +222,22 @@ form h2.subtitle {
         <label class="label">Code of Conduct</label>
         <input class="input" type="text" autocomplete="off" name="code_of_conduct_url" value="{{ old('code_of_conduct_url') ?: $event->code_of_conduct_url }}">
         <div class="help">provide one or more URLs to codes of conduct that are applicable to this event</div>
+    </div>
+
+    @if(Setting::value('zoom_api_key'))
+    <div class="field">
+        <label class="checkbox">
+            <input type="checkbox" name="create_zoom_meeting" value="1">
+            Schedule a Zoom Meeting
+        </label>
+        <div class="help">check the box above to schedule a zoom meeting for this event. the meeting url will be shown on the event page 15 minutes before the start. note: the host will need to log in to zoom as {{ Setting::value('zoom_email') }} to start the meeting.</div>
+    </div>
+    @endif
+
+    <div class="field" id="meeting-url-field">
+        <label class="label">Meeting URL</label>
+        <input class="input @error('meeting_url') is-danger @enderror" type="url" autocomplete="off" name="meeting_url" value="{{ old('meeting_url') ?: $event->meeting_url }}">
+        <div class="help">if this is a virtual event, enter a url to join the virtual meeting. <b>this will be shown only 15 minutes before the event start</b>, and hidden afterwards</div>
     </div>
 
     <div class="field">
