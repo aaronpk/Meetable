@@ -48,6 +48,7 @@ Route::middleware('slashes:remove')->group(function(){
 
     Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
     Route::get('/tag/{tag}/archive', 'Controller@tag_archive')->name('tag-archive');
+    Route::redirect('/tag', '/tags', 301);
     Route::get('/tags', 'Controller@tags')->name('tags');
 
     Route::get('/local-time', 'Controller@local_time')->name('local_time');
