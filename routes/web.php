@@ -34,36 +34,38 @@ Route::get('/setup/heroku-in-progress', 'Setup\Controller@heroku_finished')->nam
 ######
 
 
-Route::get('/archive', 'Controller@archive')->name('archive');
+Route::middleware('slashes:remove')->group(function(){
+    Route::get('/archive', 'Controller@archive')->name('archive');
 
-Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
-Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event-short');
+    Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
+    Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event-short');
 
-Route::get('/{year}/{month}/{day}', 'Controller@index')->name('day');
-Route::get('/{year}/{month}', 'Controller@index')->name('month');
-Route::get('/{year}', 'Controller@index')->name('year');
+    Route::get('/{year}/{month}/{day}', 'Controller@index')->name('day');
+    Route::get('/{year}/{month}', 'Controller@index')->name('month');
+    Route::get('/{year}', 'Controller@index')->name('year');
 
-Route::get('/{year}/{month}/{partial_slug}', 'Controller@find_matching_events');
+    Route::get('/{year}/{month}/{partial_slug}', 'Controller@find_matching_events');
 
-Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
-Route::get('/tag/{tag}/archive', 'Controller@tag_archive')->name('tag-archive');
-Route::get('/tags', 'Controller@tags')->name('tags');
+    Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
+    Route::get('/tag/{tag}/archive', 'Controller@tag_archive')->name('tag-archive');
+    Route::get('/tags', 'Controller@tags')->name('tags');
 
-Route::get('/local-time', 'Controller@local_time')->name('local_time');
+    Route::get('/local-time', 'Controller@local_time')->name('local_time');
 
-Route::get('/webmention', 'WebmentionController@get');
-Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
+    Route::get('/webmention', 'WebmentionController@get');
+    Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
 
-Route::get('/add-to-google/{event}', 'Controller@add_to_google')->name('add-to-google');
+    Route::get('/add-to-google/{event}', 'Controller@add_to_google')->name('add-to-google');
 
-Route::get('/login', 'AuthController@login')->name('login');
-Route::get('/logout', 'AuthController@logout')->name('logout');
-Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
-Route::get('/auth/heroku', 'HerokuController@callback')->name('heroku-oauth-redirect');
+    Route::get('/login', 'AuthController@login')->name('login');
+    Route::get('/logout', 'AuthController@logout')->name('logout');
+    Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
+    Route::get('/auth/heroku', 'HerokuController@callback')->name('heroku-oauth-redirect');
 
-Route::get('/{key}', 'Controller@event_shorturl');
+    Route::get('/{key}', 'Controller@event_shorturl');
+});
 
-Route::middleware('auth')->group(function(){
+Route::middleware('auth')->middleware('slashes:remove')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');
     Route::get('/import', 'EventController@import_event')->name('import-event');
