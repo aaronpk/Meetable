@@ -221,6 +221,10 @@ class Event extends Model
         }
     }
 
+    public function date_summary_text() {
+        return strip_tags($this->date_summary());
+    }
+
     public function start_datetime_local($format='Ymd\THi') {
         $start_date = new DateTime($this->start_date.' '.$this->start_time);
         return $start_date->format($format);

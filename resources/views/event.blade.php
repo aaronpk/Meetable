@@ -15,7 +15,14 @@
 <meta property="og:url" content="{{ $event->absolute_permalink() }}">
 @if($event->cover_image)
 <meta property="og:image" content="{{ $event->cover_image_absolute_url() }}">
+<meta name="twitter:image" content="{{ $event->cover_image_absolute_url() }}">
 <meta name="twitter:card" content="summary_large_image">
+@endif
+<meta name="twitter:label1" value="Date">
+<meta name="twitter:data1" value="{{ $event->date_summary_text() }}">
+@if($event->location_summary())
+<meta name="twitter:label2" value="Location">
+<meta name="twitter:data2" value="{{ $event->location_summary_with_name() }}">
 @endif
 @endsection
 
