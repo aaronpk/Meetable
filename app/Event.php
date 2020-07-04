@@ -538,6 +538,11 @@ class Event extends Model
         if($this->location_country)
             $data['location']['address']['addressCountry'] = $this->location_country;
 
+        // Remove the location property if no values were added
+        if(count($data['location']['address']) == 1) {
+            unset($data['location']);
+        }
+
         if($this->description)
             $data['description'] = substr($this->description, 0, 512).'...'; // google only shows a snippet
 
