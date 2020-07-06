@@ -56,6 +56,8 @@
 		@php($currentRevision = $previousRevision)
 	@endif
 @endforeach
+	
+@if($currentRevision)
 		<li>
 			<div class="left">
 				<div class="meta">
@@ -77,6 +79,7 @@
 				</a>
 			</div>
 		</li>
+@endif
 </ul>
 
 <style>

@@ -35,7 +35,7 @@ class EventSubscriber implements ShouldQueue
         }
 
 		$summary = '[Event Updated] '
-			. $event->event->createdBy->display_url() . ' updated'
+			. $event->revision->createdBy->display_url() . ' updated'
 			. ' "' . $event->event->name . '"'
 			. ' on ' . $event->event->date_summary_text()
 			. ' changed ' . implode(', ', $event->revision->changed_fields($previous))

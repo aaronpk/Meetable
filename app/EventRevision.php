@@ -26,4 +26,28 @@ class EventRevision extends Event
         return route('view-revision-diff', [$this->event_id, $this->id]);
 	}
 
+	public static function createFromEvent(Event $event) {
+		$revision = new EventRevision;
+
+		$revision->event_id = $event->id;
+
+        $revision->sort_date = $event->sort_date;
+        $revision->slug = $event->slug;
+        $revision->key = $event->key;
+        $revision->last_modified_by = $event->last_modified_by;
+        $revision->created_by = $event->created_by;
+
+        foreach(Event::$EDITABLE_PROPERTIES as $p) {
+            $revision->{$p} = $event->{$p};
+        }
+
+        $tags = [];
+        foreach($event->tags as $tag) {
+        	$tags[] = $tag->tag;
+        }
+        $revision->tags = json_encode($tags);
+
+        return $revision;
+	}
+
 }

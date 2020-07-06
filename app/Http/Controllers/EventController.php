@@ -114,6 +114,10 @@ class EventController extends BaseController
                 $event->tags()->attach(Tag::get($t));
         }
 
+        // Store a snapshot in the revision table
+        $revision = EventRevision::createFromEvent($event);
+        $revision->save();
+        
         event(new EventCreated($event));
 
         return redirect($event->permalink());
@@ -155,49 +159,35 @@ class EventController extends BaseController
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
         ]);
 
-        // Save a snapshot of the previous state
-        $revision = new EventRevision;
-        $revision->event_id = $event->id;
-
         // Update the properties on the event
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
-            $event->{$p} = $revision->{$p} = (request($p) ?: null);
+            $event->{$p} = (request($p) ?: null);
         }
 
-        $event->sort_date = $revision->sort_date = $event->sort_date();
+        $event->sort_date = $event->sort_date();
 
         // Generate a new slug
-        $event->slug = $revision->slug = Event::slug_from_name($event->name);
+        $event->slug = Event::slug_from_name($event->name);
 
         // Schedule a zoom meeting if requested
         if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
-            $event->meeting_url = $revision->meeting_url = Zoom::schedule_meeting($event);
+            $event->meeting_url = Zoom::schedule_meeting($event);
             if(!$event->meeting_url) {
                 return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         }
 
-        $event->last_modified_by = $revision->last_modified_by = Auth::user()->id;
+        $event->last_modified_by = Auth::user()->id;
         $event->save();
-
-        $revision->created_by = $event->created_by;
 
         // Capture the tags serialized as JSON
         $rawtags = request('tags') ? explode(' ', request('tags')) : [];
         $tags = [];
-        $tags_string = [];
         foreach($rawtags as $t) {
             if(trim($t)) {
-                $tag = Tag::get($t);
-                $tags[] = $tag;
-                $tags_string[] = $tag->tag;
+                $tags[] = Tag::get($t);
             }
         }
-
-        $revision->key = $event->key;
-        $revision->tags = json_encode($tags_string);
-        $revision->edit_summary = request('edit_summary');
-        $revision->save();
 
         // Delete related tags
         $event->tags()->detach();
@@ -205,6 +195,10 @@ class EventController extends BaseController
         foreach($tags as $tag) {
             $event->tags()->attach($tag);
         }
+
+        $revision = EventRevision::createFromEvent($event);
+        $revision->edit_summary = request('edit_summary');
+        $revision->save();
 
         event(new EventUpdated($event, $revision));
 
