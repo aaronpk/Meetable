@@ -29,6 +29,11 @@ class EventSubscriber implements ShouldQueue
           ->orderBy('created_at', 'desc')
           ->first();
 
+        if(!$previous) {
+        	Log::error('Could not find previous revision of event '.$event->event->id);
+        	return;
+        }
+
 		$summary = '[Event Updated] '
 			. $event->event->createdBy->display_url() . ' updated'
 			. ' "' . $event->event->name . '"'
