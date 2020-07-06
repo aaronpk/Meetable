@@ -262,6 +262,7 @@ class Controller extends BaseController
             'month' => $month,
             'key' => $key,
             'slug' => $slug,
+            'mode' => 'event',
         ]);
     }
 

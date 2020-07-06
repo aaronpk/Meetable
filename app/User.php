@@ -38,6 +38,10 @@ class User extends Authenticatable
     protected $casts = [
     ];
 
+    public function display_name() {
+        return $this->name ?: \p3k\url\display_url($this->url);
+    }
+
     public function downloadProfilePhoto($url) {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);

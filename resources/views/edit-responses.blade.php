@@ -4,7 +4,7 @@
 <section class="section event">
 
 <div class="content">
-    <h1>Responses on {{ $event->name }}</h1>
+    <h1>Responses on "{{ $event->name }}"</h1>
 
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
 </div>

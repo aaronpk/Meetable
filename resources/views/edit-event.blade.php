@@ -45,7 +45,7 @@ use App\Setting, App\Event;
 @endif
 
 <div class="content">
-    <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').$event->name) : 'Add an Event' }}</h1>
+    <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').'"'.$event->name.'"') : 'Add an Event' }}</h1>
 
     @if($event->id)
         <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
@@ -265,6 +265,11 @@ form h2.subtitle {
         </div>
     </div>
 
+    <div class="field">
+        <label class="label">Edit Summary</label>
+        <input class="input" type="text" name="edit_summary" value="{{ old('edit_summary') }}" autocomplete="off">
+        <div class="help">a brief description of your changes</div>
+    </div>
 
     <button class="button is-primary" type="submit">Save</button>
 

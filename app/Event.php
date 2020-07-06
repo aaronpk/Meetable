@@ -27,6 +27,14 @@ class Event extends Model
         'cancelled' => 'Cancelled',
     ];
 
+    public static $EDITABLE_PROPERTIES = [
+        'name', 'start_date', 'end_date', 'start_time', 'end_time',
+        'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
+        'latitude', 'longitude', 'timezone', 'status',
+        'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url',
+        'description', 'cover_image',
+    ];
+
     public static function slug_from_name($name) {
         return preg_replace('/--+/', '-', mb_ereg_replace('[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+', '-', mb_strtolower($name)));
     }
@@ -57,6 +65,11 @@ class Event extends Model
     public function num_pending_responses() {
         return $this->pending_responses
             ->count();
+    }
+
+    public function revisions() {
+        return $this->hasMany('\App\EventRevision', 'key', 'key')
+            ->orderBy('created_at', 'desc');
     }
 
     public function photos() {

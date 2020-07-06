@@ -19,6 +19,7 @@
         "guzzlehttp/guzzle": "^6.5",
         "indieweb/date-formatter": "^0.3.1",
         "intervention/image": "^2.5",
+        "jfcherng/php-diff": "^6.7",
         "laravel/framework": "^6.13",
         "laravel/tinker": "^1.0",
         "lcobucci/jwt": "^3.3",

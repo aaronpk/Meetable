@@ -8,7 +8,9 @@
 
 <link rel="stylesheet" href="/jquery/jquery-ui-1.12.1/jquery-ui.min.css">
 <script type="application/ld+json">
+@if($mode != 'archive')
 {!! $event->toGoogleJSON() !!}
+@endif
 </script>
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ $event->name }}">
@@ -34,6 +36,7 @@
 <section class="section">
 
 @can('manage-event', $event)
+@if($mode != 'archive')
 
 <div class="level">
   <div class="level-left"></div>
@@ -67,6 +70,10 @@
                         <span class="icon">@icon(comment)</span>
                         <span>Edit Responses</span>
                     </a>
+                    <a class="dropdown-item" href="{{ route('revision-history', $event) }}">
+                        <span class="icon">@icon(history)</span>
+                        <span>Revision History</span>
+                    </a>
                     @if($num=$event->num_pending_responses())
                     <a class="dropdown-item" href="{{ route('moderate-responses', $event) }}">
                         <span class="icon">@icon(comment)</span>
@@ -82,10 +89,17 @@
   </div>
 </div>
 
+@endif
 @endcan
 
 
 <article class="h-event event">
+
+    @if($mode == 'archive')
+        <b>Viewing event at revision {{ $event->created_at }}</b>
+
+        <p><a href="{{ route('revision-history', $event_id) }}">@icon(arrow-circle-left) revision history</a></p>
+    @endif
 
     @if($event->cover_image)
         <div class="cover-image">
@@ -187,19 +201,32 @@
         </div>
     @endif
 
-    @if($event->meeting_url && !$event->is_past())
-        <div class="website segment with-icon">
-            <span class="icon">@icon(video)</span>
-            <span>
-                @if($event->is_starting_soon())
-                    <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
-                        Join the Online Meeting
+    @if($mode == 'archive')
+        @if($event->meeting_url)
+            <div class="website segment with-icon">
+                <span class="icon">@icon(video)</span>
+                <span>
+                    <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" target="_blank">
+                        {{ strlen($event->meeting_url) > 80 ?  parse_url($event->meeting_url, PHP_URL_HOST) : \p3k\url\display_url($event->meeting_url) }}
                     </a>
-                @else
-                    The meeting link will be shown 15 minutes before the event
-                @endif
-            </span>
-        </div>
+                </span>
+            </div>
+        @endif
+    @else
+        @if($event->meeting_url && !$event->is_past())
+            <div class="website segment with-icon">
+                <span class="icon">@icon(video)</span>
+                <span>
+                    @if($event->is_starting_soon())
+                        <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
+                            Join the Online Meeting
+                        </a>
+                    @else
+                        The meeting link will be shown 15 minutes before the event
+                    @endif
+                </span>
+            </div>
+        @endif
     @endif
 
     <div class="e-content description segment content">
@@ -207,11 +234,20 @@
     </div>
 
     <div class="segment tags are-medium" id="tags">
-        @foreach($event->tags as $tag)
-            <a href="{{ $tag->url() }}" class="tag is-rounded">#<span class="p-category">{{ $tag->tag }}</span></a>
-        @endforeach
+        @if($mode == 'archive')
+            @if($event->tags)
+                @foreach(json_decode($event->tags, true) as $tag)
+                    <a href="{{ route('tag', $tag) }}" class="tag is-rounded">#<span class="p-category">{{ $tag }}</span></a>
+                @endforeach
+            @endif
+        @else
+            @foreach($event->tags as $tag)
+                <a href="{{ $tag->url() }}" class="tag is-rounded">#<span class="p-category">{{ $tag->tag }}</span></a>
+            @endforeach
+        @endif
     </div>
 
+    @if($mode != 'archive')
     @if($event->has_likes())
         <div class="responses likes" id="likes">
             <ul>
@@ -374,6 +410,7 @@
                 @endforeach
             </ul>
         </div>
+    @endif
     @endif
 
     @can('manage-event', $event)

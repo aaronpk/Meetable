@@ -11,6 +11,7 @@ use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto, App\
 use Illuminate\Support\Str;
 use Auth, Storage, Gate, Log;
 use Image;
+use DateTime;
 use App\Services\Zoom, App\Services\EventParser;
 
 
@@ -152,53 +153,101 @@ class EventController extends BaseController
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
         ]);
 
-        $properties = [
-            'name', 'start_date', 'end_date', 'start_time', 'end_time',
-            'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
-            'latitude', 'longitude', 'timezone', 'status',
-            'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url',
-            'description', 'cover_image',
-        ];
-
         // Save a snapshot of the previous state
         $revision = new EventRevision;
-        $fixed_properties = ['key','slug','created_by','last_modified_by'];
-        foreach(array_merge($properties, $fixed_properties) as $p) {
-            $revision->{$p} = $event->{$p} ?: null;
-        }
-        $revision->save();
 
         // Update the properties on the event
-        foreach($properties as $p) {
-            $event->{$p} = request($p) ?: null;
+        foreach(Event::$EDITABLE_PROPERTIES as $p) {
+            $event->{$p} = $revision->{$p} = (request($p) ?: null);
         }
 
-        $event->sort_date = $event->sort_date();
+        $event->sort_date = $revision->sort_date = $event->sort_date();
 
         // Generate a new slug
-        $event->slug = Event::slug_from_name($event->name);
+        $event->slug = $revision->slug = Event::slug_from_name($event->name);
 
         // Schedule a zoom meeting if requested
         if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
-            $event->meeting_url = Zoom::schedule_meeting($event);
+            $event->meeting_url = $revision->meeting_url = Zoom::schedule_meeting($event);
             if(!$event->meeting_url) {
                 return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         }
 
-        $event->last_modified_by = Auth::user()->id;
+        $event->last_modified_by = $revision->last_modified_by = Auth::user()->id;
         $event->save();
+
+        $revision->created_by = $event->created_by;
+
+        // Capture the tags serialized as JSON
+        $rawtags = request('tags') ? explode(' ', request('tags')) : [];
+        $tags = [];
+        $tags_string = [];
+        foreach($rawtags as $t) {
+            if(trim($t)) {
+                $tag = Tag::get($t);
+                $tags[] = $tag;
+                $tags_string[] = $tag->tag;
+            }
+        }
+
+        $revision->key = $event->key;
+        $revision->tags = json_encode($tags_string);
+        $revision->edit_summary = request('edit_summary');
+        $revision->save();
 
         // Delete related tags
         $event->tags()->detach();
         // Add all the tags back
-        foreach(explode(' ', request('tags')) as $t) {
-            if(trim($t))
-                $event->tags()->attach(Tag::get($t));
+        foreach($tags as $tag) {
+            $event->tags()->attach($tag);
         }
 
         return redirect($event->permalink());
     }
+
+    public function revision_history(Event $event) {
+        Gate::authorize('manage-event', $event);
+
+        $revisions = $event->revisions;
+
+        return view('revision-history', [
+            'event' => $event,
+            'revisions' => $revisions,
+        ]);
+    }
+
+    public function view_revision(Event $event, EventRevision $revision) {
+        Gate::authorize('manage-event', $revision);
+
+        $date = new DateTime($revision->start_date);
+
+        return view('event', [
+            'event' => $revision,
+            'year' => $date->format('Y'),
+            'month' => $date->format('m'),
+            'key' => $revision->key,
+            'slug' => $revision->slug,
+            'mode' => 'archive',
+            'event_id' => $event->id,
+        ]);
+    }    
+
+    public function view_revision_diff(Event $event, EventRevision $revision) {
+        Gate::authorize('manage-event', $revision);
+
+        $previous = EventRevision::where('key', $revision->key)
+          ->where('id', '!=', $revision->id)
+          ->where('created_at', '<', $revision->created_at)
+          ->orderBy('created_at', 'desc')
+          ->first();
+
+        return view('diff', [
+            'current' => $revision,
+            'previous' => $previous,
+            'event_id' => $event->id,
+        ]);
+    }    
 
     public function upload_event_cover_image(Event $event) {
         Gate::authorize('manage-event', $event);
