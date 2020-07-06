@@ -22,4 +22,8 @@ class EventRevision extends Event
 		return $changes;
 	}
 
+	public function revision_diff_permalink() {
+        return route('view-revision-diff', [$this->event_id, $this->id]);
+	}
+
 }

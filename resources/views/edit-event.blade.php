@@ -271,7 +271,7 @@ form h2.subtitle {
         <div class="help">a brief description of your changes</div>
     </div>
 
-    <button class="button is-primary" type="submit">Save</button>
+    <button class="button is-primary" type="submit" id="save-button">Save</button>
 
     <input type="hidden" name="latitude" value="{{ old('latitude') ?: $event->latitude }}">
     <input type="hidden" name="longitude" value="{{ old('longitude') ?: $event->longitude }}">
@@ -357,6 +357,12 @@ $(function(){
             $("input[name=start_time]").removeAttr("required");
             $("select[name=timezone]").removeAttr("required");
             $("#start-time-optional, #timezone-optional").removeClass("hidden");
+        }
+    });
+
+    $("input[name=edit_summary]").on('keydown', function(evt){
+        if(evt.keyCode == 13) {
+            $("#save-button").click();
         }
     });
 

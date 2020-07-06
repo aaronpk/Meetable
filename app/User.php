@@ -42,6 +42,10 @@ class User extends Authenticatable
         return $this->name ?: \p3k\url\display_url($this->url);
     }
 
+    public function display_url() {
+        return \p3k\url\display_url($this->url);
+    }
+
     public function downloadProfilePhoto($url) {
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);

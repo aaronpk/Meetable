@@ -13,7 +13,7 @@ use Auth, Storage, Gate, Log;
 use Image;
 use DateTime;
 use App\Services\Zoom, App\Services\EventParser;
-
+use App\Events\EventCreated, App\Events\EventUpdated;
 
 class EventController extends BaseController
 {
@@ -114,6 +114,8 @@ class EventController extends BaseController
                 $event->tags()->attach(Tag::get($t));
         }
 
+        event(new EventCreated($event));
+
         return redirect($event->permalink());
     }
 
@@ -155,6 +157,7 @@ class EventController extends BaseController
 
         // Save a snapshot of the previous state
         $revision = new EventRevision;
+        $revision->event_id = $event->id;
 
         // Update the properties on the event
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
@@ -203,6 +206,8 @@ class EventController extends BaseController
             $event->tags()->attach($tag);
         }
 
+        event(new EventUpdated($event, $revision));
+
         return redirect($event->permalink());
     }
 
@@ -236,7 +241,7 @@ class EventController extends BaseController
     public function view_revision_diff(Event $event, EventRevision $revision) {
         Gate::authorize('manage-event', $revision);
 
-        $previous = EventRevision::where('key', $revision->key)
+        $previous = EventRevision::where('event_id', $revision->event_id)
           ->where('id', '!=', $revision->id)
           ->where('created_at', '<', $revision->created_at)
           ->orderBy('created_at', 'desc')

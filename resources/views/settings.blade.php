@@ -171,6 +171,21 @@ use App\Setting;
 
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
+            <label class="label">Notification Endpoint</label>
+            <input class="input" type="url" value="{{ Setting::value('notification_endpoint') }}" name="notification_endpoint" autocomplete="off">
+        </div>
+
+        <div class="control is-expanded">
+            <label class="label">Notification Token</label>
+            <input class="input" type="password" value="{{ Setting::value('notification_token') ? '********' : '' }}" name="notification_token" autocomplete="off">
+        </div>
+    </div>
+    <p class="help">When set, notifications about new and updated events will be sent to this URL with the token in the Authorization header and the notification text in a form post parameter named "content".</p>
+
+    <br>
+
+    <div class="field is-grouped is-grouped-multiline">
+        <div class="control is-expanded">
             <label class="label">Zoom Email</label>
             <input class="input" type="email" value="{{ Setting::value('zoom_email') }}" name="zoom_email" autocomplete="off">
         </div>

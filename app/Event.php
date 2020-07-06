@@ -68,7 +68,7 @@ class Event extends Model
     }
 
     public function revisions() {
-        return $this->hasMany('\App\EventRevision', 'key', 'key')
+        return $this->hasMany('\App\EventRevision')
             ->orderBy('created_at', 'desc');
     }
 
@@ -179,6 +179,14 @@ class Event extends Model
 
     public function absolute_permalink() {
         return env('APP_URL').$this->permalink();
+    }
+
+    public function shortlink() {
+        return '/' . $this->key;
+    }
+
+    public function absolute_shortlink() {
+        return env('APP_URL').$this->shortlink();
     }
 
     public function code_of_conduct_urls() {
