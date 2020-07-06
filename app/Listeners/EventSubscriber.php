@@ -14,8 +14,7 @@ class EventSubscriber implements ShouldQueue
 		Log::info('Event created: '.$event->event->id);
 		$summary = '[New Event] '
 			. $event->event->createdBy->display_url() . ' created'
-			. ' "' . $event->event->name . '"'
-			. ' on ' . $event->event->date_summary_text()
+			. ' "' . $event->event->date_summary_text() . ' ' . $event->event->name . '"'
 			. ' ' . $event->event->absolute_shortlink();
 		$this->sendTextNotification($summary);
 	}
@@ -36,8 +35,7 @@ class EventSubscriber implements ShouldQueue
 
 		$summary = '[Event Updated] '
 			. $event->revision->lastModifiedBy->display_url() . ' updated'
-			. ' "' . $event->event->name . '"'
-			. ' on ' . $event->event->date_summary_text()
+			. ' "' . $event->event->date_summary_text() . ' ' . $event->event->name . '"'
 			. ' changed ' . implode(', ', $event->revision->changed_fields($previous))
 			. ($event->revision->edit_summary ? ' "'.$event->revision->edit_summary.'"' : '')
 			. ' ' . $event->revision->revision_diff_permalink();
