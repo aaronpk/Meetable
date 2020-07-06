@@ -1421,16 +1421,16 @@
         },
         {
             "name": "jfcherng/php-diff",
-            "version": "6.7.3",
+            "version": "6.7.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jfcherng/php-diff.git",
-                "reference": "f56b4b6412e240c5f392cbf74086cf9d5162caea"
+                "reference": "cb2e02332035a9617e8f8bca0db9ed6317df4443"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jfcherng/php-diff/zipball/f56b4b6412e240c5f392cbf74086cf9d5162caea",
-                "reference": "f56b4b6412e240c5f392cbf74086cf9d5162caea",
+                "url": "https://api.github.com/repos/jfcherng/php-diff/zipball/cb2e02332035a9617e8f8bca0db9ed6317df4443",
+                "reference": "cb2e02332035a9617e8f8bca0db9ed6317df4443",
                 "shasum": ""
             },
             "require": {
@@ -1441,7 +1441,7 @@
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.16",
-                "phan/phan": "^2.5",
+                "phan/phan": "^2.5 || ^3",
                 "phpunit/phpunit": ">=7 <10",
                 "squizlabs/php_codesniffer": "^3.5"
             },
@@ -1472,7 +1472,7 @@
                 "unidiff",
                 "unified diff"
             ],
-            "time": "2020-05-27T19:22:55+00:00"
+            "time": "2020-07-06T03:10:30+00:00"
         },
         {
             "name": "jfcherng/php-mb-string",
