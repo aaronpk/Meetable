@@ -107,7 +107,7 @@ td.diff-container td {
 						@break
 					@default
 						<td class="diff-container">
-							{!! Jfcherng\Diff\DiffHelper::calculate($previous->{$field} ?: '', $current->{$field} ?: '', 'Combined', [
+							{!! Jfcherng\Diff\DiffHelper::calculate((string)$previous->{$field}, (string)$current->{$field}, 'Combined', [
 									'detailLevel' => 'word',
 									'lineNumbers' => false,
 								]) 
