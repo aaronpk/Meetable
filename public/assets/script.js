@@ -5,6 +5,24 @@ $(function(){
     $(this).parents(".dropdown").toggleClass("is-active");
   });
 
+  // Add local time info into the tooltip in the event lists
+  $(".event-timezone").each(function(){
+    var date = new Date($(this).attr("datetime"));
+    console.log("=====================");
+    console.log($(this).attr("datetime"));
+    console.log(date);
+    var event_timezone = $(this).data("tooltip");
+    console.log($(this).data("tooltip"));
+    var event_time = $(this).data("event-time");
+    var local_time = date_to_display_time(date);
+    if(event_time != local_time) {
+      local = "\n("+local_time+" in your timezone)";
+    } else {
+      local = "";
+    }
+    $(this).attr("data-tooltip", event_timezone+local);
+  });
+
   // Check for click events on the navbar burger icon
   $(".navbar-burger").click(function() {
     // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
@@ -133,4 +151,27 @@ $(function(){
 
 function csrf_token() {
     return $("input[name=_token]").val();
+}
+
+function zero_pad(num) {
+  num = "" + num;
+  if(num.length == 1) {
+    num = "0" + num;
+  }
+  return num;
+}
+
+function tz_minutes_to_offset(minutes) {
+  var hours = zero_pad(Math.floor(Math.abs(minutes / 60)));
+  var min = zero_pad(Math.abs(minutes) % 60);
+  return (minutes > 0 ? '-' : '+') + hours + ":" + min;
+}
+
+function date_to_display_time(date) {
+  var h = date.getHours() % 12;
+  if(date.getHours() == 0)
+      h = 12;
+  var m = zero_pad(date.getMinutes());
+  var pm = date.getHours() >= 12 ? 'pm' : 'am';
+  return h+":"+m+pm;
 }

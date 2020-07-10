@@ -239,6 +239,7 @@
 .event-list .event h3 {
     font-weight: bold;
     font-size: 1.2em;
+    display: inline-block;
 }
 
 .single-photo img {

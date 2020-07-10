@@ -230,13 +230,15 @@ class Event extends Model
 
         } else {
             if($this->start_time) {
-                $start = new DateTime($this->start_date.' '.$this->start_time);
                 if($this->timezone) {
-                    $tz = 'class="has-tooltip-bottom" data-tooltip="'.$this->timezone.'" title="'.$this->timezone.'"';
+                    $tz = new DateTimeZone($this->timezone);
+                    $start = new DateTime($this->start_date.' '.$this->start_time, $tz);
+                    $tzattrs = 'class="has-tooltip-bottom event-timezone" data-event-time="'.$start->format('g:ia').'" data-tooltip="'.$this->timezone.'"';
                 } else {
-                    $tz = '';
+                    $start = new DateTime($this->start_date.' '.$this->start_time);
+                    $tzattrs = '';
                 }
-                return '<time datetime="'.$start->format('Y-m-d H:i').'" '.$tz.'>'
+                return '<time datetime="'.$start->format('c').'" '.$tzattrs.'>'
                         . $start->format('M j, Y g:ia')
                         . '</time>';
             } else {

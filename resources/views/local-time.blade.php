@@ -103,14 +103,11 @@
 <script>
 $(function(){
 
+    // Parsing a date string that includes a timezone offset will cause
+    // the browser to return a date object in the local timezone
     var date = new Date($("#date").val());
 
-    var h = date.getHours() % 12;
-    if(date.getHours() == 0)
-        h = 12;
-    var m = zero_pad(date.getMinutes());
-    var pm = date.getHours() >= 12 ? 'pm' : 'am';
-    $(".local .time").text(h+":"+m+pm);
+    $(".local .time").text(date_to_display_time(date));
 
     var tz;
     if(Intl) {
@@ -148,20 +145,6 @@ $(function(){
     $(".local .date").text(day+", "+month+" "+date.getDate()+", "+(1900+date.getYear()));
 
 });
-
-function zero_pad(num) {
-  num = "" + num;
-  if(num.length == 1) {
-    num = "0" + num;
-  }
-  return num;
-}
-
-function tz_minutes_to_offset(minutes) {
-  var hours = zero_pad(Math.floor(Math.abs(minutes / 60)));
-  var min = zero_pad(Math.abs(minutes) % 60);
-  return (minutes > 0 ? '-' : '+') + hours + ":" + min;
-}
 
 </script>
 
