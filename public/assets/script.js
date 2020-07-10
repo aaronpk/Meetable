@@ -164,10 +164,5 @@ function tz_minutes_to_offset(minutes) {
 }
 
 function date_to_display_time(date) {
-  var h = date.getHours() % 12;
-  if(date.getHours() == 0)
-      h = 12;
-  var m = zero_pad(date.getMinutes());
-  var pm = date.getHours() >= 12 ? 'pm' : 'am';
-  return h+":"+m+pm;
+  return date.toLocaleTimeString([], {hour:'2-digit', minute: '2-digit'});  
 }
