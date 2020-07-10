@@ -231,7 +231,12 @@ class Event extends Model
         } else {
             if($this->start_time) {
                 $start = new DateTime($this->start_date.' '.$this->start_time);
-                return '<time datetime="'.$start->format('Y-m-d H:i').'">'
+                if($this->timezone) {
+                    $tz = 'class="has-tooltip-bottom" data-tooltip="'.$this->timezone.'" title="'.$this->timezone.'"';
+                } else {
+                    $tz = '';
+                }
+                return '<time datetime="'.$start->format('Y-m-d H:i').'" '.$tz.'>'
                         . $start->format('M j, Y g:ia')
                         . '</time>';
             } else {
