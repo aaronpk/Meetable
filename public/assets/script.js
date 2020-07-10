@@ -8,11 +8,7 @@ $(function(){
   // Add local time info into the tooltip in the event lists
   $(".event-timezone").each(function(){
     var date = new Date($(this).attr("datetime"));
-    console.log("=====================");
-    console.log($(this).attr("datetime"));
-    console.log(date);
     var event_timezone = $(this).data("tooltip");
-    console.log($(this).data("tooltip"));
     var event_time = $(this).data("event-time");
     var local_time = date_to_display_time(date);
     if(event_time != local_time) {
