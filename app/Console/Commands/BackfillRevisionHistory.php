@@ -5,7 +5,7 @@ use Illuminate\Support\Str;
 use Log, Storage;
 use App\Event, App\EventRevision;
 
-class MigrateEventSortDate extends Command {
+class BackfillRevisionHistory extends Command {
 
 	protected $signature = 'migrate:revision_history';
 	protected $description = 'Add a new revision history entry for the current state of all events that are missing revisions';
