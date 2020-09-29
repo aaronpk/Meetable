@@ -7,7 +7,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag;
-use DateTime, DateTimeZone, Exception;
+use DateTime, DateTimeZone, DateInterval, Exception;
 use DB;
 
 class Controller extends BaseController
@@ -316,6 +316,8 @@ class Controller extends BaseController
         }
         elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
+            # The add to Google link doesn't work with out the end time, so use the start as the end
+            $end = $start;
             if($event->timezone) $params['ctz'] = $event->timezone;
         }
         elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
@@ -329,9 +331,9 @@ class Controller extends BaseController
             if($event->timezone) $params['ctz'] = $event->timezone;
         }
 
-        $params['dates'] = $start . ($end ? '/' . $end : '');
+        $params['dates'] = $start . '/' . $end;
 
-        $url = 'http://www.google.com/calendar/render?' . http_build_query($params);
+        $url = 'https://www.google.com/calendar/render?' . http_build_query($params);
 
         return redirect($url, 302);
     }
