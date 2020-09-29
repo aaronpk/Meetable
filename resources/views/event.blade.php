@@ -222,7 +222,8 @@
                             Join the Online Meeting
                         </a>
                     @else
-                        The meeting link will be shown 15 minutes before the event
+                        <a href="" class="pulsing-yellow hidden" target="_blank" id="event-meeting-url">Join the Online Meeting</a>
+                        <span id="event-meeting-url-msg">The meeting link will be shown 15 minutes before the event</span>
                     @endif
                 </span>
             </div>
@@ -433,6 +434,23 @@
         });
     </script>
     @endcan
+
+    @if($event->meeting_url && !$event->is_past())
+    <script>
+        var meetingURLTimer;
+        $(function(){
+            meetingURLTimer = setInterval(function(){
+                $.getJSON("/event/{{ $event->key }}.json", function(data){
+                    if(data.meeting_url) {
+                        $("#event-meeting-url-msg").addClass("hidden");
+                        $("#event-meeting-url").attr("href", data.meeting_url).removeClass("hidden");
+                        clearInterval(meetingURLTimer);
+                    }
+                });
+            }, 2000);
+        });
+    </script>
+    @endif
 
     <input type="hidden" id="event_id" value="{{ $event->id }}">
 

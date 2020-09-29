@@ -46,6 +46,8 @@ Route::middleware('slashes:remove')->group(function(){
 
     Route::get('/{year}/{month}/{partial_slug}', 'Controller@find_matching_events');
 
+    Route::get('/event/{key}.json', 'Controller@event_json')->name('event-json');
+
     Route::get('/tag/{tag}', 'Controller@tag')->name('tag');
     Route::get('/tag/{tag}/archive', 'Controller@tag_archive')->name('tag-archive');
     Route::redirect('/tag', '/tags', 301);

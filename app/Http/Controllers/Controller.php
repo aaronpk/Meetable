@@ -266,6 +266,23 @@ class Controller extends BaseController
         ]);
     }
 
+    public function event_json($key) {
+        $event = Event::where('key', $key)->first();
+        if(!$event) {
+            abort(404);
+        }
+
+        $meeting_url = false;
+
+        if($event->meeting_url && !$event->is_past() && $event->is_starting_soon()) {
+            $meeting_url = $event->meeting_url;
+        }
+
+        return response()->json([
+            'meeting_url' => $meeting_url,
+        ]);
+    }
+
     public function event_shorturl($key) {
         return $this->event(0, 0, $key);
     }
