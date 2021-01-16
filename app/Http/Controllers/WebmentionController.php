@@ -137,10 +137,14 @@ class WebmentionController extends BaseController
         if(request('from') == 'browser') {
             return redirect($event->permalink().'#rsvps');
         } else {
-            return response()->json([
+            $data = [
                 'result' => 'accepted',
                 'data' => json_decode($response->data),
-            ]);
+            ];
+            if($response->approved == false) {
+                $data['status'] = 'Your webmention was received, but was not automatically approved. If you log in with the same domain as your RSVP, it will be automatically approved in the future.';
+            }
+            return response()->json($data);
         }
     }
 
