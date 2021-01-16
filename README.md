@@ -152,11 +152,18 @@ GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 ```
 
-If you want to configure a list of allowed users, define them as a space-separated list of usernames in the config file:
+If you want to restrict who can log in, define a space-separated list of usernames in the config file. If someone attempts to log in via GitHub and is not in this list, their login will be blocked.
 
 ```
 GITHUB_ALLOWED_USERS=user1 user2 user3
 ```
+
+To set specific users as admins when they log in, define them in the config file:
+
+```
+GITHUB_ADMIN_USERS=user1 user2
+```
+
 
 #### Heroku Authentication
 
@@ -245,6 +252,7 @@ In the `location ~* \.php` block which proxies requests to the PHP handler, add 
 
 If you want your website to be visible even to logged-out users, make sure Vouch is configured with `publicAccess: true` to avoid sending back an error page when users are not logged in.
 
+All users created in this mode will be created as regular users. You'll need to manually configure specific accounts as admin accounts in the database after they log in.
 
 ### Permissions
 
