@@ -324,24 +324,34 @@ class Controller extends BaseController
 
         $start = false;
         $end = false;
+
+        # Single-day event
         if($event->start_date && !$event->start_time && !$event->end_date && !$event->end_time) {
             $start = (new DateTime($event->start_date))->format('Ymd');
         }
+
+        # Multi-day event
         elseif($event->start_date && !$event->start_time && $event->end_date && !$event->end_time) {
             $start = (new DateTime($event->start_date))->format('Ymd');
-            $end = (new DateTime($event->end_date))->format('Ymd');
+            $end = (new DateTime($event->end_date))->add(new DateInterval('P1D'))->format('Ymd');
         }
+
+        # Start time but no end time
         elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
             # The add to Google link doesn't work with out the end time, so use the start as the end
             $end = $start;
             if($event->timezone) $params['ctz'] = $event->timezone;
         }
+
+        # Start and end time on the same day
         elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
             $end = (new DateTime($event->start_date.' '.$event->end_time))->format('Ymd\THis');
             if($event->timezone) $params['ctz'] = $event->timezone;
         }
+
+        # Start and end time spanning multiple days
         elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
             $end = (new DateTime($event->end_date.' '.$event->end_time))->format('Ymd\THis');
