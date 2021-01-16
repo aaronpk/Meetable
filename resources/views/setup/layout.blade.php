@@ -14,7 +14,7 @@
 
     <script src="/jquery/jquery-1.12.0.min.js"></script>
 
-    <link href="/bulma-0.8.0/bulma.min.css" rel="stylesheet">
+    <link href="/bulma-0.9.0/bulma.min.css" rel="stylesheet">
 
     <link href="/assets/style.css" rel="stylesheet">
     <style>
