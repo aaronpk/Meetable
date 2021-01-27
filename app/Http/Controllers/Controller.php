@@ -99,8 +99,27 @@ class Controller extends BaseController
 
         $events = $events->get();
 
+        if(count($events) <= 1) {
+            $now = new DateTime('now', new DateTimeZone('+12:00')); // opposite offset compared to looking for future events
+            $nowDate = $now->format('Y-m-d');
+
+            $past_events = $this->events_query(false, false, false, false);
+
+            $past_events = $past_events->whereHas('tags', function($query) use ($tag){
+                $query->where('tag', $tag);
+            })->where(function($query)use($nowDate){
+                $query->where('start_date', '<=', $nowDate)
+                      ->orWhere('end_date', '<=', $nowDate);
+            })->limit(6);
+
+            $past_events = $past_events->get();
+        } else {
+            $past_events = [];
+        }
+
         return $this->show_events_from_query($events, [
             'tag' => $tag,
+            'past_events' => $past_events,
         ]);
     }
 
@@ -140,6 +159,25 @@ class Controller extends BaseController
                 $data[$y][$m] = [];
 
             $data[$y][$m][] = $event;
+        }
+
+        if(isset($opts['past_events'])) {
+            $past_events = [];
+
+            foreach($opts['past_events'] as $event) {
+                $y = date('Y', strtotime($event->start_date));
+                $m = (int)date('m', strtotime($event->start_date));
+
+                if(!isset($past_events[$y]))
+                    $past_events[$y] = [];
+
+                if(!isset($past_events[$y][$m]))
+                    $past_events[$y][$m] = [];
+
+                $past_events[$y][$m][] = $event;
+            }
+
+            $opts['past_events'] = $past_events;
         }
 
         return view('index', array_merge($opts, [
