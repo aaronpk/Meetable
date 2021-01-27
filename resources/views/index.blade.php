@@ -63,7 +63,7 @@ use App\Setting;
     @endif
 
     @if(isset($past_events))
-        <h2 class="subtitle" style="margin-top: 2em;">Past Events</h2>
+        <h2 class="subtitle" style="margin-top: 2em; font-weight: bold;">Past Events</h2>
         @include('components/event-list', ['data' => $past_events])
     @endif
 
