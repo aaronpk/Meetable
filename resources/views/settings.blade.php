@@ -37,6 +37,14 @@ use App\Setting;
 
     <div class="field">
         <label class="label">
+            <input type="checkbox" name="support_unlisted_events" value="1" {{ Setting::value('support_unlisted_events') ? 'checked="checked"' : ''}}>
+            Support Unlisted Events
+        </label>
+        <p class="help">When checked, events can be marked as "unlisted", preventing them from showing up on the home page and all feeds.</p>
+    </div>
+
+    <div class="field">
+        <label class="label">
             <input type="checkbox" name="enable_webmention_responses" value="1" {{ Setting::value('enable_webmention_responses') ? 'checked="checked"' : ''}}>
             Enable Webmention Responses
         </label>

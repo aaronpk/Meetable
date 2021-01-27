@@ -96,6 +96,8 @@ class EventController extends BaseController
 
         $event->cover_image = request('cover_image');
 
+        $event->unlisted = request('unlisted') ?: 0;
+
         $event->created_by = Auth::user()->id;
         $event->last_modified_by = Auth::user()->id;
 
@@ -117,7 +119,7 @@ class EventController extends BaseController
         // Store a snapshot in the revision table
         $revision = EventRevision::createFromEvent($event);
         $revision->save();
-        
+
         event(new EventCreated($event));
 
         return redirect($event->permalink());
@@ -163,6 +165,9 @@ class EventController extends BaseController
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
             $event->{$p} = (request($p) ?: null);
         }
+
+        if(!$event->unlisted)
+            $event->unlisted = 0; // override null from above
 
         $event->sort_date = $event->sort_date();
 
@@ -230,7 +235,7 @@ class EventController extends BaseController
             'mode' => 'archive',
             'event_id' => $event->id,
         ]);
-    }    
+    }
 
     public function view_revision_diff(Event $event, EventRevision $revision) {
         Gate::authorize('manage-event', $revision);
@@ -246,7 +251,7 @@ class EventController extends BaseController
             'previous' => $previous,
             'event_id' => $event->id,
         ]);
-    }    
+    }
 
     public function upload_event_cover_image(Event $event) {
         Gate::authorize('manage-event', $event);

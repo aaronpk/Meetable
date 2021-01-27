@@ -265,6 +265,17 @@ form h2.subtitle {
         </div>
     </div>
 
+    @if(Setting::value('support_unlisted_events'))
+    <div class="field">
+        <div class="control is-expanded">
+            <label class="checkbox">
+                <input type="checkbox" name="unlisted" value="1" {{ $event->unlisted ? 'checked' : '' }}>
+                Unlisted event (prevents this event from showing on the home page and other feeds)
+            </label>
+        </div>
+    </div>
+    @endif
+
     <div class="field">
         <label class="label">Edit Summary</label>
         <input class="input" type="text" name="edit_summary" value="{{ old('edit_summary') }}" autocomplete="off">

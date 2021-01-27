@@ -136,6 +136,7 @@ class ICSController extends BaseController
     public function index($year=false, $month=false) {
 
         $events = Event::orderBy('start_date', 'desc')
+            ->where('unlisted', 0)
             ->get();
 
         $vCalendar = new \Eluceo\iCal\Component\Calendar(parse_url(env('APP_URL'), PHP_URL_HOST));
@@ -157,7 +158,9 @@ class ICSController extends BaseController
 
         $events = Event::whereHas('tags', function($query) use ($tag){
             $query->where('tag', $tag);
-        })->orderBy('events.start_date', 'desc')->get();
+        })
+        ->where('unlisted', 0)
+        ->orderBy('events.start_date', 'desc')->get();
 
         $vCalendar = new \Eluceo\iCal\Component\Calendar(parse_url(env('APP_URL'), PHP_URL_HOST).' '.$tag);
 

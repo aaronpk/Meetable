@@ -32,7 +32,7 @@ class Event extends Model
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
         'latitude', 'longitude', 'timezone', 'status',
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url',
-        'description', 'cover_image',
+        'description', 'cover_image', 'unlisted',
     ];
 
     public static function slug_from_name($name) {
