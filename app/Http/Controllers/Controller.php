@@ -195,6 +195,7 @@ class Controller extends BaseController
 
         $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status')
             ->where('start_date', '<', $now->format('Y-m-d'))
+            ->where('unlisted', 0)
             ->orderBy('sort_date', 'desc')
             ->get();
 
