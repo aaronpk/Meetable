@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\EventRevision, App\Tag, App\Response, App\ResponsePhoto, App\Setting;
 use Illuminate\Support\Str;
-use Auth, Storage, Gate, Log;
+use Auth, Storage, Gate, Log, DB;
 use Image;
 use DateTime;
 use App\Services\Zoom, App\Services\EventParser;
@@ -362,6 +362,32 @@ class EventController extends BaseController
         $timezone = \p3k\Timezone::timezone_for_location(request('latitude'), request('longitude'));
         return response()->json([
             'timezone' => $timezone,
+        ]);
+    }
+
+    public function unlisted_events() {
+        Gate::authorize('create-event');
+
+        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'),
+            'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status')
+          ->where('unlisted', 1)
+          ->orderBy('sort_date', 'desc')
+          ->get();
+
+        $data = [];
+
+        foreach($events as $event) {
+            if(!isset($data[$event->year]))
+                $data[$event->year] = [];
+
+            if(!isset($data[$event->year][$event->month]))
+                $data[$event->year][$event->month] = [];
+
+            $data[$event->year][$event->month][] = $event;
+        }
+
+        return view('unlisted', [
+            'data' => $data,
         ]);
     }
 

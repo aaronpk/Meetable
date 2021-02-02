@@ -72,6 +72,7 @@ Route::middleware('auth')->middleware('slashes:remove')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');
     Route::get('/import', 'EventController@import_event')->name('import-event');
+    Route::get('/events/unlisted', 'EventController@unlisted_events')->name('unlisted');
 
     Route::post('/create', 'EventController@create_event')->name('create-event');
     Route::get('/event/{event}', 'EventController@edit_event')->name('edit-event');
