@@ -8,7 +8,6 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.2",
         "ext-imagick": "*",
         "ext-pcntl": "*",
         "ext-pdo": "*",
@@ -33,7 +32,7 @@
         "p3k/xray": "^1.11"
     },
     "require-dev": {
-        "facade/ignition": "^2.0",
+        "facade/ignition": "^2.5",
         "fzaninotto/faker": "^1.4",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^4.1",
