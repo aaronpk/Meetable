@@ -202,6 +202,26 @@ use App\Setting;
 
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
+            <label class="label">Mail From Address</label>
+            <input class="input" type="email" value="{{ Setting::value('mail_from_address') }}" name="mail_from_address" autocomplete="off">
+        </div>
+
+        <div class="control is-expanded">
+            <label class="label">Mailgun Domain</label>
+            <input class="input" type="text" value="{{ Setting::value('mailgun_domain') }}" name="mailgun_domain" autocomplete="off">
+        </div>
+
+        <div class="control is-expanded">
+            <label class="label">Mailgun Secret</label>
+            <input class="input" type="password" value="{{ Setting::value('mailgun_secret') ? '********' : '' }}" name="mailgun_secret" autocomplete="off">
+        </div>
+    </div>
+    <p class="help">Configuring Mailgun enables this website to send email notifications for events that require registration.</p>
+
+    <br>
+
+    <div class="field is-grouped is-grouped-multiline">
+        <div class="control is-expanded">
             <label class="label">Zoom Email</label>
             <input class="input" type="email" value="{{ Setting::value('zoom_email') }}" name="zoom_email" autocomplete="off">
         </div>

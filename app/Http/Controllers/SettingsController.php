@@ -20,7 +20,7 @@ class SettingsController extends BaseController
     public function post() {
         $properties = ['add_an_event', 'logo_url', 'logo_width', 'logo_height', 'favicon_url',
             'analytics', 'home_meta_description', 'home_social_image_url', 'zoom_email',
-            'notification_endpoint',
+            'notification_endpoint', 'mail_from_address', 'mailgun_domain',
         ];
         foreach($properties as $id) {
             Setting::set($id, request($id));
@@ -36,7 +36,7 @@ class SettingsController extends BaseController
         $passwords = ['googlemaps_api_key', 'twitter_consumer_key', 'twitter_consumer_secret',
             'twitter_access_token', 'twitter_access_token_secret',
             'zoom_api_key', 'zoom_api_secret',
-            'notification_token',
+            'notification_token', 'mailgun_secret',
         ];
         foreach($passwords as $id) {
             if(request($id) != '********') {
