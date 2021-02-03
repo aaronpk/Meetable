@@ -29,6 +29,14 @@ use App\Setting;
 
     <div class="field">
         <label class="label">
+            <input type="checkbox" name="enable_registration" value="1" {{ Setting::value('enable_registration') ? 'checked="checked"' : ''}}>
+            Enable Built-In Registration
+        </label>
+        <p class="help">When checked, registration can be enabled on this website for events.</p>
+    </div>
+
+    <div class="field">
+        <label class="label">
             <input type="checkbox" name="show_rsvps_in_ics" value="1" {{ Setting::value('show_rsvps_in_ics') ? 'checked="checked"' : ''}}>
             Show RSVPs in ICS Feeds
         </label>
@@ -37,8 +45,8 @@ use App\Setting;
 
     <div class="field">
         <label class="label">
-            <input type="checkbox" name="support_unlisted_events" value="1" {{ Setting::value('support_unlisted_events') ? 'checked="checked"' : ''}}>
-            Support Unlisted Events
+            <input type="checkbox" name="enable_unlisted_events" value="1" {{ Setting::value('enable_unlisted_events') ? 'checked="checked"' : ''}}>
+            Enable Unlisted Events
         </label>
         <p class="help">When checked, events can be marked as "unlisted", preventing them from showing up on the home page and all feeds.</p>
     </div>

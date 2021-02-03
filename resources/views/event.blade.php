@@ -1,8 +1,12 @@
 @extends('layouts/main')
 
+@php
+use App\Setting;
+@endphp
+
 @section('headtags')
 
-@if(\App\Setting::value('enable_webmention_responses'))
+@if(Setting::value('enable_webmention_responses'))
 <link rel="webmention" href="{{ route('webmention') }}">
 @endif
 
@@ -70,6 +74,12 @@
                         <span class="icon">@icon(comment)</span>
                         <span>Edit Responses</span>
                     </a>
+                    @if(Setting::value('enable_registration'))
+                        <a class="dropdown-item" href="{{ route('edit-registration', $event) }}">
+                            <span class="icon">@icon(file-alt)</span>
+                            <span>Enable Registration</span>
+                        </a>
+                    @endif
                     <a class="dropdown-item" href="{{ route('revision-history', $event) }}">
                         <span class="icon">@icon(history)</span>
                         <span>Revision History</span>

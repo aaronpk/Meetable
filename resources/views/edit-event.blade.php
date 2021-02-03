@@ -265,7 +265,7 @@ form h2.subtitle {
         </div>
     </div>
 
-    @if(Setting::value('support_unlisted_events'))
+    @if(Setting::value('enable_unlisted_events'))
     <div class="field">
         <div class="control is-expanded">
             <label class="checkbox">

@@ -96,6 +96,8 @@ Route::middleware('auth')->middleware('slashes:remove')->group(function(){
     Route::get('/event/{event}/responses/{response}.json', 'ResponseController@get_response_details')->name('get-response-details');
     Route::post('/event/{event}/responses/save_alt_text', 'ResponseController@save_alt_text')->name('save-alt-text');
 
+    Route::get('/event/{event}/registration', 'ResponseController@edit_registration')->name('edit-registration');
+
     Route::get('/moderate', 'ResponseController@moderate_all_responses')->name('moderate-all-responses');
     Route::get('/event/{event}/moderate', 'ResponseController@moderate_responses')->name('moderate-responses');
     Route::post('/event/{event}/moderate/{response}/approve', 'ResponseController@approve_response')->name('approve-response');

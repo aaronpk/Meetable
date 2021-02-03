@@ -62,7 +62,7 @@ use App\Response;
                 <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
                 <a class="navbar-item" href="{{ route('tags') }}">Discover</a>
                 @can('create-event')
-                    @if(Setting::value('support_unlisted_events'))
+                    @if(Setting::value('enable_unlisted_events'))
                         <a class="navbar-item" href="{{ route('unlisted') }}">Unlisted Events</a>
                     @endif
                     @if(Setting::value('enable_webmention_responses'))
