@@ -14,6 +14,25 @@ class ResponseController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    public function save_alt_text(Event $event) {
+        Gate::authorize('manage-event', $event);
+
+        $photo = ResponsePhoto::where('event_id', $event->id)->where('id', request('photo_id'))->first();
+
+        if(!$photo) {
+            return response()->json([
+                'result' => 'error',
+            ]);
+        }
+
+        $photo->alt = request('alt');
+        $photo->save();
+
+        return response()->json([
+            'result' => 'ok',
+        ]);
+    }
+
     public function edit_responses(Event $event) {
         Gate::authorize('manage-event', $event);
 
