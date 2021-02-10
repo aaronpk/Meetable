@@ -5,18 +5,20 @@ use App\Setting;
 use Lcobucci\JWT;
 use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use DateTimeImmutable;
 
 class Zoom {
 
     public static function schedule_meeting(&$event) {
         // Note: the $event may not have been saved in the database yet
 
-        $time = time();
+        $now = new DateTimeImmutable();
+        $oneHour = new DateTimeImmutable('+1 hour');
         $signer = new Sha256();
         $token = (new JWT\Builder())->issuedBy(Setting::value('zoom_api_key')) // iss
                                 ->permittedFor(null) // aud
-                                ->issuedAt($time) // Configures the time that the token was issue (iat claim)
-                                ->expiresAt($time + 3600) // Configures the expiration time of the token (exp claim)
+                                ->issuedAt($now) // Configures the time that the token was issue (iat claim)
+                                ->expiresAt($oneHour) // Configures the expiration time of the token (exp claim)
                                 ->getToken($signer, new Key(Setting::value('zoom_api_secret'))); // Signs the token
         $zoom_access_token = (string)$token;
 
