@@ -521,7 +521,7 @@ class Event extends Model
 
         $html = \p3k\HTML::sanitize($html, ['allowTables' => true]);
         // Add Bulma css for tables
-        $html = preg_replace('/^<table>/', '<table class="table is-fullwidth is-bordered">', $html);
+        $html = preg_replace('/^<table>$/m', '<table class="table is-fullwidth is-bordered">', $html);
 
         return $html;
     }
