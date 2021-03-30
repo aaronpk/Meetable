@@ -77,7 +77,7 @@ use App\Setting;
                     @if(Setting::value('enable_registration'))
                         <a class="dropdown-item" href="{{ route('edit-registration', $event) }}">
                             <span class="icon">@icon(file-alt)</span>
-                            <span>Enable Registration</span>
+                            <span>{{ $event->registration ? 'Configure' : 'Enable' }} Registration</span>
                         </a>
                     @endif
                     <a class="dropdown-item" href="{{ route('revision-history', $event) }}">

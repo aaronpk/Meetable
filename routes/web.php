@@ -88,15 +88,13 @@ Route::middleware('auth')->middleware('slashes:remove')->group(function(){
     Route::get('/event/{event}/photo', 'EventController@add_event_photo')->name('add-event-photo');
     Route::post('/event/{event}/photo', 'EventController@upload_event_photo')->name('upload-event-photo');
     Route::post('/event/{event}/photo_order', 'EventController@set_photo_order')->name('set-photo-order');
-
     Route::post('/event/cover_image', 'EventController@upload_event_cover_image')->name('upload-event-cover-image');
+    Route::get('/event/{event}/registration', 'EventController@edit_registration')->name('edit-registration');
 
     Route::get('/event/{event}/responses', 'ResponseController@edit_responses')->name('edit-responses');
     Route::post('/event/{event}/responses/{response}/delete', 'ResponseController@delete_response')->name('delete-response');
     Route::get('/event/{event}/responses/{response}.json', 'ResponseController@get_response_details')->name('get-response-details');
     Route::post('/event/{event}/responses/save_alt_text', 'ResponseController@save_alt_text')->name('save-alt-text');
-
-    Route::get('/event/{event}/registration', 'ResponseController@edit_registration')->name('edit-registration');
 
     Route::get('/moderate', 'ResponseController@moderate_all_responses')->name('moderate-all-responses');
     Route::get('/event/{event}/moderate', 'ResponseController@moderate_responses')->name('moderate-responses');
