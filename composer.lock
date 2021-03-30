@@ -3206,16 +3206,16 @@
         },
         {
             "name": "p3k/html-sanitizer",
-            "version": "v0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/p3k-html-sanitizer.git",
-                "reference": "6669c3117f8179d5f15e0acbe15a9124ff7eaacc"
+                "reference": "40a1c9fd3595fbda2ec517ac1315cd51dbae94a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/p3k-html-sanitizer/zipball/6669c3117f8179d5f15e0acbe15a9124ff7eaacc",
-                "reference": "6669c3117f8179d5f15e0acbe15a9124ff7eaacc",
+                "url": "https://api.github.com/repos/aaronpk/p3k-html-sanitizer/zipball/40a1c9fd3595fbda2ec517ac1315cd51dbae94a5",
+                "reference": "40a1c9fd3595fbda2ec517ac1315cd51dbae94a5",
                 "shasum": ""
             },
             "require": {
@@ -3244,9 +3244,9 @@
             "homepage": "https://github.com/aaronpk/p3k-html-sanitizer",
             "support": {
                 "issues": "https://github.com/aaronpk/p3k-html-sanitizer/issues",
-                "source": "https://github.com/aaronpk/p3k-html-sanitizer/tree/v0.1.0"
+                "source": "https://github.com/aaronpk/p3k-html-sanitizer/tree/0.1.1"
             },
-            "time": "2019-11-29T18:47:00+00:00"
+            "time": "2021-03-29T23:06:57+00:00"
         },
         {
             "name": "p3k/http",
