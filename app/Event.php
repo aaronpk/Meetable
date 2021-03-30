@@ -520,6 +520,8 @@ class Event extends Model
         $html = \Michelf\MarkdownExtra::defaultTransform($markdown);
 
         $html = \p3k\HTML::sanitize($html, ['allowTables' => true]);
+        // Add Bulma css for tables
+        $html = preg_replace('/^<table>/', '<table class="table is-fullwidth is-bordered">', $html);
 
         return $html;
     }
