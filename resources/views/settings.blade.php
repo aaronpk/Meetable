@@ -27,6 +27,7 @@ use App\Setting;
         <p class="help">Show or hide the "Registration URL" field on events.</p>
     </div>
 
+    <!--
     <div class="field">
         <label class="label">
             <input type="checkbox" name="enable_registration" value="1" {{ Setting::value('enable_registration') ? 'checked="checked"' : ''}}>
@@ -34,6 +35,7 @@ use App\Setting;
         </label>
         <p class="help">When checked, registration can be enabled on this website for events.</p>
     </div>
+-->
 
     <div class="field">
         <label class="label">
