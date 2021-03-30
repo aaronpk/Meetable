@@ -519,7 +519,7 @@ class Event extends Model
 
         $html = \Michelf\MarkdownExtra::defaultTransform($markdown);
 
-        $html = \p3k\HTML::sanitize($html);
+        $html = \p3k\HTML::sanitize($html, ['allowTables' => true]);
 
         return $html;
     }
