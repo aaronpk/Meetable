@@ -166,6 +166,12 @@ class EventController extends BaseController
             $event->{$p} = (request($p) ?: null);
         }
 
+        // If there is an end date, remove the start/end times
+        if($event->end_date) {
+            $event->start_time = null;
+            $event->end_time = null;
+        }
+
         if(!$event->unlisted)
             $event->unlisted = 0; // override null from above
 
