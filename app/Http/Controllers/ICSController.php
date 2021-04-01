@@ -17,61 +17,49 @@ class ICSController extends BaseController
 
         $isset = false;
 
-        // start date only
-        // full-day events
-        if($event->start_date && !$event->start_time && !$event->end_date && !$event->end_time) {
-            $isset = true;
-            $vEvent->setUseUtc(false); // force floating times
-            $vEvent->setDtStart(new DateTime($event->start_date))
-                   ->setDtEnd(new DateTime($event->start_date))
-                   ->setNoTime(true);
-        }
-        // start and end date, no time
-        // multi-day events
-        elseif($event->start_date && !$event->start_time && $event->end_date && !$event->end_time) {
+        if($event->is_multiday()) {
             $isset = true;
             $vEvent->setUseUtc(false); // force floating times
             $vEvent->setDtStart(new DateTime($event->start_date))
                    ->setDtEnd(new DateTime($event->end_date))
                    ->setNoTime(true);
-        }
-        // start date with only start time
-        elseif($event->start_date && $event->start_time && !$event->end_date && !$event->end_time) {
-            if($event->timezone) {
-                $isset = true;
-                $start = new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone));
-                $vEvent->setDtStart($start);
-            } else {
+        } else {
+
+            // start date with start and end time
+            if($event->start_date && $event->start_time && $event->end_time) {
+                if($event->timezone) {
+                    $isset = true;
+                    $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
+                           ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
+                } else {
+                    $isset = true;
+                    $vEvent->setUseUtc(false); // force floating times
+                    $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
+                           ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time));
+                }
+            }
+            // start date with only start time
+            elseif($event->start_date && $event->start_time && !$event->end_time) {
+                if($event->timezone) {
+                    $isset = true;
+                    $start = new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone));
+                    $vEvent->setDtStart($start);
+                } else {
+                    $isset = true;
+                    $vEvent->setUseUtc(false); // force floating times
+                    $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time));
+                }
+            }
+            // start date only
+            // full-day events
+            elseif($event->start_date && !$event->start_time && !$event->end_time) {
                 $isset = true;
                 $vEvent->setUseUtc(false); // force floating times
-                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time));
+                $vEvent->setDtStart(new DateTime($event->start_date))
+                       ->setDtEnd(new DateTime($event->start_date))
+                       ->setNoTime(true);
             }
-        }
-        // start date with start and end time
-        elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
-            if($event->timezone) {
-                $isset = true;
-                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
-                       ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
-            } else {
-                $isset = true;
-                $vEvent->setUseUtc(false); // force floating times
-                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
-                       ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time));
-            }
-        }
-        // start and end date and time
-        elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
-            if($event->timezone) {
-                $isset = true;
-                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
-                       ->setDtEnd(new DateTime($event->end_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
-            } else {
-                $isset = true;
-                $vEvent->setUseUtc(false); // force floating times
-                $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
-                       ->setDtEnd(new DateTime($event->end_date.' '.$event->end_time));
-            }
+
         }
 
         if(!$isset) {
