@@ -11,6 +11,10 @@ class Setting extends Model
     static $cached = [];
 
     public static function value($id) {
+        if(!file_exists(__DIR__.'/../.env')) {
+            return null;
+        }
+
         if(isset(self::$cached[$id]))
             return self::$cached[$id];
 
