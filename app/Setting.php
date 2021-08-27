@@ -2,7 +2,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use DB, Auth, Log;
+use DB, Auth, Log, Schema;
 
 class Setting extends Model
 {
@@ -14,6 +14,9 @@ class Setting extends Model
         if(!file_exists(__DIR__.'/../.env')) {
             return null;
         }
+
+        if(!Schema::hasTable('settings'))
+            return null;
 
         if(isset(self::$cached[$id]))
             return self::$cached[$id];
