@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag, App\Setting;
 use DateTime, DateTimeZone;
 use DB, Log;
+use Illuminate\Http\Request;
 
 class ICSController extends BaseController
 {
@@ -121,7 +122,17 @@ class ICSController extends BaseController
         $vCalendar->addComponent($vEvent);
     }
 
-    public function index($year=false, $month=false) {
+    private function _isRequestFromBrowser(Request $request) {
+        return $request->accepts('text/html');
+    }
+
+    public function index(Request $request) {
+
+        if($this->_isRequestFromBrowser($request)) {
+            return view('ics', [
+                'url' => $request->url(),
+            ]);
+        }
 
         $events = Event::orderBy('start_date', 'desc')
             ->where('unlisted', 0)
@@ -141,7 +152,14 @@ class ICSController extends BaseController
         ]);
     }
 
-    public function tag($tag) {
+    public function tag(Request $request, $tag) {
+
+        if($this->_isRequestFromBrowser($request)) {
+            return view('ics', [
+                'url' => $request->url(),
+            ]);
+        }
+
         $tag = Tag::normalize($tag);
 
         $events = Event::whereHas('tags', function($query) use ($tag){
@@ -164,7 +182,13 @@ class ICSController extends BaseController
         ]);
     }
 
-    public function event($year, $month, $key_or_slug, $key2=false) {
+    public function event(Request $request, $year, $month, $key_or_slug, $key2=false) {
+
+        if($this->_isRequestFromBrowser($request)) {
+            return view('ics', [
+                'url' => $request->url(),
+            ]);
+        }
 
         if($key2) {
             $key = $key2;
