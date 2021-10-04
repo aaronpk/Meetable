@@ -38,6 +38,22 @@ class User extends Authenticatable
     protected $casts = [
     ];
 
+    public static function find_from_email($email) {
+        $user = User::where('email', $email)->first();
+        if($user)
+            return $user;
+
+        $userEmail = UserEmail::where('email', $email)->first();
+        if($userEmail)
+            return $userEmail->user;
+
+        return null;
+    }
+
+    public function emails() {
+        return $this->hasMany('App\UserEmail');
+    }
+
     public function display_name() {
         return $this->name ?: \p3k\url\display_url($this->url);
     }

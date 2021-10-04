@@ -19,6 +19,7 @@
         "indieweb/date-formatter": "^0.3.1",
         "intervention/image": "^2.5",
         "jfcherng/php-diff": "^6.7",
+        "johngrogg/ics-parser": "^3.0",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
         "lcobucci/jwt": "^3.3",
@@ -29,7 +30,8 @@
         "p3k/html-sanitizer": "^0.1",
         "p3k/timezone": "^0.1.0",
         "p3k/utils": "^1.2",
-        "p3k/xray": "^1.11"
+        "p3k/xray": "^1.11",
+        "php-mime-mail-parser/php-mime-mail-parser": "^7.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
