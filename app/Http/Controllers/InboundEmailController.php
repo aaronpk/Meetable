@@ -157,6 +157,7 @@ class InboundEmailController extends BaseController
 
         $event->description = $description;
         $event->status = 'confirmed';
+        $event->unlisted = 0;
 
         $event->save();
 
