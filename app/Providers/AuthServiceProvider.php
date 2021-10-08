@@ -5,7 +5,9 @@ namespace App\Providers;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Services\Auth\VouchGuard;
-use App\Services\Auth\GitHubGuard, App\Services\Auth\HerokuGuard;
+use App\Services\Auth\GitHubGuard;
+use App\Services\Auth\HerokuGuard;
+use App\Services\Auth\OIDCGuard;
 use Auth;
 
 class AuthServiceProvider extends ServiceProvider
@@ -38,6 +40,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::extend('heroku', function($app, $name, array $config) {
             return new HerokuGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
+        });
+
+        Auth::extend('oidc', function($app, $name, array $config) {
+            return new OIDCGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
         });
 
         Gate::define('create-event', function($user) {

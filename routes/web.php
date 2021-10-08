@@ -64,6 +64,9 @@ Route::middleware('slashes:remove')->group(function(){
     Route::get('/logout', 'AuthController@logout')->name('logout');
     Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
     Route::get('/auth/heroku', 'HerokuController@callback')->name('heroku-oauth-redirect');
+    Route::get('/auth/oidc', 'OIDCController@callback')->name('oidc-redirect');
+    Route::get('/auth/oidc/initiate', 'OIDCController@initiate')->name('oidc-initiate');
+    Route::get('/auth/oidc/logout', 'OIDCController@logout')->name('oidc-logout');
 
     Route::get('/{key}', 'Controller@event_shorturl');
 });

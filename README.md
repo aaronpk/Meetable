@@ -184,6 +184,37 @@ HEROKU_CLIENT_SECRET=
 There are no other config options to set permissions. The first user to log in will be the site admin. No other users will be able to log in after that. If you'd like, you can manually add Heroku user IDs to the database if you really do want other Heroku users to log in.
 
 
+#### OpenID Connect
+
+You can configure Meetable to authenticate users via an OpenID Connect server. This is useful if you are already using a service like Auth0 or Okta and want to add this as another app.
+
+You'll need to register an application at your OpenID Connect service and configure the redirect URL appropriately. You can also configure IdP-initiated login in order to let your users log in to Meetable from their dashboard at the OpenID Connect server. The templates for each URL are below:
+
+* Redirect URI: `https://events.example.org/auth/oidc`
+* Initiate Login URI: `https://events.example.org/auth/oidc/initiate`
+
+You will also need to add the following configuration to Meetable:
+
+```
+OIDC_AUTHORIZATION_ENDPOINT=https://authorization-server.com/authorize
+OIDC_TOKEN_ENDPOINT=https://authorization-server.com/token
+OIDC_CLIENT_ID=
+OIDC_CLIENT_SECRET=
+```
+
+By default, all users that exist at this server will be allowed to log in to Meetable. To limit who can log in, you can of course create policies at your OpenID Connect server to prevent users from being able to log in. If that's not an option, you can hard-code a list of user IDs who are allowed to log in here. Enter a space-separated string of each user's `sub` ID in the config:
+
+```
+OIDC_ALLOWED_USERS=sub1 sub2 sub3
+```
+
+To set specific users as admins when they log in, define their `sub` IDs in the config file:
+
+```
+OIDC_ADMIN_USERS=sub1 sub2
+```
+
+
 #### Vouch Proxy
 
 In this configuration, this project provides no authentication mechanism itself. Instead, it relies on the web server being able to authenticate users somehow, and setting an environment variable when users are logged in.
@@ -304,5 +335,5 @@ heroku config:set ...
 
 ## License
 
-Copyright 2020 by Aaron Parecki. Available under the MIT license.
+Copyright 2020-2021 by Aaron Parecki. Available under the MIT license.
 
