@@ -31,7 +31,7 @@
         "p3k/timezone": "^0.1.0",
         "p3k/utils": "^1.2",
         "p3k/xray": "^1.11",
-        "php-mime-mail-parser/php-mime-mail-parser": "^7.0"
+        "zbateson/mail-mime-parser": "^2.0"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

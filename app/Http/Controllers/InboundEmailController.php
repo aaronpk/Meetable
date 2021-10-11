@@ -7,10 +7,12 @@ use App\Event, App\EventRevision, App\User, App\InboundEmail;
 use App\Events\EventCreated, App\Events\EventUpdated;
 use DateTime, DateTimeZone;
 use DB, Log;
-use PhpMimeMailParser;
 use ICal\ICal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use ZBateson\MailMimeParser\MailMimeParser;
+use ZBateson\MailMimeParser\Message;
+use ZBateson\MailMimeParser\Header\HeaderConsts;
 
 class InboundEmailController extends BaseController
 {
@@ -19,16 +21,15 @@ class InboundEmailController extends BaseController
 
         $raw_data = request('email');
 
-        $parser = new PhpMimeMailParser\Parser();
-        $parser->setText($raw_data);
+        $message = Message::from($raw_data, false);
 
-        $rawHeaderFrom = $parser->getHeader('from');
+        $rawHeaderFrom = $message->getHeaderValue(HeaderConsts::FROM);
         Log::info($rawHeaderFrom);
 
         $ics = false;
         $ics_src_type = false;
 
-        $attachments = $parser->getAttachments();
+        $attachments = $message->getAllAttachmentParts();
         foreach($attachments as $attachment) {
             if(!$ics) {
                 if($attachment->getContentType() == 'text/calendar') {
@@ -173,7 +174,11 @@ class InboundEmailController extends BaseController
             event(new EventUpdated($event, $revision));
         }
 
-        return response()->json(['result' => 'success']);
+        return response()->json([
+            'result' => 'success',
+            'event_id' => $event->id,
+            'revision_id' => $revision->id
+        ]);
     }
 
     private function log_inbound_email($status, $raw, $ics, $user=null, $event=null) {
