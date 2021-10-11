@@ -16,7 +16,7 @@ class UserEmail extends Migration
         Schema::create('user_emails', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('user_id');
-            $table->string('email', 255)->index();
+            $table->string('email', 150)->index();
         });
     }
 
