@@ -111,12 +111,15 @@ class OIDCController extends BaseController
         if(env('OIDC_ALLOWED_USERS')) {
             $allowedUsers = explode(' ', env('OIDC_ALLOWED_USERS'));
             if(!in_array($userinfo['sub'], $allowedUsers)) {
+                Log::error('User '.$userinfo['sub'].' is not in the list of allowed users');
                 return view('auth/oidc-error', [
                     'error' => 'User Not Allowed',
                     'error_description' => 'Sorry, you are not in the list of allowed users for this website.',
                 ]);
             }
         }
+
+        Log::info('User logged in: '.json_encode($userinfo));
 
         // Create the user record if it doesn't yet exist
         $user = User::where('identifier', $userinfo['sub'])->first();
