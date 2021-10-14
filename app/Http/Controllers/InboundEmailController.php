@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\EventRevision, App\User, App\InboundEmail;
+use App\Event, App\Response, App\EventRevision, App\User, App\InboundEmail;
 use App\Events\EventCreated, App\Events\EventUpdated;
 use DateTime, DateTimeZone;
 use DB, Log;
@@ -210,6 +210,18 @@ class InboundEmailController extends BaseController
         $this->log_inbound_email(($is_new ? 'created' : 'updated'), $raw_data, $ics, $user, $event);
 
         if($is_new) {
+
+            // Mark the user who created it as attending
+            $rsvp = new Response;
+            $rsvp->event_id = $event->id;
+            $rsvp->rsvp_user_id = $user->id;
+            $rsvp->created_by = $user->id;
+            $rsvp->approved_by = $user->id;
+            $rsvp->approved_at = date('Y-m-d H:i:s');
+            $rsvp->approved = true;
+            $rsvp->rsvp = 'yes';
+            $rsvp->save();
+
             event(new EventCreated($event));
         } else {
             event(new EventUpdated($event, $revision));
