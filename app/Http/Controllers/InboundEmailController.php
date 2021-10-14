@@ -24,7 +24,7 @@ class InboundEmailController extends BaseController
         $message = Message::from($raw_data, false);
 
         $rawHeaderFrom = $message->getHeaderValue(HeaderConsts::FROM);
-        Log::info($rawHeaderFrom);
+        Log::info('Parsing email from '.$rawHeaderFrom);
 
         $ics = false;
         $ics_src_type = false;
@@ -48,7 +48,7 @@ class InboundEmailController extends BaseController
 
         if(!$user) {
             Log::info('Received email from unknown user: '.$rawHeaderFrom);
-            $this->log_inbound_email('invalid_user', $raw_data, null, null, null);
+            $this->log_inbound_email('invalid_user', $raw_data, $ics, null, null);
             return response()->json(['result' => 'invalid_user']);
         }
 
@@ -69,8 +69,6 @@ class InboundEmailController extends BaseController
             return response()->json(['result' => 'error_parsing_ics']);
         }
 
-        Log::info($ics);
-
         if(!$ical->hasEvents()) {
             Log::error('No events found in ics from '.$rawHeaderFrom);
             $this->log_inbound_email('no_events', $raw_data, $ics, $user, null);
@@ -80,7 +78,6 @@ class InboundEmailController extends BaseController
         $data = $ical->events()[0];
 
         if(isset($ical->cal['VCALENDAR']['METHOD']) && $ical->cal['VCALENDAR']['METHOD'] == 'CANCEL') {
-            Log::info($ical->cal['VCALENDAR']['METHOD']);
             $event = Event::where('ics_uid', $data->uid)->first();
             $this->log_inbound_email('deleted', $raw_data, $ics, $user, $event);
             if($event) {
@@ -219,8 +216,8 @@ class InboundEmailController extends BaseController
     private function log_inbound_email($status, $raw, $ics, $user=null, $event=null) {
         $log = new InboundEmail();
         $log->status = $status;
-        $log->raw_ics = $ics ?: '';
-        $log->raw_body = $raw ?: '';
+        $log->raw_ics = $ics;
+        $log->raw_body = $raw;
         if($user)
             $log->user_id = $user->id;
         if($event)
