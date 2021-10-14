@@ -205,9 +205,6 @@ class InboundEmailController extends BaseController
         // Store a snapshot in the revision table
         $revision = EventRevision::createFromEvent($event);
         $revision->edit_summary = 'Updated via calendar invite';
-        if(count($ignored)) {
-            $revision->edit_summary .= ' (ignored '.implode(', ', $ignored).' because they were edited on the website';
-        }
         $revision->save();
 
         $this->log_inbound_email(($is_new ? 'created' : 'updated'), $raw_data, $ics, $user, $event);
