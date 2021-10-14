@@ -48,43 +48,79 @@ class InboundEmailController extends BaseController
 
         if(!$user) {
             Log::info('Received email from unknown user: '.$rawHeaderFrom);
-            $this->log_inbound_email('invalid_user', $raw_data, $ics, null, null);
+            self::log_inbound_email('invalid_user', $raw_data, $ics, null, null);
             return response()->json(['result' => 'invalid_user']);
         }
 
         if(!$ics) {
             Log::error('No ics file in email from '.$rawHeaderFrom);
-            $this->log_inbound_email('no_ics', $raw_data, null, $user, null);
+            self::log_inbound_email('no_ics', $raw_data, null, $user, null);
             return response()->json(['result' => 'no_ics']);
         }
 
+        list($status, $event, $is_new) = self::createEventFromICS($ics, $user);
+
+        if($status != 'success') {
+            self::log_inbound_email($status, $raw_data, $ics, $user, $event);
+            return response()->json(['result' => $error]);
+        }
+
+        self::log_inbound_email(($is_new ? 'created' : 'updated'), $raw_data, $ics, $user, $event);
+
+        // Store a snapshot in the revision table
+        $revision = EventRevision::createFromEvent($event);
+        $revision->edit_summary = ($is_new ? 'Created' : 'Updated').' via calendar invite';
+        $revision->save();
+
+        if($is_new) {
+            // Mark the user who created it as attending
+            $rsvp = new Response;
+            $rsvp->event_id = $event->id;
+            $rsvp->rsvp_user_id = $user->id;
+            $rsvp->created_by = $user->id;
+            $rsvp->approved_by = $user->id;
+            $rsvp->approved_at = date('Y-m-d H:i:s');
+            $rsvp->approved = true;
+            $rsvp->rsvp = 'yes';
+            $rsvp->save();
+
+            event(new EventCreated($event));
+        } else {
+            event(new EventUpdated($event, $revision));
+        }
+
+        return response()->json([
+            'result' => 'success',
+            'event_id' => $event->id,
+            'revision_id' => $revision->id
+        ]);
+    }
+
+    public static function createEventFromICS($ics, User $user) {
         try {
             $ical = new ICal(false, [
                 'skipRecurrence' => true
             ]);
             $ical->initString($ics);
         } catch(\Exception $e) {
-            Log::error('Error parsing ics file from '.$rawHeaderFrom);
-            $this->log_inbound_email('error_parsing_ics', $raw_data, null, $user, null);
-            return response()->json(['result' => 'error_parsing_ics']);
+            Log::error('Error parsing ics file');
+            return ['error_parsing_ics', null, null];
         }
 
         if(!$ical->hasEvents()) {
-            Log::error('No events found in ics from '.$rawHeaderFrom);
-            $this->log_inbound_email('no_events', $raw_data, $ics, $user, null);
-            return response()->json(['result' => 'no_events']);
+            Log::error('No events found in ics');
+            return ['no_events', null, null];
         }
 
         $data = $ical->events()[0];
 
         if(isset($ical->cal['VCALENDAR']['METHOD']) && $ical->cal['VCALENDAR']['METHOD'] == 'CANCEL') {
             $event = Event::where('ics_uid', $data->uid)->first();
-            $this->log_inbound_email('deleted', $raw_data, $ics, $user, $event);
             if($event) {
                 Log::info('Deleting cancelled event: '.$event->absolute_permalink());
                 $event->delete();
             }
-            return response()->json(['result' => 'deleted']);
+            return ['deleted', $event, null];
         }
 
         Log::info($data->uid);
@@ -92,6 +128,9 @@ class InboundEmailController extends BaseController
         Log::info($data->dtstart);
         Log::info($data->dtend);
         Log::info($data->description);
+        if(property_exists($data, 'url')) {
+            Log::info($data->url);
+        }
 
         // Check if we've already created an event for this UID
         $event = Event::where('ics_uid', $data->uid)->withTrashed()->first();
@@ -101,7 +140,7 @@ class InboundEmailController extends BaseController
             $event->ics_uid = $data->uid;
             $event->created_by = $user->id;
             $event->last_modified_by = $user->id;
-            $event->fields_from_ics = json_encode(['name','description','datetime','location']);
+            $event->fields_from_ics = json_encode(['name','description','datetime','location','url']);
             $is_new = true;
         } else {
             $is_new = false;
@@ -137,10 +176,18 @@ class InboundEmailController extends BaseController
             $description = trim(substr($description, 0, $endpos));
         }
 
-        if(preg_match('~(https?:\/\/[^\s]+)~', $description, $match)) {
-            $url = $match[1];
-            $event->website = $url;
-            $description = trim(str_replace($url, '', $description));
+        // Check URL from URL field before pulling from description
+        if(property_exists($data, 'url')) {
+            $event->website = $data->url;
+        }
+
+
+        if(!$event->website) {
+            if(preg_match('~(https?:\/\/[^\s]+)~', $description, $match)) {
+                $url = $match[1];
+                $event->website = $url;
+                $description = trim(str_replace($url, '', $description));
+            }
         }
 
         if($event->field_is_from_ics_invite('description')) {
@@ -202,39 +249,10 @@ class InboundEmailController extends BaseController
 
         $event->save();
 
-        // Store a snapshot in the revision table
-        $revision = EventRevision::createFromEvent($event);
-        $revision->edit_summary = 'Updated via calendar invite';
-        $revision->save();
-
-        $this->log_inbound_email(($is_new ? 'created' : 'updated'), $raw_data, $ics, $user, $event);
-
-        if($is_new) {
-
-            // Mark the user who created it as attending
-            $rsvp = new Response;
-            $rsvp->event_id = $event->id;
-            $rsvp->rsvp_user_id = $user->id;
-            $rsvp->created_by = $user->id;
-            $rsvp->approved_by = $user->id;
-            $rsvp->approved_at = date('Y-m-d H:i:s');
-            $rsvp->approved = true;
-            $rsvp->rsvp = 'yes';
-            $rsvp->save();
-
-            event(new EventCreated($event));
-        } else {
-            event(new EventUpdated($event, $revision));
-        }
-
-        return response()->json([
-            'result' => 'success',
-            'event_id' => $event->id,
-            'revision_id' => $revision->id
-        ]);
+        return ['success', $event, $is_new];
     }
 
-    private function log_inbound_email($status, $raw, $ics, $user=null, $event=null) {
+    private static function log_inbound_email($status, $raw, $ics, $user=null, $event=null) {
         $log = new InboundEmail();
         $log->status = $status;
         $log->raw_ics = $ics;
