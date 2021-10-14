@@ -219,8 +219,8 @@ class InboundEmailController extends BaseController
     private function log_inbound_email($status, $raw, $ics, $user=null, $event=null) {
         $log = new InboundEmail();
         $log->status = $status;
-        $log->raw_ics = $ics;
-        $log->raw_body = $raw;
+        $log->raw_ics = $ics ?: '';
+        $log->raw_body = $raw ?: '';
         if($user)
             $log->user_id = $user->id;
         if($event)
