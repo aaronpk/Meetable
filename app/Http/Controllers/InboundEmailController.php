@@ -105,7 +105,7 @@ class InboundEmailController extends BaseController
             $is_new = true;
         } else {
             $is_new = false;
-            $event->deleted_at = null;
+            // $event->deleted_at = null; # don't restore deleted events
         }
 
 
