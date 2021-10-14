@@ -161,6 +161,37 @@ class EventController extends BaseController
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
         ]);
 
+        if($event->fields_from_ics) {
+            // Remove edited fields from the list of fields created by an ICS invite
+
+            $fields = json_decode($event->fields_from_ics);
+
+            if(request('name') != $event->name) {
+                $fields = array_diff($fields, ['name']);
+            }
+
+            if(request('description') != $event->description) {
+                $fields = array_diff($fields, ['description']);
+            }
+
+            $date_fields = ['start_date', 'end_date', 'start_time', 'end_time'];
+            foreach($date_fields as $f) {
+                if(request($f) != $event->{$f}) {
+                    $fields = array_diff($fields, ['datetime']);
+                }
+            }
+
+            $loc_fields = ['location_name', 'location_address', 'location_locality', 'location_region', 'location_country'];
+            foreach($loc_fields as $f) {
+                if(request($f) != $event->{$f}) {
+                    $fields = array_diff($fields, ['location']);
+                }
+            }
+
+            $event->fields_from_ics = json_encode(array_values($fields));
+        }
+
+
         // Update the properties on the event
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
             $event->{$p} = (request($p) ?: null);

@@ -610,6 +610,13 @@ class Event extends Model
         return $this->cover_image;
     }
 
+    public function field_is_from_ics_invite($field) {
+        $fields = json_decode($this->fields_from_ics);
+        if(!is_array($fields))
+            return false;
+        return in_array($field, $fields);
+    }
+
     public static function used_timezones() {
         return Event::select('timezone')
             ->whereNotNull('timezone')

@@ -104,49 +104,35 @@ class InboundEmailController extends BaseController
             $event->ics_uid = $data->uid;
             $event->created_by = $user->id;
             $event->last_modified_by = $user->id;
+            $event->fields_from_ics = json_encode(['name','description','datetime','location']);
             $is_new = true;
         } else {
             $is_new = false;
             $event->deleted_at = null;
         }
 
-        $event->name = html_entity_decode($data->summary);
-        $event->slug = Event::slug_from_name($event->name);
 
-        // Get the default timezone of this user to localize the dates
-        if($user->default_timezone) {
-            $event->timezone = $tz = $user->default_timezone;
-            Log::info('User default timezone '.$tz);
-        } else {
-            $tz = 'UTC';
-            Log::info('Timezone '.$tz);
+
+        // NAME
+
+        if($event->field_is_from_ics_invite('name')) {
+            // Don't override the name/slug if the event name was changed manually
+            $event->name = html_entity_decode($data->summary);
+            $event->slug = Event::slug_from_name($event->name);
         }
 
-        $tz = new DateTimeZone($tz);
 
-        $start = new DateTime($data->dtstart);
-        $end = new DateTime($data->dtend);
 
-        $start->setTimeZone($tz);
-        $end->setTimeZone($tz);
-
-        Log::info($start->format('c').' '.$end->format('c'));
-
-        if($start->format('Y-m-d') == $end->format('Y-m-d')) {
-            $event->start_date = $start->format('Y-m-d');
-            $event->start_time = $start->format('H:i:s');
-            if($end)
-                $event->end_time = $end->format('H:i:s');
-        } else {
-            $event->start_date = $start->format('Y-m-d');
-            $event->end_date = $end->format('Y-m-d');
-        }
-
-        $event->sort_date = $event->sort_date();
+        // DESCRIPTION
 
         $description = $data->description;
 
-        if(($endpos = strpos($description, '-::~:~::~:~:~:~:~')) !== 0) {
+        if(($endpos = strpos($description, '-::~:~::~:~:~:~:~')) !== null) {
+            // Google hides the timezone in the URL of the event, attempt to grab it from there
+            $googleblob = substr($description, $endpos);
+            if(preg_match('/calendar\.google\.com.+ctz=([A-Za-z_\/%2]+)/', $googleblob, $match)) {
+                $event->timezone = $tz = urldecode($match[1]);
+            }
             $description = trim(substr($description, 0, $endpos));
         }
 
@@ -156,7 +142,56 @@ class InboundEmailController extends BaseController
             $description = trim(str_replace($url, '', $description));
         }
 
-        $event->description = $description;
+        if($event->field_is_from_ics_invite('description')) {
+            $event->description = $description;
+        }
+
+
+
+        // DATE/TIME
+
+        if($event->field_is_from_ics_invite('datetime')) {
+
+            // If the timezone wasn't set by pulling it out of the event description (or manually later)...
+            if(!$event->timezone) {
+                // Get the default timezone of this user to localize the dates
+                if($user->default_timezone) {
+                    $event->timezone = $tz = $user->default_timezone;
+                    Log::info('User default timezone '.$tz);
+                } else {
+                    $tz = 'UTC';
+                    Log::info('Timezone '.$tz);
+                }
+            }
+
+            $tz = new DateTimeZone($tz);
+
+            $start = new DateTime($data->dtstart);
+            $end = new DateTime($data->dtend);
+
+            $start->setTimeZone($tz);
+            $end->setTimeZone($tz);
+
+            Log::info($start->format('c').' '.$end->format('c'));
+
+            if($start->format('Y-m-d') == $end->format('Y-m-d')) {
+                $event->start_date = $start->format('Y-m-d');
+                $event->start_time = $start->format('H:i:s');
+                if($end)
+                    $event->end_time = $end->format('H:i:s');
+            } else {
+                $event->start_date = $start->format('Y-m-d');
+                $event->end_date = $end->format('Y-m-d');
+            }
+
+            $event->sort_date = $event->sort_date();
+
+        }
+
+        // TODO: Geocode the location from the invite to populate all the fields
+
+
+
         $event->status = 'confirmed';
         $event->unlisted = 0;
 
