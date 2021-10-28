@@ -180,9 +180,19 @@ use App\Setting;
     <div class="field">
       <div class="control">
         <label class="label">Analytics</label>
-        <textarea class="input" name="analytics" style="height:6em">{{ Setting::value('analytics') }}</textarea>
+        <textarea class="input" name="analytics" style="height:8em; font-family:courier; font-size: 0.8em;">{{ Setting::value('analytics') }}</textarea>
       </div>
       <p class="help">Provide your website analytics tracking code here</p>
+    </div>
+
+    <br>
+
+    <div class="field">
+      <div class="control">
+        <label class="label">Event Page Embed</label>
+        <textarea class="input" name="event_page_embed" style="height:8em; font-family:courier; font-size: 0.8em;">{{ Setting::value('event_page_embed') }}</textarea>
+        <p class="help">Provide some HTML or JS that will be embedded on the event permalinks. You can use this to add external comments to event pages for example, such as using the <a href="https://meta.discourse.org/t/embedding-discourse-comments-via-javascript/31963">Discourse embed</a> code. The magic string <code>%EVENT_URL%</code> will be replaced with the full URL to the event page.</p>
+      </div>
     </div>
 
     <br>

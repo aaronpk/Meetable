@@ -3,6 +3,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use DB, Auth, Log, Schema;
+use App\Event;
 
 class Setting extends Model
 {
@@ -61,6 +62,10 @@ class Setting extends Model
             $setting->last_saved_by = Auth::user()->id;
         $setting->value = $value;
         $setting->save();
+    }
+
+    public static function event_page_embed(Event $event) {
+        return str_replace('%EVENT_URL%', $event->absolute_permalink(), self::value('event_page_embed'));
     }
 
 }

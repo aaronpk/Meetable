@@ -422,6 +422,11 @@ use App\Setting;
             </ul>
         </div>
     @endif
+
+    @if(Setting::value('event_page_embed'))
+        {!! Setting::event_page_embed($event) !!}
+    @endif
+
     @endif
 
     @can('manage-event', $event)
