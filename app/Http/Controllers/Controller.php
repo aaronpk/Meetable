@@ -317,7 +317,7 @@ class Controller extends BaseController
             'key' => $key,
             'slug' => $slug,
             'mode' => 'event',
-            'page_title' => $event->name,
+            'page_title' => $event->name . ' | ' . $event->display_date(),
         ]);
     }
 
