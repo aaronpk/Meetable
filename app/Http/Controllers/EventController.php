@@ -406,6 +406,7 @@ class EventController extends BaseController
 
         return view('unlisted', [
             'data' => $data,
+            'page_title' => 'Unlisted Events',
         ]);
     }
 

@@ -12,7 +12,7 @@ use App\Response;
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ env('APP_NAME') }}</title>
+    <title>{{ isset($page_title) ? $page_title.' | '.env('APP_NAME') : env('APP_NAME') }}</title>
 
     @yield('headtags')
 

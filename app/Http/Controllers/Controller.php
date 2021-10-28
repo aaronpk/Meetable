@@ -121,7 +121,7 @@ class Controller extends BaseController
 
         return $this->show_events_from_query($events, [
             'tag' => $tag,
-            'past_events' => $past_events,
+            'page_title' => 'Upcoming events tagged #'.$tag,
         ]);
     }
 
@@ -144,6 +144,7 @@ class Controller extends BaseController
         return $this->show_events_from_query($events, [
             'tag' => $tag,
             'archive' => true,
+            'page_title' => 'Events tagged #'.$tag,
         ]);
     }
 
@@ -180,6 +181,18 @@ class Controller extends BaseController
             }
 
             $opts['past_events'] = $past_events;
+        }
+
+        if(!isset($opts['page_title'])) {
+            if(!empty($opts['day'])) {
+                $opts['page_title'] = env('APP_NAME').' on '.date('F j, Y', strtotime($opts['year'].'-'.$opts['month'].'-'.$opts['day']));
+            } elseif(!empty($opts['month'])) {
+                $opts['page_title'] = env('APP_NAME').' in '.date('F Y', strtotime($opts['year'].'-'.$opts['month'].'-01'));
+            } elseif(!empty($opts['year'])) {
+                $opts['page_title'] = env('APP_NAME').' in '.$opts['year'];
+            } else {
+                $opts['page_title'] = env('APP_NAME');
+            }
         }
 
         return view('index', array_merge($opts, [
@@ -304,6 +317,7 @@ class Controller extends BaseController
             'key' => $key,
             'slug' => $slug,
             'mode' => 'event',
+            'page_title' => $event->name,
         ]);
     }
 

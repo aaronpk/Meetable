@@ -9,7 +9,7 @@ use App\Setting;
 @if(Setting::value('home_social_image_url') || Setting::value('home_meta_description'))
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="{{ env('APP_NAME') }}">
+<meta property="og:title" content="{{ $page_title }}">
 @if(Setting::value('home_meta_description'))
 <meta property="og:description" content="{{ Setting::value('home_meta_description') }}">
 <meta property="description" content="{{ Setting::value('home_meta_description') }}">
@@ -36,17 +36,7 @@ use App\Setting;
 </style>
 <section class="section">
 
-    @if(isset($tag))
-        <h1 class="title">{{ isset($archive) ? '' : 'Upcoming' }} Events Tagged #{{ $tag }}</h1>
-    @elseif(!empty($day))
-        <h1 class="title">{{ env('APP_NAME') }} on {{ date('F j, Y', strtotime($year.'-'.$month.'-'.$day)) }}</h1>
-    @elseif(!empty($month))
-        <h1 class="title">{{ env('APP_NAME') }} in {{ date('F Y', strtotime($year.'-'.$month.'-01')) }}</h1>
-    @elseif(!empty($year))
-        <h1 class="title">{{ env('APP_NAME') }} in {{ $year }}</h1>
-    @else
-        <h1 class="title">{{ env('APP_NAME') }}</h1>
-    @endif
+    <h1 class="title">{{ $page_title }}</h1>
 
     @if(isset($tags) && count($tags))
     <div class="tags are-medium">
