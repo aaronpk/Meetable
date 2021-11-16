@@ -121,6 +121,7 @@ class Controller extends BaseController
 
         return $this->show_events_from_query($events, [
             'tag' => $tag,
+            'past_events' => $past_events,
             'page_title' => 'Upcoming events tagged #'.$tag,
         ]);
     }
