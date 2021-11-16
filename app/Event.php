@@ -31,7 +31,7 @@ class Event extends Model
         'name', 'start_date', 'end_date', 'start_time', 'end_time',
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
         'latitude', 'longitude', 'timezone', 'status',
-        'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url',
+        'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url',
         'description', 'cover_image', 'unlisted',
     ];
 
@@ -518,6 +518,55 @@ class Event extends Model
         $html = preg_replace('/^<table>$/m', '<table class="table is-fullwidth is-bordered">', $html);
 
         return $html;
+    }
+
+    private static $YOUTUBE_VIDEOID_REGEX = '/(?:v=|\.be\/)([a-zA-Z0-9_-]+)/';
+    private static $IA_VIDEOSLUG_REGEX = '/(?:details\/)([a-zA-Z0-9_-]+)/';
+
+    public function can_embed_video() {
+        if(!$this->video_url)
+            return false;
+
+        $host = parse_url($this->video_url, PHP_URL_HOST);
+
+        if(in_array($host, ['www.youtube.com', 'youtube.com', 'youtu.be'])) {
+            if(preg_match(self::$YOUTUBE_VIDEOID_REGEX, $this->video_url, $match))
+                return true;
+        }
+
+        if(in_array($host, ['archive.org'])) {
+            if(preg_match(self::$IA_VIDEOSLUG_REGEX, $this->video_url, $match))
+                return true;
+        }
+
+        return false;
+    }
+
+    public function video_embed_html() {
+        if(!$this->video_url)
+            return '';
+
+        $host = parse_url($this->video_url, PHP_URL_HOST);
+
+        switch($host) {
+            case 'www.youtube.com':
+            case 'youtube.com':
+            case 'youtu.be':
+                if(!preg_match(self::$YOUTUBE_VIDEOID_REGEX, $this->video_url, $match))
+                    return '';
+
+                $videoID = $match[1];
+
+                return '<iframe width="100%" height="420" src="https://www.youtube-nocookie.com/embed/'.$videoID.'" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+
+            case 'archive.org':
+                if(!preg_match(self::$IA_VIDEOSLUG_REGEX, $this->video_url, $match))
+                    return '';
+
+                $videoSlug = $match[1];
+
+                return '<iframe src="https://archive.org/embed/'.$videoSlug.'" width="100%" height="420" frameborder="0" webkitallowfullscreen="true" mozallowfullscreen="true" allowfullscreen></iframe>';
+        }
     }
 
     public function setTicketsUrlAttribute($value) {

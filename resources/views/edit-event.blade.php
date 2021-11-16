@@ -252,6 +252,12 @@ form h2.subtitle {
         <div class="help">space separated, lowercase</div>
     </div>
 
+    <div class="field" id="video-url-field">
+        <label class="label">Video URL</label>
+        <input class="input @error('video_url') is-danger @enderror" type="url" autocomplete="off" name="video_url" value="{{ old('video_url') ?: ($mode == 'clone' ? '' : $event->video_url) }}">
+        <div class="help">After the event is over, you can add a link to a recording here. YouTube and Vimeo videos will be embedded in the page, otherwise only the link will be displayed.</div>
+    </div>
+
     <div class="field">
         <div class="control is-expanded">
             <label class="label">Status</label>

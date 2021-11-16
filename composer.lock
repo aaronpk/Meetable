@@ -3462,16 +3462,16 @@
         },
         {
             "name": "p3k/utils",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aaronpk/p3k-utils.git",
-                "reference": "ecd0ba1afca8e586f09792f7be5052e142d3cbde"
+                "reference": "8436f02ec02d916177a23250ae32b34ae5316942"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aaronpk/p3k-utils/zipball/ecd0ba1afca8e586f09792f7be5052e142d3cbde",
-                "reference": "ecd0ba1afca8e586f09792f7be5052e142d3cbde",
+                "url": "https://api.github.com/repos/aaronpk/p3k-utils/zipball/8436f02ec02d916177a23250ae32b34ae5316942",
+                "reference": "8436f02ec02d916177a23250ae32b34ae5316942",
                 "shasum": ""
             },
             "require": {
@@ -3506,9 +3506,9 @@
             "homepage": "https://github.com/aaronpk/p3k-utils",
             "support": {
                 "issues": "https://github.com/aaronpk/p3k-utils/issues",
-                "source": "https://github.com/aaronpk/p3k-utils/tree/1.2.0"
+                "source": "https://github.com/aaronpk/p3k-utils/tree/1.2.1"
             },
-            "time": "2018-03-28T13:44:56+00:00"
+            "time": "2021-11-16T21:44:23+00:00"
         },
         {
             "name": "p3k/xray",

@@ -240,6 +240,23 @@ use App\Setting;
         @endif
     @endif
 
+    @if($event->video_url)
+        <div class="website segment with-icon">
+            <span class="icon">@brand_icon(youtube)</span>
+            <span>
+                <a href="{{ $event->video_url }}" title="{{ $event->video_url }}">
+                    {{ \p3k\url\display_url(strlen($event->video_url) > 40 ? 'http://'.parse_url($event->video_url, PHP_URL_HOST) : $event->video_url) }}
+                </a>
+            </span>
+        </div>
+    @endif
+
+    @if($event->video_url && $event->can_embed_video())
+        <div class="video description segment content">
+            {!! $event->video_embed_html() !!}
+        </div>
+    @endif
+
     <div class="e-content description segment content">
         {!! $event->html() !!}
     </div>
