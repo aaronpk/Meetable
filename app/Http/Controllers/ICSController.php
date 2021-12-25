@@ -123,7 +123,7 @@ class ICSController extends BaseController
     }
 
     private function _isRequestFromBrowser(Request $request) {
-        return $request->accepts('text/html');
+        return 'text/html' === $request->prefers(['text/calendar', 'text/html']);
     }
 
     public function index(Request $request) {
