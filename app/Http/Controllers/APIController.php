@@ -6,7 +6,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Request;
-use App\Event, App\EventRevision, App\Response, App\User;
+use App\Event, App\EventRevision, App\Tag, App\Response, App\User;
 use App\Events\EventCreated, App\Events\EventUpdated;
 use App\Events\WebmentionReceived;
 use Illuminate\Support\Str;
