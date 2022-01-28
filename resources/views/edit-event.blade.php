@@ -241,6 +241,12 @@ form h2.subtitle {
     </div>
 
     <div class="field">
+        <label class="label">Summary</label>
+        <textarea class="input" name="summary" style="max-height: none; height: {{ $event->summary ? '15vh' : '15vh' }}">{{ old('summary') ?: $event->summary }}</textarea>
+        <div class="help">markdown and HTML are supported</div>
+    </div>
+
+    <div class="field">
         <label class="label">Description</label>
         <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ old('description') ?: $event->description }}</textarea>
         <div class="help">markdown and HTML are supported</div>

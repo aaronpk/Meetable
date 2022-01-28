@@ -257,6 +257,12 @@ use App\Setting;
         </div>
     @endif
 
+    @if($event->summary)
+    <div class="e-summary description segment content">
+        {!! $event->summary_html() !!}
+    </div>
+    @endif
+
     <div class="e-content description segment content">
         {!! $event->html() !!}
     </div>

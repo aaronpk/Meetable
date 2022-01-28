@@ -32,7 +32,7 @@ class Event extends Model
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
         'latitude', 'longitude', 'timezone', 'status',
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url',
-        'description', 'cover_image', 'unlisted',
+        'summary', 'description', 'cover_image', 'unlisted',
     ];
 
     public static function slug_from_name($name) {
@@ -509,9 +509,18 @@ class Event extends Model
         if(!$this->description)
             return '';
 
-        $markdown = $this->description;
+        return $this->sanitized_html($this->description);
+    }
 
-        $html = \Michelf\MarkdownExtra::defaultTransform($markdown);
+    public function summary_html() {
+        if(!$this->summary)
+            return '';
+
+        return $this->sanitized_html($this->summary);
+    }
+
+    private function sanitized_html($html) {
+        $html = \Michelf\MarkdownExtra::defaultTransform($html);
 
         $html = \p3k\HTML::sanitize($html, ['allowTables' => true]);
         // Add Bulma css for tables

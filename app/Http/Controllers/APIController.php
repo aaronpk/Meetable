@@ -77,6 +77,7 @@ class APIController extends BaseController
 
         $event->status = request('status') ?: 'confirmed';
 
+        $event->summary = request('summary');
         $event->description = request('description');
         $event->website = request('website');
         $event->tickets_url = request('tickets_url');
