@@ -73,6 +73,11 @@
     }
 }
 
+section {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
 .event .segment {
     margin-bottom: 1em;
 }
