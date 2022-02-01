@@ -19,9 +19,9 @@ use App\Setting;
 
     <div class="tabs is-boxed">
         <ul>
-            <li class="is-active" data-tab="features"><a>Site Features</a></li>
-            <li data-tab="messages"><a>Messages</a></li>
+            <li class="is-active" data-tab="messages"><a>Messages</a></li>
             <li data-tab="design"><a>Design</a></li>
+            <li data-tab="features"><a>Site Features</a></li>
             <li data-tab="services"><a>Services</a></li>
         </ul>
     </div>
