@@ -347,3 +347,12 @@ ul.photo-album li {
 }
 
 
+
+.tab-content {
+
+}
+.tab-content.hidden {
+    display: none;
+}
+
+

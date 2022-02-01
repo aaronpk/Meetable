@@ -54,6 +54,14 @@ $(function(){
     });
   });
 
+  $(".tabs li").click(function(){
+    $(".tab-content").addClass("hidden");
+    $(".tabs li").removeClass("is-active");
+    $(this).addClass("is-active");
+    $("#tab-"+$(this).data("tab")).removeClass("hidden");
+  });
+  $(".tabs li.is-active").click();
+
   $(".photo-popup").click(function(evt){
     $("#photo-preview img").attr("src", ""); // blank out the previous photo
     $(".photo-popup").removeClass("active-photo");
