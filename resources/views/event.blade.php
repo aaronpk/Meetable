@@ -294,7 +294,7 @@ use App\Setting;
         </div>
     @endif
 
-    @if($event->rsvps_enabled && ($event->has_rsvps() || Auth::user()))
+    @if(Setting::value('enable_rsvps') && $event->rsvps_enabled && ($event->has_rsvps() || Auth::user()))
         <div class="responses rsvps" id="rsvps">
             <div class="level">
                 <div class="level-left">
@@ -427,7 +427,7 @@ use App\Setting;
                             <span class="author-details">
                                 <a href="{{ $comment->author_url() }}" class="author-name">{{ $comment->author_display_name() }}</a>
                                 <a href="{{ $comment->author_url() }}" class="author-url">{{ p3k\url\display_url($comment->author_url()) }}</a>
-                                @if($comment->rsvp)
+                                @if(Setting::value('enable_rsvps') && $comment->rsvp)
                                   <img src="/images/rsvp-{{ $comment->rsvp }}.png" width="79">
                                 @endif
                             </span>

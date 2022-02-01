@@ -47,18 +47,26 @@ use App\Setting;
 
         <div class="field">
             <label class="label">
-                <input type="checkbox" name="show_rsvps_in_ics" value="1" {{ Setting::value('show_rsvps_in_ics') ? 'checked="checked"' : ''}}>
-                Show RSVPs in ICS Feeds
-            </label>
-            <p class="help">When checked, event names in the ics feeds will include the names of people who have RSVP'd to the event.</p>
-        </div>
-
-        <div class="field">
-            <label class="label">
                 <input type="checkbox" name="enable_unlisted_events" value="1" {{ Setting::value('enable_unlisted_events') ? 'checked="checked"' : ''}}>
                 Enable Unlisted Events
             </label>
             <p class="help">When checked, events can be marked as "unlisted", preventing them from showing up on the home page and all feeds.</p>
+        </div>
+
+        <div class="field">
+            <label class="label">
+                <input type="checkbox" name="enable_rsvps" value="1" {{ Setting::value('enable_rsvps') ? 'checked="checked"' : ''}}>
+                Enable RSVPs
+            </label>
+            <p class="help">When checked, events will have an "RSVP" button for logged-in users and will show who has RSVPd. When unchecked, RSVP webmentions will not be shown either.</p>
+        </div>
+
+        <div class="field">
+            <label class="label">
+                <input type="checkbox" name="show_rsvps_in_ics" value="1" {{ Setting::value('show_rsvps_in_ics') ? 'checked="checked"' : ''}}>
+                Show RSVPs in ICS Feeds
+            </label>
+            <p class="help">When checked, event names in the ics feeds will include the names of people who have RSVP'd to the event.</p>
         </div>
 
         <div class="field">
