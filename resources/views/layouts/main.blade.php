@@ -27,6 +27,10 @@ use App\Response;
     <link rel="shortcut icon" href="{{ $favicon }}">
 @endif
 
+@if(Setting::value('custom_global_css'))
+    <link href="/custom-css" rel="stylesheet">
+@endif
+
 @if($analytics=Setting::value('analytics'))
     {!! $analytics !!}
 @endif
@@ -93,6 +97,9 @@ use App\Response;
             @endif
         </div>
     </nav>
+
+    <!-- customize with css in the settings page -->
+    <div id="site-banner"><div class="left"></div><div class="right"></div></div>
 
     @yield('content')
 

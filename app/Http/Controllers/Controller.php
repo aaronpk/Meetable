@@ -6,7 +6,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Controller as BaseController;
-use App\Event, App\Tag;
+use App\Event, App\Tag, App\Setting;
 use DateTime, DateTimeZone, DateInterval, Exception;
 use DB;
 
@@ -451,5 +451,10 @@ class Controller extends BaseController
             'timezone' => $timezone,
             'timezones' => $timezones,
         ]);
+    }
+
+    public function custom_css() {
+        $css = Setting::value('custom_global_css');
+        return response($css)->header('Content-Type', 'text/css');
     }
 }

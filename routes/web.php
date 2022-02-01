@@ -22,6 +22,7 @@ Route::get('/setup/heroku-in-progress', 'Setup\Controller@heroku_in_progress')->
 else:
 
 Route::get('/', 'Controller@index')->name('index');
+Route::get('/custom-css', 'Controller@custom_css');
 
 ######
 ## SETUP ROUTES

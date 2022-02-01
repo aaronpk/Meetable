@@ -142,6 +142,14 @@ use App\Setting;
           <p class="help">This text will be used as the meta description of the home page, as well as the description for Twitter/Facebook cards.</p>
         </div>
 
+        <div class="field">
+          <div class="control">
+            <label class="label">Custom CSS</label>
+            <textarea class="textarea" name="custom_global_css" rows="8">{{ Setting::value('custom_global_css') }}</textarea>
+          </div>
+          <p class="help">Write custom CSS that will be included on every page. This can be used to, for example, add a site banner.</p>
+        </div>
+
 
     </div>
 
