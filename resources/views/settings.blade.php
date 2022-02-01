@@ -19,14 +19,14 @@ use App\Setting;
 
     <div class="tabs is-boxed">
         <ul>
-            <li class="is-active" data-tab="events"><a>Events</a></li>
+            <li class="is-active" data-tab="features"><a>Site Features</a></li>
             <li data-tab="messages"><a>Messages</a></li>
             <li data-tab="design"><a>Design</a></li>
             <li data-tab="services"><a>Services</a></li>
         </ul>
     </div>
 
-    <div class="tab-content" id="tab-events">
+    <div class="tab-content" id="tab-features">
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="enable_ticket_url" value="1" {{ Setting::value('enable_ticket_url') ? 'checked="checked"' : ''}}>
@@ -68,6 +68,21 @@ use App\Setting;
             </label>
             <p class="help">Check this option to let people post comments and photos on events via <a href="https://webmention.net">Webmention</a>.</p>
         </div>
+
+        <div class="field">
+            <label class="label">
+                <input type="checkbox" name="auth_hide_login" value="1" {{ Setting::value('auth_hide_login') ? 'checked="checked"' : ''}}>
+                Hide Log In Button
+            </label>
+        </div>
+
+        <div class="field">
+            <label class="label">
+                <input type="checkbox" name="auth_hide_logout" value="1" {{ Setting::value('auth_hide_logout') ? 'checked="checked"' : ''}}>
+                Hide Log Out Button
+            </label>
+        </div>
+
     </div>
 
 
@@ -128,19 +143,6 @@ use App\Setting;
         </div>
 
 
-        <div class="field">
-            <label class="label">
-                <input type="checkbox" name="auth_hide_login" value="1" {{ Setting::value('auth_hide_login') ? 'checked="checked"' : ''}}>
-                Hide Log In Button
-            </label>
-        </div>
-
-        <div class="field">
-            <label class="label">
-                <input type="checkbox" name="auth_hide_logout" value="1" {{ Setting::value('auth_hide_logout') ? 'checked="checked"' : ''}}>
-                Hide Log Out Button
-            </label>
-        </div>
     </div>
 
 
