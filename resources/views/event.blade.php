@@ -432,7 +432,8 @@ use App\Setting;
                                 @endif
                             </span>
                         </span>
-                        <span class="comment-content">{{ $comment->content_text }}</span>
+                        <!-- <span class="comment-content">{{ $comment->content_text }}</span> -->
+                        <span class="comment-content-html">{!! $comment->html_cleaned() !!}</span>
                         <span class="meta">
                             <a href="{{ $comment->link() }}">
                                 <time datetime="{{ date('c', strtotime($comment->published)) }}">

@@ -29,6 +29,11 @@ class Response extends Model
         return $this->hasMany('App\ResponsePhoto');
     }
 
+    public function html_cleaned() {
+        // XRay already sanitizes the HTML, but it allows microformats classes. we remove them here.
+        return \p3k\HTML::sanitize($this->content_html, ['allowMf2' => false]);
+    }
+
     public function author_photo() {
         if($this->rsvp_user_id) {
             $user = User::where('id', $this->rsvp_user_id)->first();
