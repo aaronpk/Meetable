@@ -31,7 +31,7 @@ class Response extends Model
 
     public function html_cleaned() {
         // XRay already sanitizes the HTML, but it allows microformats classes. we remove them here.
-        return \p3k\HTML::sanitize($this->content_html, ['allowMf2' => false]);
+        return \p3k\HTML::sanitize($this->content_html, ['allowMf2' => false, 'allowImg' => false]);
     }
 
     public function author_photo() {
