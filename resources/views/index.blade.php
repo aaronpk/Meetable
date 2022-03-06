@@ -49,7 +49,7 @@ use App\Setting;
     @if(count($data))
         @include('components/event-list', ['data' => $data])
     @else
-        <div class="content"><p>No {{ isset($tag) && !isset($archive) ? 'upcoming ' : '' }}events</p></div>
+        <div class="content"><p>No {{ isset($tag) && !isset($archive) ? 'upcoming ' : '' }}events</p><div class="h-feed"></div></div>
     @endif
 
     @if(isset($past_events))
