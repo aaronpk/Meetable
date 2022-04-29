@@ -104,6 +104,13 @@ class Event extends Model
         return array_map(function($t){ return $t->tag; }, $this->tags->all());
     }
 
+    // Used when building a query to find events with a matching tag
+    public static function tagged(\Illuminate\Database\Eloquent\Builder $queryBuilder, $tag) {
+        return $queryBuilder->whereHas('tags', function($query) use ($tag){
+            $query->where('tag', $tag);
+        });
+    }
+
     public $temp_tag_string;
 
     public function tags_string() {

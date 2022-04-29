@@ -129,16 +129,37 @@ class Controller extends BaseController
     public function year_tag($year, $tag) {
         $tag = Tag::normalize($tag);
 
-        $events = $this->events_query($year);
+        $now = new DateTime('now', new DateTimeZone('-12:00'));
+        $nowDate = $now->format('Y-m-d');
 
-        $events = $events->whereHas('tags', function($query) use ($tag){
-            $query->where('tag', $tag);
+        $upcoming_events = $this->events_query($year);
+        $upcoming_events = $upcoming_events->where(function($query)use($nowDate){
+            $query->where('start_date', '>=', $nowDate)
+                  ->orWhere('end_date', '>=', $nowDate);
         });
 
-        $event_ids = $events->pluck('id');
-        $events = $events->get();
+        $upcoming_events = Event::tagged($upcoming_events, $tag);
 
-        return $this->show_events_from_query($events, [
+        $upcoming_event_ids = $upcoming_events->pluck('id');
+        $upcoming_events = $upcoming_events->get();
+
+        $past_events = $this->events_query($year, false, false, false);
+        $past_events = $past_events->whereRaw(DB::raw('
+            ((start_date < "'.$nowDate.'" AND end_date IS NULL)
+            OR
+            (end_date < "'.$nowDate.'"))
+        '));
+        $past_events = Event::tagged($past_events, $tag);
+        $past_events = $past_events->get();
+
+        if(count($upcoming_events) == 0) {
+            $upcoming_events = $past_events->reverse();
+            $past_events = null;
+        }
+
+        return $this->show_events_from_query($upcoming_events, [
+            'archive' => true,
+            'past_events' => $past_events,
             'year' => $year,
             'month' => false,
             'day' => false,
