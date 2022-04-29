@@ -126,6 +126,27 @@ class Controller extends BaseController
         ]);
     }
 
+    public function year_tag($year, $tag) {
+        $tag = Tag::normalize($tag);
+
+        $events = $this->events_query($year);
+
+        $events = $events->whereHas('tags', function($query) use ($tag){
+            $query->where('tag', $tag);
+        });
+
+        $event_ids = $events->pluck('id');
+        $events = $events->get();
+
+        return $this->show_events_from_query($events, [
+            'year' => $year,
+            'month' => false,
+            'day' => false,
+            'home' => (!$year && !$month && !$day),
+            'page_title' => $year . ' #' . $tag
+        ]);
+    }
+
     public function tag_archive($tag) {
         $tag = Tag::normalize($tag);
 
