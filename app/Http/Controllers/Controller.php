@@ -143,7 +143,7 @@ class Controller extends BaseController
             'month' => false,
             'day' => false,
             'home' => (!$year && !$month && !$day),
-            'page_title' => $year . ' #' . $tag
+            'page_title' => $year . ' #' . $tag . ' Events'
         ]);
     }
 
