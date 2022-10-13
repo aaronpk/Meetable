@@ -40,6 +40,10 @@ class GitHubGuard extends CustomGuard {
         return session('GITHUB_USER') == true;
     }
 
+    public function hasUser() {
+        return $this->check();
+    }
+
     public function guest() {
         return session('GITHUB_USER') != true;
     }

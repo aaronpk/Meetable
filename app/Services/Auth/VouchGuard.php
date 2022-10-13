@@ -39,6 +39,10 @@ class VouchGuard extends CustomGuard {
         return $url == true;
     }
 
+    public function hasUser() {
+        return $this->check();
+    }
+
     public function guest() {
         $url = $this->request->server->get('HTTP_REMOTE_USER');
         return $url != true;

@@ -40,6 +40,10 @@ class HerokuGuard extends CustomGuard {
         return session('HEROKU_USERID') == true;
     }
 
+    public function hasUser() {
+        return $this->check();
+    }
+
     public function guest() {
         return session('HEROKU_USERID') != true;
     }

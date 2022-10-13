@@ -40,6 +40,10 @@ class OIDCGuard extends CustomGuard {
         return session('OIDC_USER') == true;
     }
 
+    public function hasUser() {
+        return $this->check();
+    }
+
     public function guest() {
         return session('OIDC_USER') != true;
     }

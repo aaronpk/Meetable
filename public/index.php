@@ -18,7 +18,7 @@ if(file_exists(__DIR__.'/../.env')) {
 }
 
 // Check for environment variables and trigger the setup flow if it doesn't exist
-if(!getenv('APP_NAME')) {
+if(empty($_ENV['APP_NAME'])) {
     $_ENV['APP_NAME'] = 'Meetable Installer';
     // Use a temporary fixed APP_KEY during installation
     $_ENV['APP_KEY'] = 'base64:v7ZDOfJbqzXdbbJ/3GYSAP+B4jm3rMlrWiNutsaQYEE=';
