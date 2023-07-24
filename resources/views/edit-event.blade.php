@@ -181,7 +181,7 @@ form h2.subtitle {
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">Start Date</label>
-            <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: ($event->parent ? $event->parent->start_date : $event->start_date) }}" required>
+            <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: (($mode == 'create' && $event->parent) ? $event->parent->start_date : $event->start_date) }}" required>
         </div>
 
         <div class="control is-expanded">
