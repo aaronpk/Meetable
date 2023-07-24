@@ -37,7 +37,7 @@ class Controller extends BaseController
             $events = new Event();
         }
 
-        $events = $events->where('unlisted', 0);
+        $events = $events->where('unlisted', 0)->where('hide_from_main_feed', 0);
 
         if($only_future)
             $events = $events->orderBy('sort_date');

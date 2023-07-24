@@ -33,6 +33,11 @@ class EventController extends BaseController
             $event = new Event;
         }
 
+        $parent = null;
+        if(request('parent')) {
+            $event->parent = Event::where('id', request('parent'))->first();
+        }
+
         return view('edit-event', [
             'event' => $event,
             'mode' => 'create',
@@ -102,6 +107,9 @@ class EventController extends BaseController
 
         $event->created_by = Auth::user()->id;
         $event->last_modified_by = Auth::user()->id;
+
+        $event->hide_from_main_feed = request('hide_from_main_feed') ?: 0;
+        $event->parent_id = request('parent_id');
 
         // Schedule a Zoom meeting
         if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
@@ -207,6 +215,9 @@ class EventController extends BaseController
 
         if(!$event->unlisted)
             $event->unlisted = 0; // override null from above
+
+        if(!$event->hide_from_main_feed)
+            $event->hide_from_main_feed = 0;
 
         $event->sort_date = $event->sort_date();
 

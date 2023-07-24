@@ -70,6 +70,10 @@ use App\Setting;
                         <span class="icon">@icon(camera)</span>
                         <span>Add Photo</span>
                     </a>
+                    <a class="dropdown-item" href="{{ route('new-event', ['parent'=>$event]) }}">
+                        <span class="icon">@icon(calendar)</span>
+                        <span>Add Sub-Event</span>
+                    </a>
                     <a class="dropdown-item" href="{{ route('edit-responses', $event) }}">
                         <span class="icon">@icon(comment)</span>
                         <span>Edit Responses</span>
@@ -118,6 +122,15 @@ use App\Setting;
     @endif
 
     <h1 class="p-name event-name">{!! $event->status_tag() !!}{{ $event->name }}</h1>
+
+    @if($event->parent)
+        <div class="parent-event segment with-icon">
+            <span class="icon">@icon(calendar)</span>
+            <span>
+                <a href="{{ $event->parent->permalink() }}">{{ $event->parent->name }}</a>
+            </span>
+        </div>
+    @endif
 
     <div class="date segment with-icon">
         <span class="icon">@icon(clock)</span>
@@ -280,6 +293,22 @@ use App\Setting;
             @endforeach
         @endif
     </div>
+
+    @if($event->children->count())
+        <div class="sub-events" id="sub-events">
+            <b>Sessions</b>
+            <ul>
+                @foreach($event->children as $child)
+                    <li>
+                        <b><a href="{{ $child->permalink() }}">
+                            {{ $child->name }}
+                        </a></b>
+                        {!! $child->display_date().' '.$child->display_time() !!}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     @if($mode != 'archive')
     @if($event->has_likes())

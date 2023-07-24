@@ -81,6 +81,23 @@ form h2.subtitle {
 
 <form action="{{ $form_action }}" method="post" class="event-form">
 
+    @if($event->parent)
+        <div class="field">
+            <p><i>{{ $mode == 'create' ? 'Creating' : 'Editing' }} an event under <b><a href="{{ $event->parent->permalink() }}">{{ $event->parent->name }}</a></b></i></p>
+            <input type="hidden" name="parent_id" value="{{ $event->parent->id }}">
+        </div>
+
+        <div class="field">
+            <div class="control is-expanded">
+                <label class="checkbox">
+                    <input type="checkbox" name="hide_from_main_feed" value="1" {{ $event->hide_from_main_feed ? 'checked' : '' }}>
+                    Hide from main feed (Only show this event on the parent event)
+                </label>
+            </div>
+        </div>
+
+    @endif
+
     <h2 class="subtitle">What's the name of the event?</h2>
 
     <div class="field">
@@ -164,7 +181,7 @@ form h2.subtitle {
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">Start Date</label>
-            <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: $event->start_date }}" required>
+            <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: ($event->parent ? $event->parent->start_date : $event->start_date) }}" required>
         </div>
 
         <div class="control is-expanded">
@@ -188,13 +205,13 @@ form h2.subtitle {
         </div>
     </div>
 
-    <div class="field hidden" id="timezone-field">
+    <div class="field">
         <div class="control is-expanded">
             <label class="label">Timezone <span id="timezone-optional">(optional)</span></label>
             <div class="select is-fullwidth">
                 <select name="timezone">
                     @foreach(\App\Event::timezones() as $tz)
-                        <option value="{{ $tz }}" {{ (old('timezone') ?: $event->timezone) == $tz ? 'selected' : '' }} {{ $tz == '──────────' ? 'disabled' : '' }}>{{ $tz }}</option>
+                        <option value="{{ $tz }}" {{ (old('timezone') ?: ($event->parent ? $event->parent->timezone : $event->timezone)) == $tz ? 'selected' : '' }} {{ $tz == '──────────' ? 'disabled' : '' }}>{{ $tz }}</option>
                     @endforeach
                 </select>
             </div>
@@ -254,7 +271,7 @@ form h2.subtitle {
 
     <div class="field">
         <label class="label">Tags</label>
-        <input class="input" type="text" name="tags" value="{{ old('tags') ?: $event->tags_string() }}" autocomplete="off">
+        <input class="input" type="text" name="tags" value="{{ old('tags') ?: ($event->parent ? $event->parent->tags_string() : $event->tags_string()) }}" autocomplete="off">
         <div class="help">space separated, lowercase</div>
     </div>
 
@@ -347,14 +364,6 @@ $(function(){
         $("#cover-photo-preview").addClass("hidden");
     });
 
-    $("input[name=start_time]").on('change', function(){
-        if($(this).val()) {
-            $("#timezone-field").removeClass('hidden');
-        } else {
-            $("#timezone-field").addClass('hidden');
-        }
-    });
-
     $("input[name=start_time]").change();
 
     $("input[name=end_date]").on('change', function(){
@@ -371,7 +380,6 @@ $(function(){
         if($(this).is(":checked")) {
             $("#meeting-url-field").addClass('hidden');
             // Require time fields
-            $("#timezone-field").removeClass('hidden');
             $("input[name=start_time]").attr("required","required");
             $("select[name=timezone]").attr("required","required");
             $("#start-time-optional, #timezone-optional").addClass("hidden");

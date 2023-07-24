@@ -32,7 +32,7 @@ class Event extends Model
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
         'latitude', 'longitude', 'timezone', 'status',
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url',
-        'summary', 'description', 'cover_image', 'unlisted',
+        'summary', 'description', 'cover_image', 'unlisted', 'parent_id', 'hide_from_main_feed',
     ];
 
     public static function slug_from_name($name) {
@@ -121,6 +121,15 @@ class Event extends Model
         foreach($this->tags as $t)
             $tags[] = $t->tag;
         return implode(' ', $tags);
+    }
+
+    public function parent() {
+        return $this->belongsTo('\App\Event', 'parent_id');
+    }
+
+    public function children() {
+        return $this->hasMany('\App\Event', 'parent_id')
+            ->orderBy('sort_date', 'asc');
     }
 
     public function has_rsvps() {
