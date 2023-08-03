@@ -29,8 +29,7 @@ class MigrateConfigSettings extends Command {
                 $migrated = true;
         }
 
-        $passwords = ['GOOGLEMAPS_API_KEY', 'TWITTER_CONSUMER_KEY', 'TWITTER_CONSUMER_SECRET',
-            'TWITTER_ACCESS_TOKEN', 'TWITTER_ACCESS_TOKEN_SECRET'];
+        $passwords = ['GOOGLEMAPS_API_KEY'];
         foreach($passwords as $id) {
             Setting::set(strtolower($id), env($id));
             if(env($id))

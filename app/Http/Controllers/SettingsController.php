@@ -35,8 +35,7 @@ class SettingsController extends BaseController
             Setting::set($id, request($id) ? 1 : 0);
         }
 
-        $passwords = ['googlemaps_api_key', 'twitter_consumer_key', 'twitter_consumer_secret',
-            'twitter_access_token', 'twitter_access_token_secret',
+        $passwords = ['googlemaps_api_key',
             'zoom_api_key', 'zoom_api_secret',
             'notification_token', 'mailgun_secret',
         ];

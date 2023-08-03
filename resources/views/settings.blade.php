@@ -139,7 +139,7 @@ use App\Setting;
             <label class="label">Home Page Social Image</label>
             <input class="input" type="url" value="{{ Setting::value('home_social_image_url') }}" name="home_social_image_url">
           </div>
-          <p class="help">Provide the URL to an image to use for the home page social sharing card. This will not be displayed on the website, it will only appear in Twitter/Slack/Facebook previews of the home page.</p>
+          <p class="help">Provide the URL to an image to use for the home page social sharing card. This will not be displayed on the website, it will only appear in Slack/Facebook/etc previews of the home page.</p>
         </div>
 
         <div class="field">
@@ -147,7 +147,7 @@ use App\Setting;
             <label class="label">Home Page Meta Description</label>
             <input class="input" type="text" value="{{ Setting::value('home_meta_description') }}" name="home_meta_description">
           </div>
-          <p class="help">This text will be used as the meta description of the home page, as well as the description for Twitter/Facebook cards.</p>
+          <p class="help">This text will be used as the meta description of the home page, as well as the description for Slack/Facebook/etc cards.</p>
         </div>
 
         <div class="field">
@@ -171,30 +171,6 @@ use App\Setting;
           <p class="help">In order to search for locations and show maps, you'll need to get a <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Google Maps API key</a></p>
         </div>
 
-        <div class="field is-grouped is-grouped-multiline">
-            <div class="control is-expanded">
-                <label class="label">Twitter Consumer Key</label>
-                <input class="input" type="password" value="{{ Setting::value('twitter_consumer_key') ? '********' : '' }}" name="twitter_consumer_key" autocomplete="off">
-            </div>
-
-            <div class="control is-expanded">
-                <label class="label">Twitter Consumer Secret</label>
-                <input class="input" type="password" value="{{ Setting::value('twitter_consumer_secret') ? '********' : '' }}" name="twitter_consumer_secret" autocomplete="off">
-            </div>
-        </div>
-
-        <div class="field is-grouped is-grouped-multiline">
-            <div class="control is-expanded">
-                <label class="label">Twitter Access Token</label>
-                <input class="input" type="password" value="{{ Setting::value('twitter_access_token') ? '********' : '' }}" name="twitter_access_token" autocomplete="off">
-            </div>
-
-            <div class="control is-expanded">
-                <label class="label">Twitter Access Token Secret</label>
-                <input class="input" type="password" value="{{ Setting::value('twitter_access_token_secret') ? '********' : '' }}" name="twitter_access_token_secret" autocomplete="off">
-            </div>
-        </div>
-        <p class="help">Create a Twitter app and provide these values in order to be able to quickly add tweets to event pages as comments or photos</p>
         <br>
 
         <div class="field">
