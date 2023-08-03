@@ -184,7 +184,7 @@ class ICSController extends BaseController
 
     public function event(Request $request, $year, $month, $key_or_slug, $key2=false) {
 
-        if($this->_isRequestFromBrowser($request)) {
+        if($this->_isRequestFromBrowser($request) && !(request('download') !== null)) {
             return view('ics', [
                 'url' => $request->url(),
             ]);
@@ -220,7 +220,7 @@ class ICSController extends BaseController
 
         return response($ics)->withHeaders([
             'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="event.ics"'
+            'Content-Disposition' => 'attachment; filename="event-'.$event->key.'.ics"'
         ]);
     }
 

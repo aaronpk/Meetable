@@ -4,7 +4,7 @@
 <section class="section">
 
     <div class="content">
-        <h2 class="title">iCal Feed</h2>
+        <h2 class="title">Export ICS</h2>
 
         <form class="event-form">
             <div class="field">
@@ -13,6 +13,14 @@
 
             <p>Copy the URL above and subscribe to it in your favorite calendar app!</p>
         </form>
+
+        <br><br>
+
+        <div class="field">
+            <a class="button" href="?download=1">
+                Download ICS
+            </a>
+        </div>
 
     </div>
 
