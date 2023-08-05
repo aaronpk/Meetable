@@ -499,4 +499,24 @@ class Controller extends BaseController
         $css = Setting::value('custom_global_css');
         return response($css)->header('Content-Type', 'text/css');
     }
+
+    public function manifest_json() {
+        $manifest = [
+            'name' => env('APP_NAME'),
+            'short_name' => env('APP_NAME'),
+            'description' => Setting::value('home_meta_description'),
+            'icons' => [
+                'src' => Setting::value('logo_url'),
+                'sizes' => '192x192',
+                'type' => 'image/png',
+            ],
+            'id' => '/',
+            'start_url' => '/',
+            'scope' => '/',
+            'background_color' => '#fff',
+            'theme_color' => '#fff',
+            'display' => 'standalone',
+        ];
+        return response()->json($manifest);
+    }
 }

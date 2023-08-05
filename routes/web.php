@@ -36,6 +36,8 @@ Route::get('/setup/heroku-in-progress', 'Setup\Controller@heroku_finished')->nam
 
 
 Route::middleware('slashes:remove')->group(function(){
+    Route::get('/manifest.json', 'Controller@manifest_json');
+
     Route::get('/archive', 'Controller@archive')->name('archive');
 
     Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
