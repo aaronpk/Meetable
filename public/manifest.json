@@ -4,7 +4,7 @@
     "description": "An events app for the web",
     "icons": [
         {
-            "src": "/icons/android-chrome-192x192.png",
+            "src": "/images/icon-192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
