@@ -23,6 +23,8 @@ use App\Response;
 
     <link href="/assets/style.css" rel="stylesheet">
 
+    <link rel="manifest" href="/manifest.json">
+
 @if($favicon=Setting::value('favicon_url'))
     <link rel="shortcut icon" href="{{ $favicon }}">
 @endif
