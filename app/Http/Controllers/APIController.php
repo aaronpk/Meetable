@@ -89,6 +89,9 @@ class APIController extends BaseController
 
         $event->unlisted = request('unlisted') ?: 0;
 
+        $event->hide_from_main_feed = request('hide_from_main_feed') ?: 0;
+        $event->parent_id = request('parent_id');
+
         $event->created_by = Auth::user()->id;
         $event->last_modified_by = Auth::user()->id;
 
