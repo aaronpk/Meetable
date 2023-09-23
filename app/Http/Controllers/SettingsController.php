@@ -21,7 +21,7 @@ class SettingsController extends BaseController
         $properties = ['add_an_event', 'logo_url', 'logo_width', 'logo_height', 'favicon_url',
             'analytics', 'home_meta_description', 'home_social_image_url', 'zoom_email',
             'notification_endpoint', 'mail_from_address', 'mailgun_domain', 'event_page_embed',
-            'custom_global_css',
+            'custom_global_css', 'manifest_logo_url',
         ];
         foreach($properties as $id) {
             Setting::set($id, request($id));

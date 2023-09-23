@@ -506,7 +506,7 @@ class Controller extends BaseController
             'short_name' => env('APP_NAME'),
             'description' => Setting::value('home_meta_description'),
             'icons' => [
-                'src' => Setting::value('logo_url'),
+                'src' => Setting::value('manifest_logo_url'),
                 'sizes' => '192x192',
                 'type' => 'image/png',
             ],

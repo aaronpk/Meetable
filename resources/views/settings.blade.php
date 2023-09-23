@@ -135,6 +135,14 @@ use App\Setting;
         </div>
 
         <div class="field">
+            <div class="control">
+                <label class="label">Manifest Logo URL</label>
+                <input class="input" type="url" value="{{ Setting::value('manifest_logo_url') }}" name="manifest_logo_url">
+            </div>
+            <p class="help">Provide the URL to a 192px square png logo for use in the <code>manifest.json</code> file, used when bookmarking the site to a phone's home screen.</p>
+        </div>
+
+        <div class="field">
           <div class="control">
             <label class="label">Home Page Social Image</label>
             <input class="input" type="url" value="{{ Setting::value('home_social_image_url') }}" name="home_social_image_url">
