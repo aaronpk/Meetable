@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\User;
 use Illuminate\Support\Str;
 use App\Events\UserCreated;
-use App\Http\Controllers\OIDCController;
+use App\Http\Controllers\Auth\OIDCController;
 
 class OIDCGuard extends CustomGuard {
 

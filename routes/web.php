@@ -65,13 +65,13 @@ Route::middleware('slashes:remove')->group(function(){
 
     Route::get('/add-to-google/{event}', 'Controller@add_to_google')->name('add-to-google');
 
-    Route::get('/login', 'AuthController@login')->name('login');
-    Route::get('/logout', 'AuthController@logout')->name('logout');
-    Route::get('/auth/github', 'GitHubController@callback')->name('github-oauth-redirect');
-    Route::get('/auth/heroku', 'HerokuController@callback')->name('heroku-oauth-redirect');
-    Route::get('/auth/oidc', 'OIDCController@callback')->name('oidc-redirect');
-    Route::get('/auth/oidc/initiate', 'OIDCController@initiate')->name('oidc-initiate');
-    Route::get('/auth/oidc/logout', 'OIDCController@logout')->name('oidc-logout');
+    Route::get('/login', 'Auth\AuthController@login')->name('login');
+    Route::get('/logout', 'Auth\AuthController@logout')->name('logout');
+    Route::get('/auth/github', 'Auth\GitHubController@callback')->name('github-oauth-redirect');
+    Route::get('/auth/heroku', 'Auth\HerokuController@callback')->name('heroku-oauth-redirect');
+    Route::get('/auth/oidc', 'Auth\OIDCController@callback')->name('oidc-redirect');
+    Route::get('/auth/oidc/initiate', 'Auth\OIDCController@initiate')->name('oidc-initiate');
+    Route::get('/auth/oidc/logout', 'Auth\OIDCController@logout')->name('oidc-logout');
 
     Route::get('/{key}', 'Controller@event_shorturl');
 });
