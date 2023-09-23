@@ -22,7 +22,7 @@ class SettingsController extends BaseController
             'analytics', 'home_meta_description', 'home_social_image_url',
             'zoom_email', 'zoom_account_id', 'zoom_client_id',
             'notification_endpoint', 'mail_from_address', 'mailgun_domain', 'event_page_embed',
-            'custom_global_css',
+            'custom_global_css', 'manifest_logo_url',
         ];
         foreach($properties as $id) {
             Setting::set($id, request($id));
