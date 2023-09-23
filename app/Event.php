@@ -3,7 +3,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DateTime, DateTimeZone;
+use DateTime, DateTimeZone, DateInterval;
 use DB;
 use App\Services\Zoom;
 
@@ -424,6 +424,9 @@ class Event extends Model
             $date = new DateTime($this->end_date.' '.$this->end_time, $tz);
         } else {
             $date = new DateTime($this->start_date.' '.($this->end_time ?: $this->start_time), $tz);
+            // Add 30 minute padding if the event has no end time. Treats events as default 30 minutes.
+            if(!$this->end_time)
+                $date->add(DateInterval::createFromDateString('30 minutes'));
         }
 
         $now = new DateTime();
