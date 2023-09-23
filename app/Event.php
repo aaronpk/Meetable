@@ -247,12 +247,10 @@ class Event extends Model
 
         } else {
             if($this->start_time) {
+                $start = $this->start_datetime();
                 if($this->timezone) {
-                    $tz = new DateTimeZone($this->timezone);
-                    $start = new DateTime($this->start_date.' '.$this->start_time, $tz);
                     $tzattrs = 'class="has-tooltip-bottom event-timezone" data-event-time="'.$start->format('g:ia').'" data-tooltip="'.$this->timezone.'"';
                 } else {
-                    $start = new DateTime($this->start_date.' '.$this->start_time);
                     $tzattrs = '';
                 }
                 return '<time datetime="'.$start->format('c').'" '.$tzattrs.'>'
@@ -273,6 +271,16 @@ class Event extends Model
     public function start_datetime_local($format='Ymd\THi') {
         $start_date = new DateTime($this->start_date.' '.$this->start_time);
         return $start_date->format($format);
+    }
+
+    public function start_datetime() {
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+            $start = new DateTime($this->start_date.' '.$this->start_time, $tz);
+        } else {
+            $start = new DateTime($this->start_date.' '.$this->start_time);
+        }
+        return $start;
     }
 
     public function display_date() {

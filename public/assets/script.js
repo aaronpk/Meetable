@@ -11,8 +11,11 @@ $(function(){
     var event_timezone = $(this).data("tooltip");
     var event_time = $(this).data("event-time");
     var local_time = date_to_display_time(date);
+    var local="";
     if(event_time != local_time) {
-      local = "\n("+local_time+" in your timezone)";
+      if(event_timezone)
+        local = "\n";
+      local = local+"("+local_time+" in your timezone)";
     } else {
       local = "";
     }
@@ -172,5 +175,5 @@ function tz_minutes_to_offset(minutes) {
 }
 
 function date_to_display_time(date) {
-  return date.toLocaleTimeString([], {hour:'2-digit', minute: '2-digit'});  
+  return date.toLocaleTimeString([], {hour:'2-digit', minute: '2-digit'});
 }

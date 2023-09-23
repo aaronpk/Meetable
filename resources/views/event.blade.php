@@ -140,8 +140,10 @@ use App\Setting;
                 <div class="time">
                     {!! $event->weekday() !!}
                     @if($event->timezone)
-                        <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">{!! $event->display_time() !!}</a>
-                        <span class="timezone">({{ $event->timezone }})</span>
+                        <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-timezone" data-event-time="{{ $event->start_datetime_local('g:ia') }}" data-tooltip="">
+                            <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">{!! $event->display_time() !!}</a>
+                            <span class="timezone">({{ $event->timezone }})</span>
+                        </time>
                     @else
                         {!! $event->display_time() !!}
                     @endif
