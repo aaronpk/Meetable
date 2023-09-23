@@ -112,7 +112,7 @@ class EventController extends BaseController
         $event->parent_id = request('parent_id');
 
         // Schedule a Zoom meeting
-        if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
+        if(Setting::value('zoom_client_id') && request('create_zoom_meeting')) {
             $event->meeting_url = Zoom::schedule_meeting($event);
             if(!$event->meeting_url) {
                 return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The event was not saved.']);
@@ -225,7 +225,7 @@ class EventController extends BaseController
         $event->slug = Event::slug_from_name($event->name);
 
         // Schedule a zoom meeting if requested
-        if(Setting::value('zoom_api_key') && request('create_zoom_meeting')) {
+        if(Setting::value('zoom_client_id') && request('create_zoom_meeting')) {
             $event->meeting_url = Zoom::schedule_meeting($event);
             if(!$event->meeting_url) {
                 return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);

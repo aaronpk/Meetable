@@ -235,16 +235,22 @@ use App\Setting;
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Zoom API Key</label>
-                <input class="input" type="password" value="{{ Setting::value('zoom_api_key') ? '********' : '' }}" name="zoom_api_key" autocomplete="off">
+                <label class="label">Zoom Account ID</label>
+                <input class="input" type="text" value="{{ Setting::value('zoom_account_id') }}" name="zoom_account_id" autocomplete="off">
+            </div>
+        </div>
+        <div class="field is-grouped is-grouped-multiline">
+            <div class="control is-expanded">
+                <label class="label">Zoom Client ID</label>
+                <input class="input" type="text" value="{{ Setting::value('zoom_client_id') }}" name="zoom_client_id" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Zoom API Secret</label>
-                <input class="input" type="password" value="{{ Setting::value('zoom_api_secret') ? '********' : '' }}" name="zoom_api_secret" autocomplete="off">
+                <label class="label">Zoom Client Secret</label>
+                <input class="input" type="password" value="{{ Setting::value('zoom_client_secret') ? '********' : '' }}" name="zoom_client_secret" autocomplete="off">
             </div>
         </div>
-        <p class="help">Create a <a href="https://marketplace.zoom.us/docs/guides/build/jwt-app">JWT Zoom Application</a> and enter the credentials above to give people the option of scheduling a Zoom meeting when creating an event. Enter the email address of the Zoom account you want to use to schedule the meetings.</p>
+        <p class="help">Create a <a href="https://developers.zoom.us/docs/internal-apps/s2s-oauth/">Server-to-Server Zoom Application</a> and enter the details above to give people the option of scheduling a Zoom meeting when creating an event. Enter the email address of the Zoom account you want to use to schedule the meetings.</p>
 
     </div>
 

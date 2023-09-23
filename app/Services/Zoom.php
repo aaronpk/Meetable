@@ -2,9 +2,6 @@
 namespace App\Services;
 
 use App\Setting;
-use Lcobucci\JWT;
-use Lcobucci\JWT\Signer\Key;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
 use DateTimeImmutable;
 
 class Zoom {
@@ -12,15 +9,18 @@ class Zoom {
     public static function schedule_meeting(&$event) {
         // Note: the $event may not have been saved in the database yet
 
-        $now = new DateTimeImmutable();
-        $oneHour = new DateTimeImmutable('+1 hour');
-        $signer = new Sha256();
-        $token = (new JWT\Builder())->issuedBy(Setting::value('zoom_api_key')) // iss
-                                ->permittedFor(null) // aud
-                                ->issuedAt($now) // Configures the time that the token was issue (iat claim)
-                                ->expiresAt($oneHour) // Configures the expiration time of the token (exp claim)
-                                ->getToken($signer, new Key(Setting::value('zoom_api_secret'))); // Signs the token
-        $zoom_access_token = (string)$token;
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+          CURLOPT_URL => "https://zoom.us/oauth/token",
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_POSTFIELDS => http_build_query([
+            'grant_type' => 'account_credentials',
+            'account_id' => Setting::value('zoom_account_id'),
+          ]),
+          CURLOPT_USERPWD => Setting::value('zoom_client_id').':'.Setting::value('zoom_client_secret'),
+        ]);
+        $response = curl_exec($ch);
+        $token = json_decode($response, true);
 
         $meeting = [
             'topic' => $event->name,
@@ -40,7 +40,7 @@ class Zoom {
           CURLOPT_RETURNTRANSFER => true,
           CURLOPT_POSTFIELDS => json_encode($meeting),
           CURLOPT_HTTPHEADER => [
-            "authorization: Bearer ".$zoom_access_token,
+            "authorization: Bearer ".$token['access_token'],
             "content-type: application/json"
           ],
         ]);

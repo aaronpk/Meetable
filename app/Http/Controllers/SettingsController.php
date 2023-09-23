@@ -19,7 +19,8 @@ class SettingsController extends BaseController
 
     public function post() {
         $properties = ['add_an_event', 'logo_url', 'logo_width', 'logo_height', 'favicon_url',
-            'analytics', 'home_meta_description', 'home_social_image_url', 'zoom_email',
+            'analytics', 'home_meta_description', 'home_social_image_url',
+            'zoom_email', 'zoom_account_id', 'zoom_client_id',
             'notification_endpoint', 'mail_from_address', 'mailgun_domain', 'event_page_embed',
             'custom_global_css',
         ];
@@ -36,7 +37,7 @@ class SettingsController extends BaseController
         }
 
         $passwords = ['googlemaps_api_key',
-            'zoom_api_key', 'zoom_api_secret',
+            'zoom_client_secret',
             'notification_token', 'mailgun_secret',
         ];
         foreach($passwords as $id) {

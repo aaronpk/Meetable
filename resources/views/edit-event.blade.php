@@ -241,7 +241,7 @@ form h2.subtitle {
         <div class="help">provide one or more URLs to codes of conduct that are applicable to this event</div>
     </div>
 
-    @if(Setting::value('zoom_api_key'))
+    @if(Setting::value('zoom_client_id'))
     <div class="field">
         <label class="checkbox">
             <input type="checkbox" name="create_zoom_meeting" value="1">
