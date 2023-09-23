@@ -335,5 +335,5 @@ heroku config:set ...
 
 ## License
 
-Copyright 2020-2021 by Aaron Parecki. Available under the MIT license.
+Copyright 2020-2023 by Aaron Parecki. Available under the MIT license.
 
