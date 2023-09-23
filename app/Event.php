@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DateTime, DateTimeZone;
 use DB;
+use App\Services\Zoom;
 
 class Event extends Model
 {
@@ -689,6 +690,24 @@ class Event extends Model
         if(!is_array($fields))
             return false;
         return in_array($field, $fields);
+    }
+
+    public function schedule_zoom_meeting() {
+        if(Setting::value('zoom_client_id')) {
+            $meeting = Zoom::schedule_meeting($this);
+            if(!$meeting) {
+                return false;
+            }
+            $this->meeting_url = $meeting['join_url'];
+            $this->zoom_meeting_id = $meeting['id'];
+        }
+        return true;
+    }
+
+    public function update_zoom_meeting() {
+        if(Setting::value('zoom_client_id')) {
+            Zoom::update_meeting($this);
+        }
     }
 
     public static function used_timezones() {

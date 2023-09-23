@@ -111,11 +111,11 @@ class EventController extends BaseController
         $event->hide_from_main_feed = request('hide_from_main_feed') ?: 0;
         $event->parent_id = request('parent_id');
 
-        // Schedule a Zoom meeting
-        if(Setting::value('zoom_client_id') && request('create_zoom_meeting')) {
-            $event->meeting_url = Zoom::schedule_meeting($event);
-            if(!$event->meeting_url) {
-                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The event was not saved.']);
+        // Schedule a zoom meeting if requested
+        if(request('create_zoom_meeting')) {
+            $meeting_result = $event->schedule_zoom_meeting();
+            if(!$meeting_result) {
+                back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         }
 
@@ -225,11 +225,13 @@ class EventController extends BaseController
         $event->slug = Event::slug_from_name($event->name);
 
         // Schedule a zoom meeting if requested
-        if(Setting::value('zoom_client_id') && request('create_zoom_meeting')) {
-            $event->meeting_url = Zoom::schedule_meeting($event);
-            if(!$event->meeting_url) {
-                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+        if(request('create_zoom_meeting')) {
+            $meeting_result = $event->schedule_zoom_meeting();
+            if(!$meeting_result) {
+                back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
+        } elseif($event->zoom_meeting_id) {
+            $event->update_zoom_meeting();
         }
 
         $event->last_modified_by = Auth::user()->id;
