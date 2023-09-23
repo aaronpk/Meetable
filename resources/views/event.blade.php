@@ -240,7 +240,7 @@ use App\Setting;
             <div class="website segment with-icon">
                 <span class="icon">@icon(video)</span>
                 <span>
-                    @if($event->is_starting_soon())
+                    @if($event->is_starting_soon() || $event->is_ongoing())
                         <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
                             Join the Online Meeting
                         </a>

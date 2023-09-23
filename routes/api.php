@@ -11,3 +11,4 @@ Route::middleware('auth:api')->group(function(){
 
 });
 
+Route::post('/zoom/webhook', 'ZoomController@webhook');

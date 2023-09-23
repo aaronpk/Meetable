@@ -394,7 +394,11 @@ class Event extends Model
         if($this->is_past())
             return false;
 
-        // Return true if the event has started
+        // If Zoom has sent the meeting started notification early, return true now
+        if($this->zoom_meeting_status == 'started')
+            return true;
+
+        // Return true if it is past the start time of the event
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
         } else {
@@ -412,6 +416,10 @@ class Event extends Model
     }
 
     public function is_past() {
+        // Always report the event is over if Zoom has sent the meeting ended notification
+        if($this->zoom_meeting_status == 'ended')
+            return true;
+
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
         } else {
@@ -430,6 +438,20 @@ class Event extends Model
         }
 
         $now = new DateTime();
+
+        // If there is a zoom meeting ID, we expect the event to only be over once the status is ended.
+        // If the status is "started", then don't say the meeting is over even if the end time is reached.
+        if($this->zoom_meeting_id) {
+            // If for some reason the webhook failed, we need to eventually stop saying it's still going.
+            // If it has been more than 12h after the event end, it is over.
+            $fallback = clone $date;
+            $fallback->add(DateInterval::createFromDateString('12 hours'));
+            if($now->format('U') > $fallback->format('U'))
+                return true;
+
+            if($this->zoom_meeting_status == 'started')
+                return false;
+        }
 
         return $date->format('U') < $now->format('U');
     }

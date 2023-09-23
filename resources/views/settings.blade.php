@@ -257,6 +257,11 @@ use App\Setting;
                 <label class="label">Zoom Client Secret</label>
                 <input class="input" type="password" value="{{ Setting::value('zoom_client_secret') ? '********' : '' }}" name="zoom_client_secret" autocomplete="off">
             </div>
+
+            <div class="control is-expanded">
+                <label class="label">Zoom Webhook Secret</label>
+                <input class="input" type="password" value="{{ Setting::value('zoom_webhook_secret') ? '********' : '' }}" name="zoom_webhook_secret" autocomplete="off">
+            </div>
         </div>
         <p class="help">Create a <a href="https://developers.zoom.us/docs/internal-apps/s2s-oauth/">Server-to-Server Zoom Application</a> and enter the details above to give people the option of scheduling a Zoom meeting when creating an event. Enter the email address of the Zoom account you want to use to schedule the meetings.</p>
 

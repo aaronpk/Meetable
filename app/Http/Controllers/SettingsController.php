@@ -37,7 +37,7 @@ class SettingsController extends BaseController
         }
 
         $passwords = ['googlemaps_api_key',
-            'zoom_client_secret',
+            'zoom_client_secret', 'zoom_webhook_secret',
             'notification_token', 'mailgun_secret',
         ];
         foreach($passwords as $id) {
