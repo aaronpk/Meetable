@@ -8,7 +8,6 @@ You can see a live version of this project at:
 
 * https://events.indieweb.org
 * https://events.oauth.net
-* https://oktadev.events
 
 ## Features
 
@@ -36,9 +35,9 @@ When logged in, you can add photos directly to an event page. Event pages also a
 
 ### Requirements
 
-* PHP 7.2+
+* PHP 8.2+
 * [Composer](https://getcomposer.org)
-* MySQL
+* MySQL/MariaDB
 * Optional: Redis
 
 ### Installation
@@ -127,24 +126,43 @@ php artisan storage:link
 
 ### Authentication
 
-There are two different ways to handle user authentication depending on how you'd like to set it up. You can either use GitHub so that GitHub users can log in, or you can use your own custom authentication mechanism configured externally.
+There are a few different ways to handle user authentication depending on how you'd like to set it up. You can use GitHub so that GitHub users can log in, you can use your own custom authentication mechanism configured externally, either via OpenID Connect or by setting an HTTP header in your web server, or you can use the site in single-user mode with the admin user logging in with a passkey.
 
-In your configuration file, you'll need to tell the project which authentication method to use, euther `github` or `vouch`.
+In your configuration file, you'll need to tell the project which authentication method to use:
 
 ```bash
 AUTH_METHOD=
 ```
 
-You can also choose whether or not you want a "log in/out" link to appear in the top navbar. When using single-sign-on with Vouch, it may be preferable to not have a log out button since that would log them out from more than just this website. For a more traditional experience, you can show both links.
+Provide one of the supported values for `AUTH_METHOD`:
+
+* `session` (passkey login)
+* `github`
+* `oidc`
+* `vouch`
+* `heroku`
+
+You can choose whether or not you want a "log in/out" link to appear in the top navbar. When using single-sign-on with Vouch, it may be preferable to not have a log out button since that would log them out from more than just this website. For a single-user site where only you will be logging in to manage events, it is best to hide the login link so visitors don't try to log in. For a multi-user configuration, you can show both links.
 
 ```bash
 AUTH_SHOW_LOGIN=true
 AUTH_SHOW_LOGOUT=false
 ```
 
+#### Passkey Authentication
+
+If you don't want to create any new dependencies when you set this up, you can use the built in passkey authentication to allow only yourself, the admin user, to log in.
+
+After you install the app, when you click "Log In", you'll be prompted to create your admin user account, specifying your email address and enrollling a passkey. From that point on, there is no way for users to be created in the web interface, and you'll need to log in with your passkey in the future.
+
+This is a good option if you want to quickly set up the site and expect that you are the only one who will be logging in to manage the content.
+
+If you expect multiple users to log in to manage the content, use one of the multi-user options below.
+
+
 #### GitHub Authentication
 
-The simplest authentication option is to use GitHub OAuth. By default, any GitHub user will be able to log in to the application. You can also configure it to allow only certain users to log in if you wish, and any other user will see an error message if they try to log in.
+With GitHub authentication, any GitHub user will be able to log in to the application. You can also configure it to allow only certain users to log in if you wish, and any other user will see an error message if they try to log in.
 
 You'll need to [create a GitHub OAuth application](https://github.com/settings/developers) and include the app's client ID and secret in the config file. In the GitHub app settings, set the callback URL to `https://events.example.org/auth/github`.
 
@@ -186,7 +204,7 @@ There are no other config options to set permissions. The first user to log in w
 
 #### OpenID Connect
 
-You can configure Meetable to authenticate users via an OpenID Connect server. This is useful if you are already using a service like Auth0 or Okta and want to add this as another app.
+You can configure Meetable to authenticate users via an OpenID Connect server. This is useful if you are already using a service like Auth0 or Okta and want to add this as another app for your organization.
 
 You'll need to register an application at your OpenID Connect service and configure the redirect URL appropriately. You can also configure IdP-initiated login in order to let your users log in to Meetable from their dashboard at the OpenID Connect server. The templates for each URL are below:
 
