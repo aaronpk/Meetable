@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        @else
+        @elseif(session('setup.auth_method') == 'github')
 
         <p>To be able to log in to the site, you'll need a GitHub account and a GitHub OAuth application. You will need to go <a href="https://github.com/settings/developers" target="_new">create a GitHub OAuth application</a> and provide the client ID and secret here.</p>
         <p>In the GitHub application settings, use the following as the callback URL in the application settings:</p>

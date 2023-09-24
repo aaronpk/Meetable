@@ -20,6 +20,7 @@
         "intervention/image": "^2.5",
         "jfcherng/php-diff": "^6.7",
         "johngrogg/ics-parser": "^3.0",
+        "laragear/webauthn": "^1.2",
         "laravel/framework": "^9",
         "laravel/tinker": "^2.0",
         "league/flysystem-aws-s3-v3": "^3.0",

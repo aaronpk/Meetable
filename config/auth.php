@@ -37,7 +37,7 @@ return [
 
     'guards' => [
         'web' => [
-            'driver' => env('AUTH_METHOD', 'vouch'),
+            'driver' => env('AUTH_METHOD', 'session'),
             'provider' => 'users',
         ],
 
@@ -68,14 +68,10 @@ return [
 
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'eloquent-webauthn',
             'model' => App\User::class,
+            'password_fallback' => false,
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
     ],
 
     /*

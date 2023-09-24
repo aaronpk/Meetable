@@ -107,14 +107,7 @@ class Controller extends BaseController
             session(['setup.'.$p => request($p)]);
         }
 
-        // If we're on Heroku, let them choose which auth method to use
-        // TODO: always redirect here if we add a third provider
-        if(self::is_heroku()) {
-            return redirect(route('setup.auth-method'));
-        } else {
-            session(['setup.auth_method' => 'github']);
-            return redirect(route('setup.auth-settings'));
-        }
+        return redirect(route('setup.auth-method'));
     }
 
     public function auth_method() {
@@ -123,11 +116,16 @@ class Controller extends BaseController
             return redirect(route('setup.app-settings'));
         }
 
-        return view('setup/auth-method');
+        return view('setup/auth-method', [
+            'is_heroku' => $this->is_heroku(),
+        ]);
     }
 
     public function save_auth_method() {
         session(['setup.auth_method' => request('method')]);
+        if(request('method') == 'session')
+            return redirect(route('setup.save-config'));
+
         return redirect(route('setup.auth-settings'));
     }
 
@@ -202,16 +200,18 @@ class Controller extends BaseController
             self::write_config_value($config, 'AWS_ROOT', HerokuS3::get_aws_root_from_env());
         }
 
-        if(session('setup.auth_method') == 'heroku') {
-            self::write_config_value($config, 'AUTH_METHOD', 'heroku');
-            foreach(['heroku_client_id', 'heroku_client_secret'] as $k) {
-                self::write_config_value($config, strtoupper($k), session('setup.'.$k));
-            }
-        } else {
-            self::write_config_value($config, 'AUTH_METHOD', 'github');
-            foreach(['github_client_id', 'github_client_secret', 'github_allowed_users', 'github_admin_users'] as $k) {
-                self::write_config_value($config, strtoupper($k), session('setup.'.$k));
-            }
+        self::write_config_value($config, 'AUTH_METHOD', session('setup.auth_method'));
+        switch(session('setup.auth_method')) {
+            case 'heroku':
+                foreach(['heroku_client_id', 'heroku_client_secret'] as $k) {
+                    self::write_config_value($config, strtoupper($k), session('setup.'.$k));
+                }
+                break;
+            case 'github':
+                foreach(['github_client_id', 'github_client_secret', 'github_allowed_users', 'github_admin_users'] as $k) {
+                    self::write_config_value($config, strtoupper($k), session('setup.'.$k));
+                }
+                break;
         }
 
         foreach(['app_name', 'app_url'] as $k) {

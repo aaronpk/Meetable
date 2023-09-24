@@ -1,4 +1,7 @@
 <?php
+use Laragear\WebAuthn\WebAuthn;
+
+WebAuthn::routes();
 
 // Check whether setup has been completed and define installer routes if not
 if(defined('MEETABLE_SETUP')):
@@ -67,6 +70,7 @@ Route::middleware('slashes:remove')->group(function(){
 
     Route::get('/login', 'Auth\AuthController@login')->name('login');
     Route::get('/logout', 'Auth\AuthController@logout')->name('logout');
+    Route::post('/auth/create-user', 'Auth\AuthController@create_user')->name('create-user');
     Route::get('/auth/github', 'Auth\GitHubController@callback')->name('github-oauth-redirect');
     Route::get('/auth/heroku', 'Auth\HerokuController@callback')->name('heroku-oauth-redirect');
     Route::get('/auth/oidc', 'Auth\OIDCController@callback')->name('oidc-redirect');

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8e5ad54d3d8e588c934127cee11620e7",
+    "content-hash": "af0d5f22ad7e1db42a9b4b4bae311d15",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2288,6 +2288,92 @@
                 }
             ],
             "time": "2022-11-16T00:17:18+00:00"
+        },
+        {
+            "name": "laragear/webauthn",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Laragear/WebAuthn.git",
+                "reference": "e57ac258b0d76eee4ab77c1e1b465f5d8e0c46de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Laragear/WebAuthn/zipball/e57ac258b0d76eee4ab77c1e1b465f5d8e0c46de",
+                "reference": "e57ac258b0d76eee4ab77c1e1b465f5d8e0c46de",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "illuminate/auth": "9.*|10.*",
+                "illuminate/config": "9.*|10.*",
+                "illuminate/database": "9.*|10.*",
+                "illuminate/encryption": "9.*|10.*",
+                "illuminate/http": "9.*|10.*",
+                "illuminate/session": "9.*|10.*",
+                "illuminate/support": "9.*|10.*",
+                "php": "8.*"
+            },
+            "require-dev": {
+                "jetbrains/phpstorm-attributes": "*",
+                "orchestra/testbench": "^7.22|8.*"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Laragear\\WebAuthn\\WebAuthnServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Laragear\\WebAuthn\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lukas Buchs",
+                    "role": "Original developer"
+                },
+                {
+                    "name": "Italo Israel Baeza Cabrera",
+                    "email": "DarkGhostHunter@Gmail.com",
+                    "homepage": "https://github.com/sponsors/DarkGhostHunter",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Authenticate your users with biometric data, devices or USB keys.",
+            "homepage": "https://github.com/laragear/webauthn",
+            "keywords": [
+                "Authentication",
+                "faceid",
+                "laravel",
+                "passkeys",
+                "touchid",
+                "webauthn",
+                "windows hello"
+            ],
+            "support": {
+                "issues": "https://github.com/Laragear/TwoFactor/issues",
+                "source": "https://github.com/Laragear/TwoFactor"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/DarkGhostHunter",
+                    "type": "Github Sponsorship"
+                },
+                {
+                    "url": "https://paypal.me/darkghosthunter",
+                    "type": "Paypal"
+                }
+            ],
+            "time": "2023-03-09T18:38:16+00:00"
         },
         {
             "name": "laravel/framework",

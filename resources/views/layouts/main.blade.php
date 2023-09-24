@@ -37,6 +37,7 @@ use App\Response;
     {!! $analytics !!}
 @endif
 
+    <script src="/assets/webauthn.js"></script>
 </head>
 <body>
 

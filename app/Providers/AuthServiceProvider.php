@@ -8,6 +8,7 @@ use App\Services\Auth\VouchGuard;
 use App\Services\Auth\GitHubGuard;
 use App\Services\Auth\HerokuGuard;
 use App\Services\Auth\OIDCGuard;
+use App\Services\Auth\PasskeyGuard;
 use Auth;
 
 class AuthServiceProvider extends ServiceProvider
