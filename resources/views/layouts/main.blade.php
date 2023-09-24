@@ -41,6 +41,8 @@ use App\Response;
 </head>
 <body>
 
+    <main>
+
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <span class="navbar-item">
@@ -101,10 +103,20 @@ use App\Response;
         </div>
     </nav>
 
-    <!-- customize with css in the settings page -->
-    <div id="site-banner"><div class="left"></div><div class="right"></div></div>
+    <div>
+        <!-- customize with css in the settings page -->
+        <div id="site-banner"><div class="left"></div><div class="right"></div></div>
 
-    @yield('content')
+        @yield('content')
+    </div>
+
+    <footer class="site-footer">
+        <div>
+            powered by <a href="https://github.com/aaronpk/Meetable">meetable</a>, an open source event listing website
+        </div>
+    </footer>
+
+    </main>
 
     <script src="/assets/script.js"></script>
     @yield('scripts')

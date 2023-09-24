@@ -22,11 +22,28 @@
     }
 }
 
+main {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+}
+
 .navbar a.navbar-logo {
     line-height: 0;
 }
 .navbar-link:not(.is-arrowless)::after {
     border-color: #888;
+}
+
+footer {
+    width: 100%;
+    margin: 0 auto;
+    font-size: 0.8em;
+    border-top: 1px #ddd solid;
+}
+footer > div {
+    padding: 6px;
+    text-align: center;
 }
 
 .has-delete {
