@@ -36,7 +36,7 @@ class EventRevision extends Event
         $revision->key = $event->key;
         $revision->last_modified_by = $event->last_modified_by;
         $revision->created_by = $event->created_by;
-        $revision->zoom_meeting_id = $event->zoom_meeting_id;
+        $revision->zoom_meeting_id = $event->zoom_meeting_id ?: '';
 
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
             $revision->{$p} = $event->{$p};
