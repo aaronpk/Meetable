@@ -68,6 +68,7 @@ class EventController extends BaseController
 
         $event->key = Str::random(12);
         $event->slug = Event::slug_from_name($event->name);
+        $event->export_secret = Str::random(20);
 
         $event->location_name = request('location_name') ?: '';
 

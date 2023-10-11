@@ -12,7 +12,7 @@ class Event extends Model
     use SoftDeletes;
 
     protected $hidden = [
-        'id',
+        'id', 'export_secret', 'created_by', 'last_modified_by', 'tags',
     ];
 
     protected $appends = [

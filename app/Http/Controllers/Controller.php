@@ -381,6 +381,18 @@ class Controller extends BaseController
         ]);
     }
 
+    public function export_event_json(Event $event, $secretkey) {
+        if($event->export_secret != $secretkey) {
+            abort(403);
+        }
+
+        return response()->json([
+            'generator' => 'Meetable',
+            'version' => '1.0',
+            'event' => $event,
+        ]);
+    }
+
     public function event_shorturl($key) {
         return $this->event(0, 0, $key);
     }

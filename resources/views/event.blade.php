@@ -94,6 +94,10 @@ use App\Setting;
                         <span>Moderate Responses {!! $num ? "<span class='badge'>($num)</span>" : '' !!}</span>
                     </a>
                     @endif
+                    <a class="dropdown-item" href="{{ route('secret-export-json', [$event, $event->export_secret]) }}">
+                        <span class="icon">@icon(link)</span>
+                        <span>Copy Export URL</span>
+                    </a>
                 </div>
             </div>
         </div>
