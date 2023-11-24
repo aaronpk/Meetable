@@ -125,7 +125,7 @@ use App\Setting;
         </div>
     @endif
 
-    <h1 class="p-name event-name">{!! $event->status_tag() !!}{{ $event->name }}</h1>
+    <h1 class="event-name">{!! $event->status_tag() !!}<span class="p-name">{{ $event->name }}</span></h1>
 
     @if($event->parent)
         <div class="parent-event segment with-icon">
