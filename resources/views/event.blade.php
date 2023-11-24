@@ -125,7 +125,16 @@ use App\Setting;
         </div>
     @endif
 
-    <h1 class="event-name">{!! $event->status_tag() !!}<span class="p-name">{{ $event->name }}</span></h1>
+    <h1 class="event-name">
+        @if($event->meeting_url && !$event->is_past())
+            <a href="{{ $event->meeting_url }}" target="_blank">
+                {!! $event->status_tag() !!}
+            </a>
+        @else
+            {!! $event->status_tag() !!}
+        @endif
+        <span class="p-name">{{ $event->name }}</span>
+    </h1>
 
     @if($event->parent)
         <div class="parent-event segment with-icon">

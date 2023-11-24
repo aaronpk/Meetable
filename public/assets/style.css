@@ -102,6 +102,7 @@ section {
 .event .event-name {
     font-size: 2.5rem;
     margin-bottom: 1rem;
+    line-height: 1.1em;
 }
 
 /* event status tags */
