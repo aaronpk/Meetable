@@ -7,7 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag, App\Setting;
-use DateTime, DateTimeZone;
+use DateTime, DateTimeZone, DateInterval;
 use DB, Log;
 use Illuminate\Http\Request;
 
@@ -28,15 +28,24 @@ class ICSController extends BaseController
 
             // start date with start and end time
             if($event->start_date && $event->start_time && $event->end_time) {
+                // special case events ending with a clock time before the start time (e.g. 11pm - 1am)
+                if(self::hms_to_sec($event->end_time) < self::hms_to_sec($event->start_time)) {
+                    $end_date = new DateTime($event->start_date);
+                    $end_date->add(new DateInterval('P1D'));
+                    $end_date = $end_date->format('Y-m-d');
+                } else {
+                    $end_date = $event->start_date;
+                }
+
                 if($event->timezone) {
                     $isset = true;
                     $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
-                           ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
+                           ->setDtEnd(new DateTime($end_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
                 } else {
                     $isset = true;
                     $vEvent->setUseUtc(false); // force floating times
                     $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
-                           ->setDtEnd(new DateTime($event->start_date.' '.$event->end_time));
+                           ->setDtEnd(new DateTime($end_date.' '.$event->end_time));
                 }
             }
             // start date with only start time
@@ -222,6 +231,11 @@ class ICSController extends BaseController
             'Content-Type' => 'text/calendar; charset=utf-8',
             'Content-Disposition' => 'attachment; filename="event-'.$event->key.'.ics"'
         ]);
+    }
+
+    public static function hms_to_sec($hms) {
+        $parts = explode(':', $hms);
+        return $parts[2] + ($parts[1]*60) + ($parts[0]*60*60);
     }
 
 }
