@@ -457,11 +457,21 @@ class Controller extends BaseController
         # Start and end time on the same day
         elseif($event->start_date && $event->start_time && !$event->end_date && $event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
-            $end = (new DateTime($event->start_date.' '.$event->end_time))->format('Ymd\THis');
+
+            if(self::hms_to_sec($event->end_time) < self::hms_to_sec($event->start_time)) {
+                $end_date = new DateTime($event->start_date);
+                $end_date->add(new DateInterval('P1D'));
+                $end_date = $end_date->format('Y-m-d');
+            } else {
+                $end_date = $event->start_date;
+            }
+
+            $end = (new DateTime($end_date.' '.$event->end_time))->format('Ymd\THis');
             if($event->timezone) $params['ctz'] = $event->timezone;
         }
 
         # Start and end time spanning multiple days
+        # TODO: I think this is not possible
         elseif($event->start_date && $event->start_time && $event->end_date && $event->end_time) {
             $start = (new DateTime($event->start_date.' '.$event->start_time))->format('Ymd\THis');
             $end = (new DateTime($event->end_date.' '.$event->end_time))->format('Ymd\THis');
@@ -473,6 +483,11 @@ class Controller extends BaseController
         $url = 'https://www.google.com/calendar/render?' . http_build_query($params);
 
         return redirect($url, 302);
+    }
+
+    public static function hms_to_sec($hms) {
+        $parts = explode(':', $hms);
+        return $parts[2] + ($parts[1]*60) + ($parts[0]*60*60);
     }
 
     public function local_time() {
