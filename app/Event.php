@@ -238,11 +238,22 @@ class Event extends Model
         if($this->is_multiday()) {
             $end_date = new DateTime($this->end_date);
 
+            if($start_date->format('Y') != $end_date->format('Y')) {
+                $start_text = $start_date->format('M j, Y');
+                $end_text = $end_date->format('M j, Y');
+            } elseif($start_date->format('F') == $end_date->format('F')) {
+                $start_text = $start_date->format('M j');
+                $end_text = $end_date->format('j, Y');
+            } else {
+                $start_text = $start_date->format('M j');
+                $end_text = $end_date->format('M j, Y');
+            }
+
             return '<time datetime="'.$start_date->format('Y-m-d').'">'
-                    . $start_date->format('M j')
+                    . $start_text
                     . '</time> - '
                     . '<time datetime="'.$end_date->format('Y-m-d').'">'
-                    . ($end_date->format('m') == $start_date->format('m') ? $end_date->format('j, Y') : $end_date->format('M j, Y'))
+                    . $end_text
                     . '</time>';
 
         } else {
@@ -281,6 +292,27 @@ class Event extends Model
             $start = new DateTime($this->start_date.' '.$this->start_time);
         }
         return $start;
+    }
+
+    public function end_datetime() {
+        if(!$this->end_time)
+            return null;
+
+        $date = $this->start_datetime();
+
+        if(self::hms_to_sec($this->end_time) < self::hms_to_sec($this->start_time)) {
+            $date->add(DateInterval::createFromDateString('1 day'));
+        }
+
+
+        if($this->timezone) {
+            $tz = new DateTimeZone($this->timezone);
+            $end = new DateTime($date->format('Y-m-d ').$this->end_time, $tz);
+        } else {
+            $end = new DateTime($date->format('Y-m-d ').$this->end_time);
+        }
+
+        return $end;
     }
 
     public function display_date() {
@@ -345,19 +377,11 @@ class Event extends Model
         } else {
 
             if($this->start_date && $this->start_time && $this->end_time) {
-                if($this->timezone) {
-                    $start = (new DateTime($this->start_date.' '.$this->start_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
-                    $end = (new DateTime($this->start_date.' '.$this->end_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
-                } else {
-                    $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
-                    $end = (new DateTime($this->start_date.' '.$this->end_time))->format('Y-m-d\TH:i:s');
-                }
+                $start = $this->start_datetime()->format('Y-m-dTH:i:sP');
+                $end = $this->end_datetime()->format('Y-m-dTH:i:sP');
             }
             elseif($this->start_date && $this->start_time && !$this->end_time) {
-                if($this->timezone)
-                    $start = (new DateTime($this->start_date.' '.$this->start_time, new DateTimeZone($this->timezone)))->format('Y-m-d\TH:i:sP');
-                else
-                    $start = (new DateTime($this->start_date.' '.$this->start_time))->format('Y-m-d\TH:i:s');
+                $start = $this->start_datetime()->format('Y-m-dTH:i:sP');
             }
             elseif($this->start_date && !$this->start_time && !$this->end_time) {
                 $start = (new DateTime($this->start_date))->format('Y-m-d');
@@ -784,6 +808,11 @@ class Event extends Model
             } catch(\Exception $e) {}
         }
         return null;
+    }
+
+    public static function hms_to_sec($hms) {
+        $parts = explode(':', $hms);
+        return $parts[2] + ($parts[1]*60) + ($parts[0]*60*60);
     }
 
 }
