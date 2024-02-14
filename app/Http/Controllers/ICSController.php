@@ -36,13 +36,12 @@ class ICSController extends BaseController
                 } else {
                     $end_date = $event->start_date;
                 }
+                $isset = true;
 
                 if($event->timezone) {
-                    $isset = true;
                     $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
                            ->setDtEnd(new DateTime($end_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
                 } else {
-                    $isset = true;
                     $vEvent->setUseUtc(false); // force floating times
                     $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
                            ->setDtEnd(new DateTime($end_date.' '.$event->end_time));
