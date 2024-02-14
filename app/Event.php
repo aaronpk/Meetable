@@ -447,7 +447,7 @@ class Event extends Model
         return $now->format('U') > $date->format('U');
     }
 
-    public function is_past() {
+    public function is_past($now=null) {
         // Always report the event is over if Zoom has sent the meeting ended notification
         if($this->zoom_meeting_status == 'ended')
             return true;
@@ -461,15 +461,20 @@ class Event extends Model
         }
 
         if($this->end_date) {
+            // TODO: There should never be an end_time set if there is an end_date, so why is that here?
             $date = new DateTime($this->end_date.' '.$this->end_time, $tz);
         } else {
-            $date = new DateTime($this->start_date.' '.($this->end_time ?: $this->start_time), $tz);
-            // Add 30 minute padding if the event has no end time. Treats events as default 30 minutes.
-            if(!$this->end_time)
+            if($this->end_time) {
+                $date = $this->end_datetime();
+            } else {
+                $date = $this->start_datetime();
+                // Add 30 minute padding if the event has no end time. Treats events as default 30 minutes.
                 $date->add(DateInterval::createFromDateString('30 minutes'));
+            }
         }
 
-        $now = new DateTime();
+        if(!$now)
+            $now = new DateTime();
 
         // If there is a zoom meeting ID, we expect the event to only be over once the status is ended.
         // If the status is "started", then don't say the meeting is over even if the end time is reached.

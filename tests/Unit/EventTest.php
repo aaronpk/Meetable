@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Event;
+use DateTime, DateTimeZone;
 
 class EventTest extends TestCase
 {
@@ -136,5 +137,41 @@ class EventTest extends TestCase
         $this->assertEquals('December 31, 2024 - January 4, 2025', $event->display_date());
         $this->assertEquals('', $event->display_time());
         $this->assertEquals(5760, $event->duration_minutes());
+    }
+
+    public function testIsPastNextDay() {
+        $event = new Event;
+        $event->start_date = '2024-12-01';
+        $event->start_time = '17:00:00';
+        $event->end_time = '01:00:00';
+        $this->assertFalse($event->is_multiday());
+        $this->assertNotNull($event->end_datetime());
+
+        $now = new DateTime('2024-12-01T14:00:00');
+        $this->assertFalse($event->is_past($now));
+
+        $now = new DateTime('2024-12-01T19:00:00');
+        $this->assertFalse($event->is_past($now));
+
+        $now = new DateTime('2024-12-02T02:00:00');
+        $this->assertTrue($event->is_past($now));
+    }
+
+    public function testIsPastNoEndTime() {
+        $event = new Event;
+        $event->start_date = '2024-12-01';
+        $event->start_time = '17:00:00';
+        $this->assertFalse($event->is_multiday());
+        $this->assertNull($event->end_datetime()); // because there is no end time set
+
+        $now = new DateTime('2024-12-01T14:00:00');
+        $this->assertFalse($event->is_past($now));
+
+        $now = new DateTime('2024-12-01T17:01:00');
+        $this->assertFalse($event->is_past($now));
+
+        // No end time defaults to 30 minute sfor "is past"
+        $now = new DateTime('2024-12-01T17:31:00');
+        $this->assertTrue($event->is_past($now));
     }
 }
