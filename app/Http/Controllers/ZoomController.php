@@ -17,49 +17,72 @@ class ZoomController extends BaseController
 
         Log::info(request());
 
+        if(request('event') == 'endpoint.url_validation') {
+            $plain_token = request('payload.plainToken');
+            $encrypted_token = hash_hmac('sha256', $plain_token, Setting::value('zoom_webhook_secret'));
+
+            return response()->json([
+                'plainToken' => $plain_token,
+                'encryptedToken' => $encrypted_token,
+            ]);
+        }
+
+        if(!$this->verify_webhook($request)) {
+            Log::debug('Received invalid payload to webhook URL');
+            return response()->json([
+                'error' => 'unauthorized',
+            ]);
+        }
+        $event = Event::where('zoom_meeting_id', request('payload.object.id'))->first();
+
+        if(!$event) {
+            Log::info('Could not find event for Zoom meeting: ' . request('payload.object.id'));
+            return response()->json([
+                'result' => 'ok',
+            ]);
+        }
+
         switch(request('event')) {
-            case 'endpoint.url_validation':
-
-                $plain_token = request('payload.plainToken');
-                $encrypted_token = hash_hmac('sha256', $plain_token, Setting::value('zoom_webhook_secret'));
-
-                return response()->json([
-                    'plainToken' => $plain_token,
-                    'encryptedToken' => $encrypted_token,
-                ]);
 
             case 'meeting.started':
             case 'meeting.ended':
 
-                if(!$this->verify_webhook($request)) {
-                    Log::debug('Received invalid payload to webhook URL');
-                    return response()->json([
-                        'error' => 'unauthorized',
-                    ]);
-                }
-                $event = Event::where('zoom_meeting_id', request('payload.object.id'))->first();
+                $status = request('event') == 'meeting.started' ? 'started' : 'ended';
+                $event->zoom_meeting_status = $status;
+                $event->save();
 
-                if($event) {
-                    $status = request('event') == 'meeting.started' ? 'started' : 'ended';
-                    $event->zoom_meeting_status = $status;
-                    $event->save();
-
-                    // Send notification to configured chat
-                    switch(request('event')) {
-                        case 'started':
-                            Notification::send('"' . $event->name . '" call started, join now: '.$event->meeting_url);
-                            break;
-                        case 'ended':
-                            Notification::send('"' . $event->name . '" call ended');
-                            break;
-                    }
+                // Send notification to configured chat
+                switch(request('event')) {
+                    case 'meeting.started':
+                        Notification::send('"' . $event->name . '" call started, join now: '.$event->meeting_url);
+                        break;
+                    case 'meeting.ended':
+                        Notification::send('"' . $event->name . '" call ended');
+                        break;
                 }
 
-                return response()->json([
-                    'result' => 'ok',
-                ]);
+                break;
+
+            case 'meeting.participant_joined':
+
+                $event->current_participants += 1;
+                $event->max_participants = max($event->max_participants, $event->current_participants);
+                $event->save();
+
+                break;
+
+            case 'meeting.participant_left':
+
+                $event->current_participants -= 1;
+                $event->save();
+
+                break;
 
         }
+
+        return response()->json([
+            'result' => 'ok',
+        ]);
     }
 
     private function verify_webhook(Request $request) {
