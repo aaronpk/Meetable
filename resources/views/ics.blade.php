@@ -14,14 +14,6 @@
             <p>Copy the URL above and subscribe to it in your favorite calendar app!</p>
         </form>
 
-        <br><br>
-
-        <div class="field">
-            <a class="button" href="?download=1">
-                Download ICS
-            </a>
-        </div>
-
     </div>
 
 </section>

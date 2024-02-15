@@ -183,12 +183,6 @@ class ICSController extends BaseController
 
     public function event(Request $request, $year, $month, $key_or_slug, $key2=false) {
 
-        if($this->_isRequestFromBrowser($request) && !(request('download') !== null)) {
-            return view('ics', [
-                'url' => $request->url(),
-            ]);
-        }
-
         if($key2) {
             $key = $key2;
             $slug = $key_or_slug;
