@@ -17,7 +17,7 @@ class EventSubscriber implements ShouldQueue
 			. $event->event->createdBy->display_url() . ' created'
 			. ' "' . $event->event->date_summary_text() . ' ' . $event->event->name . '"'
 			. ' ' . $event->event->absolute_shortlink();
-        Notification::send($summary);
+        Notification::sendMeta($summary);
 	}
 
 	public function handleEventUpdated(EventUpdated $event) {
@@ -40,7 +40,7 @@ class EventSubscriber implements ShouldQueue
 			. ' changed ' . implode(', ', $event->revision->changed_fields($previous))
 			. ($event->revision->edit_summary ? ' "'.$event->revision->edit_summary.'"' : '')
 			. ' ' . $event->revision->revision_diff_permalink();
-        Notification::send($summary);
+        Notification::sendMeta($summary);
 	}
 
 	public function subscribe($events) {

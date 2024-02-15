@@ -212,7 +212,18 @@ use App\Setting;
                 <input class="input" type="password" value="{{ Setting::value('notification_token') ? '********' : '' }}" name="notification_token" autocomplete="off">
             </div>
         </div>
-        <p class="help">When set, notifications about new and updated events will be sent to this URL with the token in the Authorization header and the notification text in a form post parameter named "content".</p>
+        <div class="field is-grouped is-grouped-multiline">
+            <div class="control is-expanded">
+                <label class="label">Primary Notification Channel</label>
+                <input class="input" type="text" value="{{ Setting::value('notification_channel_primary') }}" name="notification_channel_primary" autocomplete="off">
+            </div>
+
+            <div class="control is-expanded">
+                <label class="label">Meta Notification Channel</label>
+                <input class="input" type="text" value="{{ Setting::value('notification_channel_meta') }}" name="notification_channel_meta" autocomplete="off">
+            </div>
+        </div>
+        <p class="help">Notifications will be sent to this URL with the token in the Authorization header and the notification text in a form post parameter named "content". The primary channel will receive notifications before an event with a meeting URL starts. The meta channel will receive notifications about new and updated events.</p>
 
         <br>
 
