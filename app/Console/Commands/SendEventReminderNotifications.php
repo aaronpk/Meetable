@@ -21,8 +21,8 @@ class SendEventReminderNotifications extends Command {
         $future = new DateTime();
         $future->add(DateInterval::createFromDateString('10 minutes'));
 
-        $this->info('Now: '.$now->format('c'));
-        $this->info('+10: '.$future->format('c'));
+        // $this->info('Now: '.$now->format('c'));
+        // $this->info('+10: '.$future->format('c'));
 
         $events = Event::whereNotNull('meeting_url')
           ->whereNotNull('start_time')
