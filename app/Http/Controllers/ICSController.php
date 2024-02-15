@@ -28,35 +28,26 @@ class ICSController extends BaseController
 
             // start date with start and end time
             if($event->start_date && $event->start_time && $event->end_time) {
-                // special case events ending with a clock time before the start time (e.g. 11pm - 1am)
-                if(self::hms_to_sec($event->end_time) < self::hms_to_sec($event->start_time)) {
-                    $end_date = new DateTime($event->start_date);
-                    $end_date->add(new DateInterval('P1D'));
-                    $end_date = $end_date->format('Y-m-d');
-                } else {
-                    $end_date = $event->start_date;
-                }
                 $isset = true;
 
                 if($event->timezone) {
-                    $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone)))
-                           ->setDtEnd(new DateTime($end_date.' '.$event->end_time, new DateTimeZone($event->timezone)));
+                    $vEvent->setDtStart($event->start_datetime(), new DateTimeZone($event->timezone))
+                           ->setDtEnd($event->end_datetime(), new DateTimeZone($event->timezone));
                 } else {
                     $vEvent->setUseUtc(false); // force floating times
-                    $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time))
-                           ->setDtEnd(new DateTime($end_date.' '.$event->end_time));
+                    $vEvent->setDtStart($event->start_datetime())
+                           ->setDtEnd($event->end_datetime());
                 }
             }
             // start date with only start time
             elseif($event->start_date && $event->start_time && !$event->end_time) {
                 if($event->timezone) {
                     $isset = true;
-                    $start = new DateTime($event->start_date.' '.$event->start_time, new DateTimeZone($event->timezone));
-                    $vEvent->setDtStart($start);
+                    $vEvent->setDtStart($event->start_datetime());
                 } else {
                     $isset = true;
                     $vEvent->setUseUtc(false); // force floating times
-                    $vEvent->setDtStart(new DateTime($event->start_date.' '.$event->start_time));
+                    $vEvent->setDtStart($event->start_datetime());
                 }
             }
             // start date only
