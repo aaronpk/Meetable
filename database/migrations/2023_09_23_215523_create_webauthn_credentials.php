@@ -62,7 +62,7 @@ return new class extends Migration {
         $table->string('rp_id');
         // Where the credential was created. Should be the same reported by the Authenticator.
         $table->string('origin');
-        $table->json('transports')->nullable();
+        $table->longtext('transports')->nullable();
         $table->uuid('aaguid')->nullable(); // GUID are essentially UUID
 
         // This is the public key the credential uses to verify the challenges.
@@ -70,7 +70,7 @@ return new class extends Migration {
         // The attestation of the public key.
         $table->string('attestation_format')->default('none');
         // This would hold the certificate chain for other different attestation formats.
-        $table->json('certificates')->nullable();
+        $table->longtext('certificates')->nullable();
 
         // A way to disable the credential without deleting it.
         $table->timestamp('disabled_at')->nullable();
