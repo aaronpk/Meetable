@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller as BaseController;
 use DateTime, DateTimeZone, Exception;
 use DB, Log;
 use App\Event, App\Setting;
+use App\Helpers\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
@@ -42,11 +43,22 @@ class ZoomController extends BaseController
                     $status = request('event') == 'meeting.started' ? 'started' : 'ended';
                     $event->zoom_meeting_status = $status;
                     $event->save();
+
+                    // Send notification to configured chat
+                    switch(request('event')) {
+                        case 'started':
+                            Notification::send('"' . $event->name . '" call started, join now: '.$event->meeting_url);
+                            break;
+                        case 'ended':
+                            Notification::send('"' . $event->name . '" call ended');
+                            break;
+                    }
                 }
 
                 return response()->json([
                     'result' => 'ok',
                 ]);
+
         }
     }
 
