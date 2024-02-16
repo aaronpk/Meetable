@@ -377,11 +377,11 @@ class Event extends Model
         } else {
 
             if($this->start_date && $this->start_time && $this->end_time) {
-                $start = $this->start_datetime()->format('Y-m-dTH:i:sP');
-                $end = $this->end_datetime()->format('Y-m-dTH:i:sP');
+                $start = $this->start_datetime()->format('Y-m-d\TH:i:sP');
+                $end = $this->end_datetime()->format('Y-m-d\TH:i:sP');
             }
             elseif($this->start_date && $this->start_time && !$this->end_time) {
-                $start = $this->start_datetime()->format('Y-m-dTH:i:sP');
+                $start = $this->start_datetime()->format('Y-m-d\TH:i:sP');
             }
             elseif($this->start_date && !$this->start_time && !$this->end_time) {
                 $start = (new DateTime($this->start_date))->format('Y-m-d');
