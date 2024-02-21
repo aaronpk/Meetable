@@ -54,10 +54,10 @@ class ZoomController extends BaseController
                 // Send notification to configured chat
                 switch(request('event')) {
                     case 'meeting.started':
-                        Notification::sendMeta('"' . $event->name . '" call started, join now: '.$event->meeting_url);
+                        Notification::sendMeta('"' . $event->name . '" call started, join now: '.$event->absolute_permalink());
                         break;
                     case 'meeting.ended':
-                        Notification::sendMeta('"' . $event->name . '" call ended');
+                        Notification::sendMeta('"' . $event->name . '" call ended '.$event->absolute_permalink());
                         break;
                 }
 
