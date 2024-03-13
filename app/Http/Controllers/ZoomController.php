@@ -44,7 +44,7 @@ class ZoomController extends BaseController
 
         switch(request('event')) {
 
-            case 'meeting.started':
+            // case 'meeting.started':
             case 'meeting.ended':
 
                 $status = request('event') == 'meeting.started' ? 'started' : 'ended';
