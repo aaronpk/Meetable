@@ -66,7 +66,7 @@ class ICSController extends BaseController
             Log::warning('Rendered ics feed with no date for event '.$event->id);
         }
 
-        if(Setting::value('SHOW_RSVPS_IN_ICS')) {
+        if(Setting::value('show_rsvps_in_ics')) {
             $summary = $event->name;
 
             $rsvps = [];
@@ -86,6 +86,11 @@ class ICSController extends BaseController
         }
 
         $description = strip_tags($event->html());
+
+        if(Setting::value('show_meeting_url_in_ics')) {
+            $description .= "\n\n" . $event->meeting_url;
+        }
+
         if($event->website) {
             $description .= "\n\n" . $event->website;
         }

@@ -31,7 +31,7 @@ class SettingsController extends BaseController
 
         $checkboxes = ['enable_webmention_responses', 'enable_ticket_url', 'show_rsvps_in_ics',
             'auth_hide_login', 'auth_hide_logout', 'enable_unlisted_events', 'enable_registration',
-            'enable_rsvps',
+            'enable_rsvps', 'show_meeting_url_in_ics',
         ];
         foreach($checkboxes as $id) {
             Setting::set($id, request($id) ? 1 : 0);
