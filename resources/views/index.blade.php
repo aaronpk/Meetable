@@ -63,11 +63,11 @@ use App\Setting;
         </div>
 
         <div class="subscribe-ics">
-            <a href="{{ route('ics-tag', $tag) }}">@icon(calendar-alt) iCalendar Feed</a>
+            <a href="{{ route('ics-tag-preview', $tag) }}">@icon(calendar-alt) iCalendar Feed</a>
         </div>
     @elseif(empty($month) && empty($year))
         <div class="subscribe-ics">
-            <a href="{{ route('ics-index') }}">@icon(calendar-alt) iCalendar Feed</a>
+            <a href="{{ route('ics-index-preview') }}">@icon(calendar-alt) iCalendar Feed</a>
         </div>
     @endif
 

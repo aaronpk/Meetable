@@ -173,7 +173,7 @@ use App\Setting;
                     </div>
                     <div class="dropdown-menu" role="menu" id="add-to-calendar-menu">
                         <div class="dropdown-content">
-                            <a href="{{ $event->ics_permalink() }}?download=1" class="dropdown-item" target="_blank">
+                            <a href="{{ $event->ics_permalink() }}" class="dropdown-item" target="_blank">
                                 @icon(calendar) iCal
                             </a>
                             <a href="{{ route('add-to-google', $event->key) }}" class="dropdown-item" target="_blank">

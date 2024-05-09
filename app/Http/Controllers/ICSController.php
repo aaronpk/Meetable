@@ -131,13 +131,6 @@ class ICSController extends BaseController
     }
 
     public function index(Request $request) {
-
-        if($this->_isRequestFromBrowser($request)) {
-            return view('ics', [
-                'url' => $request->url(),
-            ]);
-        }
-
         $events = Event::orderBy('start_date', 'desc')
             ->where('unlisted', 0)
             ->get();
@@ -157,13 +150,6 @@ class ICSController extends BaseController
     }
 
     public function tag(Request $request, $tag) {
-
-        if($this->_isRequestFromBrowser($request)) {
-            return view('ics', [
-                'url' => $request->url(),
-            ]);
-        }
-
         $tag = Tag::normalize($tag);
 
         $events = Event::whereHas('tags', function($query) use ($tag){
@@ -182,7 +168,15 @@ class ICSController extends BaseController
 
         return response($ics)->withHeaders([
             'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="events.ics"'
+            'Content-Disposition' => 'attachment; filename="events-'.$tag.'.ics"'
+        ]);
+    }
+
+    public function preview(Request $request) {
+        $url = str_replace('/preview', '', $request->url());
+
+        return view('ics', [
+            'url' => $url,
         ]);
     }
 
