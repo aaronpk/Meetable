@@ -119,7 +119,12 @@ class ICSController extends BaseController
         $vEvent->setModified(new DateTime($event->updated_at));
 
         $vEvent->setUrl($event->absolute_permalink());
-        $vEvent->setUniqueId(parse_url(env('APP_URL'), PHP_URL_HOST).'/'.$event->key);
+
+        // Include the last updated date in the UID, since google apparently
+        // doesn't update properties from the ics after it's seen it once.
+        $timestamp = strtotime($event->updated_at);
+        $host = parse_url(env('APP_URL'), PHP_URL_HOST);
+        $vEvent->setUniqueId($event->key.'-'.$timestamp.'@'.$host);
 
         $vEvent->setMsBusyStatus('free');
 
