@@ -461,8 +461,7 @@ class Event extends Model
         }
 
         if($this->end_date) {
-            // TODO: There should never be an end_time set if there is an end_date, so why is that here?
-            $date = new DateTime($this->end_date.' '.$this->end_time, $tz);
+            $date = new DateTime($this->end_date.' 23:59', $tz);
         } else {
             if($this->end_time) {
                 $date = $this->end_datetime();
