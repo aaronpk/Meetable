@@ -90,7 +90,7 @@ class WebmentionController extends BaseController
         }
 
         // Drop reposts of everything, including reposts of the event and also of responses to the event
-        if($source['post-type'] == 'repost') {
+        if(isset($source['post-type']) && $source['post-type'] == 'repost') {
             if(request('from') == 'browser') {
                 return $this->error('Reposts are not accepted');
             } else {
