@@ -85,6 +85,12 @@ Once you've configured everything in the `.env` file, you can run the migrations
 php artisan migrate
 ```
 
+Generate an application key:
+
+```
+php artisan key:generate
+```
+
 In a production system you'll want to make sure the background worker script is running:
 
 ```bash
