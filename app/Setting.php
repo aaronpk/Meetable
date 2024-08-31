@@ -58,7 +58,7 @@ class Setting extends Model
                 $revision->{$key} = $setting->{$key};
             $revision->save();
         }
-        if(Auth::user())
+        if(!app()->runningInConsole() && Auth::user())
             $setting->last_saved_by = Auth::user()->id;
         $setting->value = $value;
         $setting->save();
