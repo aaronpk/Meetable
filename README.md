@@ -57,19 +57,23 @@ Install the project's dependencies
 composer install
 ```
 
-Make sure the `storage` folder is writable by the web server
+Make sure the `storage` folder is writable by the web server.
 
 ```bash
 sudo chown -R www-data: storage
 ```
 
-Copy `.env.example` to `.env` and fill it out following the instructions in the file
+Create a database in your MySQL server, and create a user that has full access to the database.
+
+Copy `.env.example` to `.env` and fill it out following the instructions in the file.
 
 ```bash
 cp .env.example .env
 ```
 
-Once you've configured everything in the `.env` file, you can run the migrations to set up the database
+Most importantly, make sure you fill out the database section or the next step won't work.
+
+Once you've configured everything in the `.env` file, you can run the migrations to set up the database.
 
 ```bash
 php artisan migrate
