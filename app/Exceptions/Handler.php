@@ -37,7 +37,9 @@ class Handler extends ExceptionHandler
     {
         if($exception instanceof \PDOException) {
             Log::error($exception->getMessage());
-            abort(550);
+            if(!app()->runningInConsole()) {
+                abort(550);
+            }
         }
 
         parent::report($exception);
