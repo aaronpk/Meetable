@@ -63,7 +63,13 @@ Make sure the `storage` folder is writable by the web server.
 sudo chown -R www-data: storage
 ```
 
-Create a database in your MySQL server, and create a user that has full access to the database.
+Create a database in your MySQL server, and create a user that has full access to the database. For example:
+
+```
+sudo mysql
+> CREATE DATABASE meetable;
+> GRANT ALL PRIVILEGES ON meetable.* TO 'meetable'@'127.0.0.1' IDENTIFIED BY 'some-password';
+```
 
 Copy `.env.example` to `.env` and fill it out following the instructions in the file.
 
