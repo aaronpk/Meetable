@@ -132,6 +132,7 @@ section {
 .event .location.segment,
 .event .website.segment,
 .event .code-of-conduct.segment,
+.event .notes.segment,
 .event .parent-event.segment {
     font-size: 1.5em;
     line-height: 1.2em;
@@ -144,13 +145,19 @@ section {
         margin-bottom: 1rem;
     }
 
-    .event .date.segment, .event .location.segment, .event .website.segment, .event .code-of-conduct.segment {
+    .event .date.segment,
+    .event .location.segment,
+    .event .website.segment,
+    .event .notes.segment,
+    .event .code-of-conduct.segment {
         font-size: 1.2em;
         line-height: 1.2em;
     }
 }
 
-.event .website.segment, .event .code-of-conduct.segment {
+.event .website.segment,
+.event .notes.segment,
+.event .code-of-conduct.segment {
     overflow: hidden;
 }
 

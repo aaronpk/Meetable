@@ -32,7 +32,7 @@ class Event extends Model
         'name', 'start_date', 'end_date', 'start_time', 'end_time',
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
         'latitude', 'longitude', 'timezone', 'status',
-        'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url',
+        'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url', 'notes_url',
         'summary', 'description', 'cover_image', 'unlisted', 'parent_id', 'hide_from_main_feed',
     ];
 

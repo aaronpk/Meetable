@@ -285,6 +285,17 @@ use App\Setting;
         </div>
     @endif
 
+    @if($event->notes_url)
+        <div class="notes segment with-icon">
+            <span class="icon">@icon(pen)</span>
+            <span class="text">
+                <a href="{{ $event->notes_url }}" title="{{ $event->notes_url }}">
+                    {{ \p3k\url\display_url(strlen($event->notes_url) > 40 ? 'http://'.parse_url($event->notes_url, PHP_URL_HOST) : $event->notes_url) }}
+                </a>
+            </span>
+        </div>
+    @endif
+
     @if($event->summary)
     <div class="e-summary description segment content">
         {!! $event->summary_html() !!}

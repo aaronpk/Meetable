@@ -258,6 +258,12 @@ form h2.subtitle {
     </div>
 
     <div class="field">
+        <label class="label">Link to Notes</label>
+        <input class="input" type="url" autocomplete="off" name="notes_url" value="{{ old('notes_url') ?: $event->notes_url }}">
+        <div class="help">link to etherpad or archived notes for this event</div>
+    </div>
+
+    <div class="field">
         <label class="label">Summary</label>
         <textarea class="input" name="summary" style="max-height: none; height: {{ $event->summary ? '15vh' : '15vh' }}">{{ old('summary') ?: $event->summary }}</textarea>
         <div class="help">markdown and HTML are supported</div>

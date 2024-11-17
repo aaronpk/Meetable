@@ -101,6 +101,7 @@ class EventController extends BaseController
         $event->code_of_conduct_url = request('code_of_conduct_url');
         $event->meeting_url = request('meeting_url');
         $event->video_url = request('video_url');
+        $event->notes_url = request('notes_url');
 
         $event->cover_image = request('cover_image');
 
