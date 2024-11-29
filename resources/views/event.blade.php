@@ -204,7 +204,7 @@ use App\Setting;
     <a href="{{ $event->absolute_permalink() }}" class="u-url"></a>
 
     @if($event->website)
-        <div class="website segment with-icon">
+        <div class="website segment with-icon with-url">
             <span class="icon">@icon(link)</span>
             <span>
                 <a href="{{ $event->website }}" class="u-url" rel="canonical" title="{{ $event->website }}">
@@ -215,7 +215,7 @@ use App\Setting;
     @endif
 
     @if($event->tickets_url)
-        <div class="website segment with-icon">
+        <div class="website segment with-icon with-url">
             <span class="icon">@icon(ticket-alt)</span>
             <span>
                 <a href="{{ $event->tickets_url }}" title="{{ $event->tickets_url }}">
@@ -226,12 +226,12 @@ use App\Setting;
     @endif
 
     @if($event->code_of_conduct_url)
-        <div class="code-of-conduct segment with-icon">
+        <div class="code-of-conduct segment with-icon with-url">
             <span class="icon">@icon(gavel)</span>
             <span class="text">
-                <span class="coc-title">Code of Conduct</span>
+                <span class="segment-title">Code of Conduct</span>
                 @foreach($event->code_of_conduct_urls() as $url)
-                    <a href="{{ $url }}" title="{{ $url }}" class="coc-url">
+                    <a href="{{ $url }}" title="{{ $url }}" class="segment-url">
                         {{ strlen($url) > 80 ?  parse_url($url, PHP_URL_HOST) : \p3k\url\display_url($url) }}
                     </a>
                 @endforeach
@@ -269,7 +269,7 @@ use App\Setting;
     @endif
 
     @if($event->video_url)
-        <div class="website segment with-icon">
+        <div class="website segment with-icon with-url">
             <span class="icon">@brand_icon(youtube)</span>
             <span>
                 <a href="{{ $event->video_url }}" title="{{ $event->video_url }}">
@@ -286,10 +286,11 @@ use App\Setting;
     @endif
 
     @if($event->notes_url)
-        <div class="notes segment with-icon">
+        <div class="notes segment with-icon with-url">
             <span class="icon">@icon(pen)</span>
             <span class="text">
-                <a href="{{ $event->notes_url }}" title="{{ $event->notes_url }}">
+                <span class="segment-title">Notes</span>
+                <a href="{{ $event->notes_url }}" title="{{ $event->notes_url }}" class="segment-url">
                     {{ \p3k\url\display_url(strlen($event->notes_url) > 40 ? 'http://'.parse_url($event->notes_url, PHP_URL_HOST) : $event->notes_url) }}
                 </a>
             </span>

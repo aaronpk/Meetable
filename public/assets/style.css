@@ -128,12 +128,7 @@ section {
 
 
 
-.event .date.segment,
-.event .location.segment,
-.event .website.segment,
-.event .code-of-conduct.segment,
-.event .notes.segment,
-.event .parent-event.segment {
+.event .segment.with-icon {
     font-size: 1.5em;
     line-height: 1.2em;
 }
@@ -145,27 +140,21 @@ section {
         margin-bottom: 1rem;
     }
 
-    .event .date.segment,
-    .event .location.segment,
-    .event .website.segment,
-    .event .notes.segment,
-    .event .code-of-conduct.segment {
+    .event .segment.with-icon {
         font-size: 1.2em;
         line-height: 1.2em;
     }
 }
 
-.event .website.segment,
-.event .notes.segment,
-.event .code-of-conduct.segment {
+.event .segment.with-url {
     overflow: hidden;
 }
 
-.event .code-of-conduct.segment .text span, .event .code-of-conduct.segment .text a {
+.event .segment.with-url .text span, .event .segment.with-url .text a {
     display: block;
 }
 
-.event .code-of-conduct.segment .text .coc-url {
+.event .segment.with-url .text .segment-url {
     font-size: 0.75em;
 }
 
