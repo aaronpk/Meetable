@@ -19,7 +19,7 @@ use App\Setting;
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ $event->name }}">
 <meta property="og:url" content="{{ $event->absolute_shortlink() }}">
-@if($event->cover_image)
+@if($event->cover_image_absolute_url())
 <meta property="og:image" content="{{ $event->cover_image_absolute_url() }}">
 <meta name="twitter:image" content="{{ $event->cover_image_absolute_url() }}">
 <meta name="twitter:card" content="summary_large_image">

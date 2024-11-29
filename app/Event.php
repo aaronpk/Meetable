@@ -716,11 +716,7 @@ class Event extends Model
         if($end)
             $data['endDate'] = $end;
 
-        if($this->cover_image) {
-            $data['image'] = $this->cover_image_absolute_url();
-        } elseif($this->has_photos()) {
-            $data['image'] = $this->photos[0]->full_url;
-        }
+        $data['image'] = $this->cover_image_absolute_url();
 
         if($this->tickets_url) {
             $data['offers'] = [
@@ -738,12 +734,18 @@ class Event extends Model
     }
 
     public function cover_image_absolute_url() {
-        // Return the absolute URL for the cover image, which is required by Twitter/FB
-        // If the URL does not already start with http, assume it's stored locally and add the app URL
-        if(!preg_match('/^https?:\/\//', $this->cover_image))
-            return env('APP_URL').$this->cover_image;
+        if($this->cover_image) {
+            // Return the absolute URL for the cover image, which is required by Twitter/FB
+            // If the URL does not already start with http, assume it's stored locally and add the app URL
+            if(!preg_match('/^https?:\/\//', $this->cover_image))
+                return env('APP_URL').$this->cover_image;
 
-        return $this->cover_image;
+            return $this->cover_image;
+        } elseif($this->has_photos()) {
+            return env('APP_URL').$this->photos[0]->full_url;
+        }
+
+        return null;
     }
 
     public function field_is_from_ics_invite($field) {
