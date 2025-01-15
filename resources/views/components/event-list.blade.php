@@ -24,6 +24,9 @@
                                     <div>{!! $event->location_summary_with_mf2() !!}</div>
                                 </div>
                                 @endif
+                                @foreach($event->tags as $tag)
+                                    <span class="p-category">{{ $tag->tag }}</span>
+                                @endforeach
                             </data>
 
                         </li>
