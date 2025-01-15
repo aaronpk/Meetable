@@ -16,6 +16,10 @@
                                 <p>{{ $event->location_city() }}</p>
                             @endif
 
+                            @foreach($event->tags as $tag)
+                                <a href="{{ $tag->url() }}" class="tag is-rounded">#<span class="p-category">{{ $tag->tag }}</span></a>
+                            @endforeach
+
                             <data style="display: none;">
                                 {!! $event->mf2_date_html() !!}
                                 @if($event->location_name || $event->location_summary_with_mf2())
@@ -24,9 +28,6 @@
                                     <div>{!! $event->location_summary_with_mf2() !!}</div>
                                 </div>
                                 @endif
-                                @foreach($event->tags as $tag)
-                                    <span class="p-category">{{ $tag->tag }}</span>
-                                @endforeach
                             </data>
 
                         </li>
