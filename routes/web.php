@@ -75,6 +75,7 @@ Route::middleware('slashes:remove')->group(function(){
     Route::post('/auth/create-user', 'Auth\AuthController@create_user')->name('create-user');
     Route::get('/auth/github', 'Auth\GitHubController@callback')->name('github-oauth-redirect');
     Route::get('/auth/heroku', 'Auth\HerokuController@callback')->name('heroku-oauth-redirect');
+    Route::get('/auth/discord', 'Auth\DiscordController@callback')->name('discord-oauth-redirect');
     Route::get('/auth/oidc', 'Auth\OIDCController@callback')->name('oidc-redirect');
     Route::get('/auth/oidc/initiate', 'Auth\OIDCController@initiate')->name('oidc-initiate');
     Route::get('/auth/oidc/logout', 'Auth\OIDCController@logout')->name('oidc-logout');

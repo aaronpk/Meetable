@@ -78,7 +78,7 @@ class HerokuController extends BaseController
         $userdata = json_decode($response, true);
 
         if(!isset($userdata['id'])) {
-            return view('auth/github-error', [
+            return view('auth/oauth-error', [
                 'error' => 'OAuth Error',
                 'error_description' => 'Unable to get user info from Heroku. Please try again.',
             ]);

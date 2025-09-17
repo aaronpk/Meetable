@@ -6,9 +6,9 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 use App\Services\Auth\VouchGuard;
 use App\Services\Auth\GitHubGuard;
+use App\Services\Auth\DiscordGuard;
 use App\Services\Auth\HerokuGuard;
 use App\Services\Auth\OIDCGuard;
-use App\Services\Auth\PasskeyGuard;
 use Auth;
 
 class AuthServiceProvider extends ServiceProvider
@@ -41,6 +41,10 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::extend('heroku', function($app, $name, array $config) {
             return new HerokuGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
+        });
+
+        Auth::extend('discord', function($app, $name, array $config) {
+            return new DiscordGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
         });
 
         Auth::extend('oidc', function($app, $name, array $config) {
