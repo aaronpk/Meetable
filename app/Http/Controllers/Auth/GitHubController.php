@@ -29,14 +29,14 @@ class GitHubController extends BaseController
 
     public function callback() {
         if(request('state') != session('GITHUB_OAUTH_STATE')) {
-            return view('auth/github-error', [
+            return view('auth/oauth-error', [
                 'error' => 'Invalid OAuth State',
                 'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
             ]);
         }
 
         if(!request('code')) {
-            return view('auth/github-error', [
+            return view('auth/oauth-error', [
                 'error' => 'OAuth Error',
                 'error_description' => 'The GitHub login process did not complete successfully. Please try again.',
             ]);
@@ -59,7 +59,7 @@ class GitHubController extends BaseController
         $data = json_decode($response, true);
 
         if(!isset($data['access_token'])) {
-            return view('auth/github-error', [
+            return view('auth/oauth-error', [
                 'error' => 'OAuth Error',
                 'error_description' => 'Unable to get an access token from GitHub. Please try again.',
             ]);
@@ -79,7 +79,7 @@ class GitHubController extends BaseController
         $userdata = json_decode($response, true);
 
         if(!isset($userdata['id'])) {
-            return view('auth/github-error', [
+            return view('auth/oauth-error', [
                 'error' => 'OAuth Error',
                 'error_description' => 'Unable to get user info from GitHub. Please try again.',
             ]);
@@ -89,7 +89,7 @@ class GitHubController extends BaseController
         if(env('GITHUB_ALLOWED_USERS')) {
             $allowedUsers = explode(' ', env('GITHUB_ALLOWED_USERS'));
             if(!in_array($userdata['login'], $allowedUsers)) {
-                return view('auth/github-error', [
+                return view('auth/oauth-error', [
                     'error' => 'User Not Allowed',
                     'error_description' => 'Sorry, you are not in the list of allowed users for this website.',
                 ]);

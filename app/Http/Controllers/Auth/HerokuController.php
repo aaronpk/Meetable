@@ -29,14 +29,14 @@ class HerokuController extends BaseController
 
     public function callback() {
         if(request('state') != session('HEROKU_OAUTH_STATE')) {
-            return view('auth/heroku-error', [
+            return view('auth/oauth-error', [
                 'error' => 'Invalid OAuth State',
                 'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
             ]);
         }
 
         if(!request('code')) {
-            return view('auth/heroku-error', [
+            return view('auth/oauth-error', [
                 'error' => 'OAuth Error',
                 'error_description' => 'The Heroku login process did not complete successfully. Please try again.',
             ]);
@@ -58,7 +58,7 @@ class HerokuController extends BaseController
         $data = json_decode($response, true);
 
         if(!isset($data['access_token'])) {
-            return view('auth/heroku-error', [
+            return view('auth/oauth-error', [
                 'error' => 'OAuth Error',
                 'error_description' => 'Unable to get an access token from Heroku. Please try again.',
             ]);
@@ -104,7 +104,7 @@ class HerokuController extends BaseController
             // Check if this user already exists
             $user = User::where('identifier', $userdata['id'])->first();
             if(!$user) {
-                return view('auth/heroku-error', [
+                return view('auth/oauth-error', [
                     'error' => 'User Not Allowed',
                     'error_description' => 'Sorry, you are not in the list of allowed users for this website.',
                 ]);
