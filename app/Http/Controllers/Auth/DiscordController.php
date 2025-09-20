@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use DateTime, DateTimeZone, Exception;
-use DB;
+use DB, Log;
 use App\User;
 use Illuminate\Support\Str;
 
@@ -107,7 +107,9 @@ class DiscordController extends BaseController
 
             if(env('DISCORD_ROLE_ID')) {
                 // Check if this user has the required role
-                if(!in_array(env('DISCORD_ROLE_ID'), $guilddata['roles'])) {
+                $role_ids = explode(' ', env('DISCORD_ROLE_ID'));
+                if(!array_intersect($role_ids, $guilddata['roles'])) {
+                    Log::error('User "'.$userdata['user']['username'].'" attempted to log in but did not have the right roles. User roles: '.json_encode($guilddata['roles']));
                     return view('auth/oauth-error', [
                         'error' => 'User Not Allowed',
                         'error_description' => 'Sorry, you are not assigned the required role in the Discord server.',
