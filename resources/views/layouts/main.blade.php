@@ -81,8 +81,9 @@ use App\Response;
                         </a>
                     @endif
                     <div class="navbar-item has-dropdown is-hoverable">
-                        <a class="navbar-link" href="{{ route('new-event') }}">Add an Event</a>
+                        <a class="navbar-link" href="{{ route('new-event') }}">Add Event</a>
                         <div class="navbar-dropdown">
+                            <a class="navbar-item" href="{{ route('new-event') }}">Create New Event</a>
                             <a class="navbar-item" href="{{ route('import-event') }}">Import from URL</a>
                         </div>
                     </div>
