@@ -104,5 +104,9 @@ class AuthServiceProvider extends ServiceProvider
 
             return false;
         });
+
+        Gate::define('logged-in', function($user) {
+            return $user ? true : false;
+        });
     }
 }

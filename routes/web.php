@@ -123,6 +123,9 @@ Route::middleware('auth')->middleware('slashes:remove')->group(function(){
         Route::post('/settings/save', 'SettingsController@post')->name('settings-save');
     });
 
+    Route::get('/profile', 'UserController@profile')->name('profile');
+    Route::post('/profile/refresh', 'UserController@refresh_profile')->name('profile-refresh');
+
 });
 
 endif; // setup

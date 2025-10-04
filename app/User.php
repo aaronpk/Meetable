@@ -9,6 +9,7 @@ use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
 use Laragear\WebAuthn\WebAuthnAuthentication;
 use Storage, Log;
 use Image;
+use p3k\XRay;
 
 class User extends Authenticatable implements WebAuthnAuthenticatable
 {
@@ -90,6 +91,25 @@ class User extends Authenticatable implements WebAuthnAuthenticatable
             }
         } else {
             Log::error('Downloading profile photo at '.$url.' failed: '.curl_error($ch));
+        }
+    }
+
+    public function fetchProfileInfo() {
+        if(!$this->url) {
+            return null;
+        }
+
+        $xray = new XRay();
+        $data = $xray->parse($this->url);
+
+        if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
+            $this->name = $data['data']['name'];
+            $this->photo = $this->downloadProfilePhoto($data['data']['photo']);
+            Log::info('  Found user details: '.$this->name.' '.$this->photo);
+            $this->save();
+        } else {
+            Log::warning('  Error fetching user details for '.$this->url);
+            Log::warning(json_encode($data));
         }
     }
 }
