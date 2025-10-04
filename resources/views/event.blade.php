@@ -240,7 +240,7 @@ use App\Setting;
     @endif
 
     @if($mode == 'archive')
-        @if($event->meeting_url)
+        @if($event->status == 'confirmed' && $event->meeting_url)
             <div class="website segment with-icon">
                 <span class="icon">@icon(video)</span>
                 <span>
@@ -251,7 +251,7 @@ use App\Setting;
             </div>
         @endif
     @else
-        @if($event->meeting_url && !$event->is_past())
+        @if($event->status == 'confirmed' && $event->meeting_url && !$event->is_past())
             <div class="website segment with-icon">
                 <span class="icon">@icon(video)</span>
                 <span>
