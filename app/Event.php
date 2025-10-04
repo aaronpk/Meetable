@@ -402,7 +402,7 @@ class Event extends Model
     }
 
     public function is_starting_soon() {
-        if($this->is_past())
+        if($this->is_past() || $this->status != 'confirmed')
             return false;
 
         // Return true if the event is starting in 15 minutes or less
@@ -423,7 +423,7 @@ class Event extends Model
     }
 
     public function is_ongoing() {
-        if($this->is_past())
+        if($this->is_past() || $this->status != 'confirmed')
             return false;
 
         // If Zoom has sent the meeting started notification early, return true now
