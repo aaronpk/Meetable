@@ -113,6 +113,9 @@ class EventController extends BaseController
         $event->hide_from_main_feed = request('hide_from_main_feed') ?: 0;
         $event->parent_id = request('parent_id');
 
+        $event->cloned_from_id = request('cloned_from_id') ?: null;
+        $event->previous_instance_date = request('previous_instance_date') ?: null;
+
         // Schedule a zoom meeting if requested
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
@@ -156,6 +159,15 @@ class EventController extends BaseController
 
     public function clone_event(Event $event) {
         Gate::authorize('create-event');
+
+        // Predict the next recurrence of the event based on the past occurrence
+        if($event->previous_instance_date) {
+            $pastDate = new DateTime($event->previous_instance_date);
+            $currentDate = new DateTime($event->start_date);
+            $diff = $pastDate->diff($currentDate, true);
+            $nextDate = $currentDate->add($diff);
+            $event->start_date = $nextDate->format('Y-m-d');
+        }
 
         return view('edit-event', [
             'event' => $event,

@@ -322,6 +322,10 @@ form h2.subtitle {
     <input type="hidden" name="latitude" value="{{ old('latitude') ?: $event->latitude }}">
     <input type="hidden" name="longitude" value="{{ old('longitude') ?: $event->longitude }}">
     <input type="hidden" name="cover_image" id="cover-photo-filename" value="{{ old('cover_image') ?: $event->cover_image }}">
+    @if($mode == 'clone')
+        <input type="hidden" name="cloned_from_id" value="{{ $event->id }}">
+        <input type="hidden" name="previous_instance_date" value="{{ $event->start_date }}">
+    @endif
 
     {{ csrf_field() }}
 </form>
