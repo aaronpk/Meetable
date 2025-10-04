@@ -364,7 +364,8 @@ use App\Setting;
                     <h2 class="subtitle">RSVPs</h2>
                 </div>
                 <div class="level-right">
-                    @if(Auth::user() && $event->status == 'confirmed')
+                @can('can-rsvp')
+                    @if($event->status == 'confirmed')
                         @if($event->rsvp_string_for_user(Auth::user()) == 'yes')
                             <div class="buttons has-addons">
                                 <button id="rsvp-button" class="button is-pressed is-light" data-action="{{ route('event-rsvp', $event->id) }}">
@@ -383,6 +384,7 @@ use App\Setting;
                             </div>
                         @endif
                     @endif
+                @endcan
                 </div>
             </div>
 

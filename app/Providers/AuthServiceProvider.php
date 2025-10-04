@@ -10,6 +10,7 @@ use App\Services\Auth\DiscordGuard;
 use App\Services\Auth\HerokuGuard;
 use App\Services\Auth\OIDCGuard;
 use Auth;
+use App\Setting;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -90,6 +91,16 @@ class AuthServiceProvider extends ServiceProvider
 
             if(env('ALLOW_MANAGE_SITE') == 'admins')
                 return $user->is_admin == 1;
+
+            return false;
+        });
+
+        Gate::define('can-rsvp', function($user) {
+            if(!$user)
+                return false;
+
+            if(Setting::value('enable_rsvps'))
+                return true;
 
             return false;
         });

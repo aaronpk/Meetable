@@ -8,7 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Response, App\EventRevision, App\Tag;
 use Illuminate\Support\Str;
-use Auth;
+use Auth, Gate;
 
 
 class EventResponseController extends BaseController
@@ -16,6 +16,7 @@ class EventResponseController extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function save_rsvp(Event $event) {
+        Gate::authorize('can-rsvp');
 
         # Load existing RSVP for this user if there is one already
         $rsvp = $event->rsvp_for_user(Auth::user());
@@ -39,6 +40,7 @@ class EventResponseController extends BaseController
     }
 
     public function delete_rsvp(Event $event) {
+        Gate::authorize('can-rsvp');
 
         # Load existing RSVP for this user if there is one already
         $rsvp = $event->rsvp_for_user(Auth::user());
