@@ -35,7 +35,7 @@ $user = Auth::user();
 </div>
 
 
-@if(env('AUTH_METHOD') == 'discord')
+@if(env('AUTH_METHOD') == 'vouch')
 <form action="{{ route('profile-refresh') }}" method="post" class="settings-form">
 
     <p class="help">Click the button below to re-fetch your profile info from your website.</p>
