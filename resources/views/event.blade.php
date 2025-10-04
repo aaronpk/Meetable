@@ -108,6 +108,13 @@ use App\Setting;
 </div>
 
 @endif
+
+@if($event->meeting_url && !$event->timezone)
+    <div class="notification is-danger">
+        The meeting URL for this event will not be shown because there is no timezone set for this event. Please edit this event to include a timezone.
+    </div>
+@endif
+
 @endcan
 
 
