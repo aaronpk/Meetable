@@ -18,7 +18,7 @@ class SettingsController extends BaseController
     }
 
     public function post() {
-        $properties = ['add_an_event', 'logo_url', 'logo_width', 'logo_height', 'favicon_url',
+        $properties = ['add_an_event', 'photo_license', 'logo_url', 'logo_width', 'logo_height', 'favicon_url',
             'analytics', 'home_meta_description', 'home_social_image_url',
             'zoom_email', 'zoom_account_id', 'zoom_client_id',
             'notification_endpoint', 'notification_channel_primary', 'notification_channel_meta',

@@ -4,6 +4,12 @@
 
 <section class="section">
 
+@if($message = \App\Setting::html_value('photo_license'))
+    <article class="message is-primary">
+        <div class="message-body content">{!! $message !!}</div>
+    </article>
+@endif
+
 <form action="{{ route('upload-event-photo', $event) }}" method="post" enctype="multipart/form-data" class="event-form">
 
     <h2 class="title">Add a Photo</h2>
