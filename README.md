@@ -8,6 +8,7 @@ You can see a live version of this project at:
 
 * https://events.indieweb.org
 * https://events.oauth.net
+* https://meet.modelcontextprotocol.io
 
 ## Features
 
