@@ -38,6 +38,10 @@ class EventController extends BaseController
             $event->parent = Event::where('id', request('parent'))->first();
         }
 
+        if(Setting::value('default_coc_url')) {
+            $event->code_of_conduct_url = Setting::value('default_coc_url');
+        }
+
         return view('edit-event', [
             'event' => $event,
             'mode' => 'create',

@@ -114,6 +114,14 @@ use App\Setting;
             <textarea class="input" name="photo_license" style="max-height: none; height: 25vh">{{ Setting::value('photo_license') }}</textarea>
             <div class="help">This message will be displayed on the photo upload form. You can use it to indicate the license users grant when uploading photos. Markdown and HTML are supported.</div>
         </div>
+
+        <div class="field">
+          <div class="control">
+            <label class="label">Default Code of Conduct URL</label>
+            <input class="input" type="url" value="{{ Setting::value('default_coc_url') }}" name="default_coc_url">
+          </div>
+          <p class="help">Provide the URL to the community Code of Conduct. This will pre-fill when creating an event, but can be overridden per event if needed.</p>
+        </div>
     </div>
 
 
