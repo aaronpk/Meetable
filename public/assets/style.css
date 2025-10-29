@@ -152,6 +152,7 @@ section {
 
 .event .segment.with-url .text span, .event .segment.with-url .text a {
     display: block;
+    word-break: break-word;
 }
 
 .event .segment.with-url .text .segment-url {
