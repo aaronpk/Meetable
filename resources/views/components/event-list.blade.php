@@ -30,6 +30,9 @@
                                 @endif
                             </data>
 
+                            @if($event->parent)
+                                <a class="u-x-parent-event" href="{{ $event->parent->permalink() }}"></a>
+                            @endif
                         </li>
                     @endforeach
                     </ul>

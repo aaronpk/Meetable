@@ -49,6 +49,9 @@ a.title:hover, a.subtitle:hover {
                                     {!! $event->mf2_date_html() !!}
                                 </data>
 
+                                @if($event->parent)
+                                    <a class="u-x-parent-event" href="{{ $event->parent->permalink() }}"></a>
+                                @endif
                             </li>
                         @endforeach
                         </ul>

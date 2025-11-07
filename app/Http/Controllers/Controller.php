@@ -249,7 +249,7 @@ class Controller extends BaseController
         // This will incorrectly show some current events that are in far negative timezones, but that's fine.
         $now = new DateTime('now', new DateTimeZone('+12:00'));
 
-        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status')
+        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status', 'parent_id')
             ->where('start_date', '<', $now->format('Y-m-d'))
             ->where('unlisted', 0)
             ->orderBy('sort_date', 'desc')
