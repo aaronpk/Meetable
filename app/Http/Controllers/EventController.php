@@ -164,6 +164,10 @@ class EventController extends BaseController
     public function clone_event(Event $event) {
         Gate::authorize('create-event');
 
+        if(!Setting::value('clone_meeting_url')) {
+            $event->meeting_url = '';
+        }
+
         // Predict the next recurrence of the event based on the past occurrence
         if($event->previous_instance_date) {
             $pastDate = new DateTime($event->previous_instance_date);

@@ -79,6 +79,14 @@ use App\Setting;
 
         <div class="field">
             <label class="label">
+                <input type="checkbox" name="clone_meeting_url" value="1" {{ Setting::value('clone_meeting_url') ? 'checked="checked"' : ''}}>
+                Clone meeting URL when cloning events
+            </label>
+            <p class="help">When checked, cloning an event will also clone the meeting URL.</p>
+        </div>
+
+        <div class="field">
+            <label class="label">
                 <input type="checkbox" name="enable_webmention_responses" value="1" {{ Setting::value('enable_webmention_responses') ? 'checked="checked"' : ''}}>
                 Enable Webmention Responses
             </label>

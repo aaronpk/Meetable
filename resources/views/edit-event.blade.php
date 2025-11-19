@@ -253,7 +253,7 @@ form h2.subtitle {
 
     <div class="field" id="meeting-url-field">
         <label class="label">Meeting URL</label>
-        <input class="input @error('meeting_url') is-danger @enderror" type="url" autocomplete="off" name="meeting_url" value="{{ old('meeting_url') ?: ($mode == 'clone' ? '' : $event->meeting_url) }}">
+        <input class="input @error('meeting_url') is-danger @enderror" type="url" autocomplete="off" name="meeting_url" value="{{ old('meeting_url') ?: $event->meeting_url }}">
         <div class="help">if this is a virtual event, enter a url to join the virtual meeting. <b>this will be shown only 15 minutes before the event start</b>, and hidden afterwards</div>
     </div>
 
