@@ -37,7 +37,7 @@ class Controller extends BaseController
             $events = new Event();
         }
 
-        $events = $events->where('unlisted', 0)->where('hide_from_main_feed', 0);
+        $events = $events->where('unlisted', 0)->where('hide_from_main_feed', 0)->where('is_template', 0);
 
         if($only_future)
             $events = $events->orderBy('sort_date');
@@ -252,6 +252,7 @@ class Controller extends BaseController
         $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status', 'parent_id')
             ->where('start_date', '<', $now->format('Y-m-d'))
             ->where('unlisted', 0)
+            ->where('is_template', 0)
             ->orderBy('sort_date', 'desc')
             ->get();
 
@@ -289,6 +290,7 @@ class Controller extends BaseController
             FROM events
             JOIN event_tag ON event_tag.event_id = events.id
             JOIN tags ON event_tag.tag_id = tags.id
+            WHERE unlisted = 0 AND is_template = 0
             GROUP BY tag, locality
             ORDER BY tag) AS data
             GROUP BY tag
@@ -345,6 +347,10 @@ class Controller extends BaseController
             return $this->find_matching_events($year, $month, $key);
         }
 
+        if($event->is_template) {
+            abort(404);
+        }
+
         // Redirect to the canonical URL
         $date = new DateTime($event->start_date);
         if($event->slug && $event->slug != $slug
@@ -365,7 +371,7 @@ class Controller extends BaseController
     }
 
     public function event_json($key) {
-        $event = Event::where('key', $key)->first();
+        $event = Event::where('key', $key)->where('is_template', 0)->first();
         if(!$event) {
             abort(404);
         }
@@ -401,6 +407,7 @@ class Controller extends BaseController
         $events = Event::whereYear('start_date', $year)
           ->whereMonth('start_date', $month)
           ->where('slug', 'like', $partial_slug.'%')
+          ->where('is_template', 0)
           ->get();
 
         if($events->count() == 0) {
@@ -420,7 +427,7 @@ class Controller extends BaseController
     }
 
     public function add_to_google($key) {
-        $event = Event::where('key', $key)->first();
+        $event = Event::where('key', $key)->where('is_template', 0)->first();
 
         if(!$event) {
             abort(404);
