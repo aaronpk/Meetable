@@ -74,10 +74,12 @@ use App\Setting;
                         <span class="icon">@icon(calendar)</span>
                         <span>Add Sub-Event</span>
                     </a>
+                    @if(Setting::value('enable_webmention_responses'))
                     <a class="dropdown-item" href="{{ route('edit-responses', $event) }}">
                         <span class="icon">@icon(comment)</span>
                         <span>Edit Responses</span>
                     </a>
+                    @endif
                     @if(Setting::value('enable_registration'))
                         <a class="dropdown-item" href="{{ route('edit-registration', $event) }}">
                             <span class="icon">@icon(file-alt)</span>
