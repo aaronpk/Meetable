@@ -3,8 +3,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DateTime, DateTimeZone, DateInterval;
-use DB;
+use DateTime, DateTimeZone, DateInterval, DatePeriod;
+use DB, Str, Log;
 use App\Services\Zoom;
 
 class Event extends Model
@@ -34,6 +34,7 @@ class Event extends Model
         'latitude', 'longitude', 'timezone', 'status',
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url', 'notes_url',
         'summary', 'description', 'cover_image', 'unlisted', 'parent_id', 'hide_from_main_feed',
+        'recurrence_interval',
     ];
 
     public static function slug_from_name($name) {
@@ -183,6 +184,11 @@ class Event extends Model
 
     public function likes() {
         return $this->responses()->where('is_like', 1)->orderBy('created_at', 'asc');
+    }
+
+    public function generate_random_values() {
+        $this->key = Str::random(12);
+        $this->export_secret = Str::random(20);
     }
 
     public function permalink() {
@@ -399,6 +405,126 @@ class Event extends Model
         $end_html = $end ? '<data class="dt-end" value="' . $end . '"></data>' : '';
 
         return $start_html . $end_html;
+    }
+
+    public function recurrence_description() {
+        if(!$this->recurrence_interval)
+            return '';
+
+        $start = new DateTime($this->start_date);
+
+        switch($this->recurrence_interval) {
+            case 'weekly_dow':
+                return 'Every week on '.$start->format('l').'s';
+            case 'biweekly_dow':
+                return 'Every other week on '.$start->format('l').'s';
+            case 'monthly_date':
+                return 'Every month on the '.$start->format('dS');
+            case 'yearly':
+                return 'Every year on '.$start->format('d');
+        }
+    }
+
+    public function recurrence_date_interval() {
+        if(!$this->recurrence_interval)
+            return null;
+
+        switch($this->recurrence_interval) {
+            case 'weekly_dow':
+                return new DateInterval('P1W');
+            case 'biweekly_dow':
+                return new DateInterval('P2W');
+            case 'monthly_date':
+                return new DateInterval('P1M');
+            case 'yearly':
+                return new DateInterval('P1Y');
+        }
+    }
+
+    public function recurrence_end_datetime() {
+        if(!$this->recurrence_interval)
+            return null;
+
+        $now = new DateTime();
+
+        switch($this->recurrence_interval) {
+            case 'weekly_dow':
+                return $now->add(new DateInterval('P5W'));
+            case 'biweekly_dow':
+                return $now->add(new DateInterval('P9W'));
+            case 'monthly_date':
+                return $now->add(new DateInterval('P4M'));
+            case 'yearly':
+                return $now->add(new DateInterval('P2Y'));
+        }
+    }
+
+    public function create_upcoming_recurrences() {
+        // Find the next events to schedule out over the next N weeks
+        $interval = $this->recurrence_date_interval();
+        $start = $this->start_datetime();
+        $now = new DateTime();
+
+        Log::info($this->name);
+        Log::info('Series starts: '.$start->format('Y-m-d'));
+        Log::info('Recurrence: '.$this->recurrence_interval);
+
+        $end = $this->recurrence_end_datetime();
+
+        Log::info('Today: '.$now->format('Y-m-d'));
+        Log::info('Target end date: '.$end->format('Y-m-d'));
+
+        $period = new DatePeriod($start, $interval, $end);
+
+        foreach($period as $date) {
+            if($date >= $now) {
+                $exists = Event::where('created_from_template_event_id', $this->id)
+                  ->where('start_date', $date->format('Y-m-d'))
+                  ->count();
+                if($exists == 0) {
+                    Log::info('  Creating instance on '.$date->format('Y-m-d'));
+
+                    $copy = $this->replicate();
+                    $copy->generate_random_values();
+                    $copy->created_from_template_event_id = $this->id;
+                    $copy->start_date = $date->format('Y-m-d');
+                    $copy->is_template = false;
+                    $copy->recurrence_interval = null;
+                    $copy->sort_date = $copy->sort_date();
+                    $copy->reset_live_event_stats();
+
+                    // Replace any YYYY-mm-dd dates in the description or URL properties
+                    $copy->replace_date($this, 'description');
+                    $copy->replace_date($this, 'notes_url');
+                    $copy->replace_date($this, 'website');
+
+                    $copy->save();
+
+                    if($this->tags()->count() > 0) {
+                        foreach($this->tags as $tag) {
+                            $copy->tags()->attach($tag);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function delete_upcoming_recurrences() {
+        $date = new DateTime();
+        Event::where('created_from_template_event_id', $this->id)
+            ->where('start_date', '>', $date->format('Y-m-d'))
+            ->delete();
+    }
+
+    private function replace_date($template_event, $property) {
+        $this->{$property} = str_replace($template_event->start_datetime()->format('Y-m-d'), $this->start_datetime()->format('Y-m-d'), $template_event->{$property});
+    }
+
+    public function reset_live_event_stats() {
+        $this->current_participants = 0;
+        $this->max_participants = 0;
+        $this->notification_sent = 0;
     }
 
     public function is_starting_soon() {

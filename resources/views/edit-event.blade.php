@@ -45,9 +45,9 @@ use App\Setting, App\Event;
 @endif
 
 <div class="content">
-    <h1>{{ $event->id ? (($mode == 'clone' ? 'Cloning ' : 'Editing ').'"'.$event->name.'"') : 'Add an Event' }}</h1>
+    <h1>{{ $event->id ? ($action_heading.' "'.$event->name.'"') : 'Add an Event' }}</h1>
 
-    @if($event->id)
+    @if($event->id && !$event->recurrence_interval)
         <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
     @endif
 </div>
@@ -96,6 +96,19 @@ form h2.subtitle {
             </div>
         </div>
 
+    @endif
+
+    @if($mode == 'recurring' || $event->recurrence_interval)
+        <div class="message is-warning">
+            <div class="message-body content">
+                @if($mode == 'recurring')
+                    You are creating a recurring event template. After you save this template, copies will be created based on the schedule you define below.
+                @else
+                    <p>This is a template event and does not appear on the calendar itself. Events are created as a copy of this event based on the schedule defined below.</p>
+                    <p>Changes you make will apply to future events and not to past events.</p>
+                @endif
+            </div>
+        </div>
     @endif
 
     <h2 class="subtitle">What's the name of the event?</h2>
@@ -175,8 +188,11 @@ form h2.subtitle {
 
 
 
-
+    @if($mode == 'recurring' || $event->recurrence_interval)
+    <h2 class="subtitle">When is the next occurrence of the event?</h2>
+    @else
     <h2 class="subtitle">When is the event?</h2>
+    @endif
 
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
@@ -184,11 +200,13 @@ form h2.subtitle {
             <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: (($mode == 'create' && $event->parent) ? $event->parent->start_date : $event->start_date) }}" required>
         </div>
 
+        @if($mode != 'recurring' && !$event->recurrence_interval)
         <div class="control is-expanded">
             <label class="label">End Date (optional)</label>
             <input class="input" type="date" name="end_date" autocomplete="off" value="{{ old('end_date') ?: $event->end_date }}">
             <div class="help">for multi-day events</div>
         </div>
+        @endif
     </div>
 
     <div class="field is-grouped is-grouped-multiline" id="time-fields">
@@ -218,6 +236,41 @@ form h2.subtitle {
             <div class="help">provide a timezone for online events and to help sort events on the same day</div>
         </div>
     </div>
+
+    @if($mode == 'recurring' || $event->recurrence_interval)
+    <h2 class="subtitle">How often do you want to repeat this event?</h2>
+
+    <div id="recurring_details">
+    </div>
+
+    <script>
+    $(function(){
+        var selected_recurrence_interval;
+        function reload_recurrence_menu() {
+            $.post("/event/{{ $event->id }}/recurring/details", {
+                _token: csrf_token(),
+                date: $("input[name=start_date]").val(),
+                recurrence: 'foo'
+            }, function(response) {
+                $("#recurring_details").html(response);
+                if(selected_recurrence_interval) {
+                    $("select[name=recurrence_interval]").val(selected_recurrence_interval);
+                } else {
+                    $("select[name=recurrence_interval]").val("{{ $event->recurrence_interval ?: 'weekly_dow' }}");
+                }
+
+                $("select[name=recurrence_interval]").on('change', function(){
+                    selected_recurrence_interval = $(this).val();
+                });
+            });
+        }
+        reload_recurrence_menu();
+        $("input[name=start_date]").on('change', reload_recurrence_menu);
+    });
+    </script>
+    <input type="hidden" name="is_template" value="1">
+    <input type="hidden" name="created_from_template_event_id" value="{{ $event->id }}">
+    @endif
 
     <h2 class="subtitle">Details</h2>
 

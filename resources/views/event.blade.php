@@ -66,6 +66,10 @@ use App\Setting;
                         <span class="icon">@icon(copy)</span>
                         <span>Clone Event</span>
                     </a>
+                    <a class="dropdown-item" href="{{ route('recurring-event', $event) }}">
+                        <span class="icon">@icon(redo)</span>
+                        <span>Create Recurring Event</span>
+                    </a>
                     <a class="dropdown-item" href="{{ route('add-event-photo', $event) }}">
                         <span class="icon">@icon(camera)</span>
                         <span>Add Photo</span>

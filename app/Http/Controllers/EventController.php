@@ -70,9 +70,15 @@ class EventController extends BaseController
         $event = new Event();
         $event->name = request('name');
 
-        $event->key = Str::random(12);
+        $event->generate_random_values();
+
+        if(request('is_template')) {
+            $event->is_template = true;
+            $event->recurrence_interval = request('recurrence_interval');
+            $event->key = '';
+        }
+
         $event->slug = Event::slug_from_name($event->name);
-        $event->export_secret = Str::random(20);
 
         $event->location_name = request('location_name') ?: '';
 
@@ -141,11 +147,20 @@ class EventController extends BaseController
 
         event(new EventCreated($event));
 
-        return redirect($event->permalink());
+        if($event->is_template) {
+            $event->create_upcoming_recurrences();
+            return redirect(route('templates'));
+        } else {
+            return redirect($event->permalink());
+        }
     }
 
     public function delete_event(Event $event) {
         Gate::authorize('manage-event', $event);
+
+        if($event->is_template) {
+            $event->delete_upcoming_recurrences();
+        }
 
         $event->delete();
         return redirect('/');
@@ -157,6 +172,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'edit',
+            'action_heading' => ($event->recurrence_interval ? 'Edit Recurring' : 'Editing'),
             'form_action' => route('save-event', $event),
         ]);
     }
@@ -180,7 +196,44 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'clone',
+            'action_heading' => 'Cloning',
             'form_action' => route('create-event'),
+        ]);
+    }
+
+    public function recurring_event(Event $event) {
+        Gate::authorize('create-event');
+
+        // Predict the next recurrence of the event based on the past occurrence
+        if($event->previous_instance_date) {
+            $pastDate = new DateTime($event->previous_instance_date);
+            $currentDate = new DateTime($event->start_date);
+            $diff = $pastDate->diff($currentDate, true);
+            $nextDate = $currentDate->add($diff);
+            $event->start_date = $nextDate->format('Y-m-d');
+        }
+
+        return view('edit-event', [
+            'event' => $event,
+            'mode' => 'recurring',
+            'action_heading' => 'Create Recurring',
+            'form_action' => route('create-event'),
+        ]);
+    }
+
+    public function recurring_event_details(Request $request, Event $event) {
+        Gate::authorize('manage-event', $event);
+
+        $recurrence = request('recurrence');
+        $date = new DateTime(request('date'));
+
+
+
+        return view('recurring-event-details', [
+            'event' => $event,
+            'recur_month_date' => $date->format('M j'),
+            'recur_date' => $date->format('jS'),
+            'recur_dow' => $date->format('l'),
         ]);
     }
 
@@ -256,6 +309,11 @@ class EventController extends BaseController
             $event->update_zoom_meeting();
         }
 
+        // Allow event templates to change the recurrence property
+        if($event->is_template) {
+            $event->recurrence_interval = request('recurrence_interval');
+        }
+
         $event->last_modified_by = Auth::user()->id;
         $event->save();
 
@@ -281,7 +339,13 @@ class EventController extends BaseController
 
         event(new EventUpdated($event, $revision));
 
-        return redirect($event->permalink());
+        if($event->is_template) {
+            $event->delete_upcoming_recurrences();
+            $event->create_upcoming_recurrences();
+            return redirect(route('templates'));
+        } else {
+            return redirect($event->permalink());
+        }
     }
 
     public function revision_history(Event $event) {
@@ -426,6 +490,7 @@ class EventController extends BaseController
         $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'),
             'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status')
           ->where('unlisted', 1)
+          ->where('is_template', 0)
           ->orderBy('sort_date', 'desc')
           ->get();
 
@@ -444,6 +509,29 @@ class EventController extends BaseController
         return view('unlisted', [
             'data' => $data,
             'page_title' => 'Unlisted Events',
+        ]);
+    }
+
+    public function template_events() {
+        Gate::authorize('create-event');
+
+        $events = Event::select('id', 'recurrence_interval', 'start_date', 'start_time', 'end_time', 'name')
+          ->where('is_template', 1)
+          ->orderBy('sort_date', 'desc')
+          ->get();
+
+        foreach($events as $event) {
+            $instances[$event->id] = Event::select('id', 'start_date', 'start_time', 'end_time', 'name', 'slug', 'key')
+              ->where('created_from_template_event_id', $event->id)
+              ->where('start_date', '>', date('Y-m-d'))
+              ->orderBy('sort_date', 'asc')
+              ->get();
+        }
+
+        return view('templates', [
+            'events' => $events,
+            'instances' => $instances,
+            'page_title' => 'Recurring Events',
         ]);
     }
 

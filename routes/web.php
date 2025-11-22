@@ -87,7 +87,9 @@ Route::middleware('auth')->middleware('slashes:remove')->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');
     Route::get('/import', 'EventController@import_event')->name('import-event');
+
     Route::get('/events/unlisted', 'EventController@unlisted_events')->name('unlisted');
+    Route::get('/events/templates', 'EventController@template_events')->name('templates');
 
     Route::post('/create', 'EventController@create_event')->name('create-event');
     Route::get('/event/{event}', 'EventController@edit_event')->name('edit-event');
@@ -96,6 +98,8 @@ Route::middleware('auth')->middleware('slashes:remove')->group(function(){
     Route::get('/event/{event}/history/{revision}', 'EventController@view_revision')->name('view-revision');
     Route::get('/event/{event}/history/{revision}/diff', 'EventController@view_revision_diff')->name('view-revision-diff');
     Route::get('/event/{event}/clone', 'EventController@clone_event')->name('clone-event');
+    Route::get('/event/{event}/recurring', 'EventController@recurring_event')->name('recurring-event');
+    Route::post('/event/{event}/recurring/details', 'EventController@recurring_event_details');
     Route::post('/event/{event}/delete', 'EventController@delete_event')->name('delete-event');
 
     Route::post('/event/timezone', 'EventController@get_timezone')->name('get-timezone');

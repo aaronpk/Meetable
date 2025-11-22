@@ -90,6 +90,11 @@ use App\Response;
                 @endcan
             </div>
             <div class="navbar-end">
+                @can('create-event')
+                    @if(true || Setting::value('enable_recurring_events'))
+                        <a class="navbar-item" href="{{ route('templates') }}">Recurring Events</a>
+                    @endif
+                @endcan
                 @can('manage-site')
                     <a class="navbar-item" href="{{ route('settings') }}">Settings</a>
                 @endcan
