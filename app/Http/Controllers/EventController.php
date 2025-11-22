@@ -520,6 +520,8 @@ class EventController extends BaseController
           ->orderBy('sort_date', 'desc')
           ->get();
 
+        $instances = [];
+
         foreach($events as $event) {
             $instances[$event->id] = Event::select('id', 'start_date', 'start_time', 'end_time', 'name', 'slug', 'key')
               ->where('created_from_template_event_id', $event->id)
