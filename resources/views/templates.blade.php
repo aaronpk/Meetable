@@ -5,12 +5,14 @@
 
 <h2 class="title">Recurring Events</h2>
 
-@if(count($events) == 0)
-    <div class="content">
+<div class="content">
+    @if(count($events) == 0)
         <p>There are no recurring events yet. You can schedule a recurring event by creating an event template from an existing event.</p>
         <p><a href="/">See upcoming events</a></p>
-    </div>
-@endif
+    @else
+        <p>You can schedule a recurring event by creating an event template from an <a href="/">existing event</a>.</p>
+    @endif
+</div>
 
 <ul class="">
 
