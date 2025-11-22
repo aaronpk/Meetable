@@ -186,6 +186,13 @@ use App\Setting;
                     </div>
                     <div class="dropdown-menu" role="menu" id="add-to-calendar-menu">
                         <div class="dropdown-content">
+                            @if(count($event->tags) > 0)
+                                <a href="{{ $event->tag_feed_ics_link() }}" class="dropdown-item">
+                                    @icon(calendar-alt) Tag Feed <span class="tag is-rounded">#{{ $event->tags[0]->tag }}</span>
+                                </a>
+                                <hr class="dropdown-divider" />
+                            @endif
+                            <div class="dropdown-item"><b>Single Event</b></div>
                             <a href="{{ $event->ics_permalink() }}" class="dropdown-item" target="_blank">
                                 @icon(calendar) iCal
                             </a>

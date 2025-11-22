@@ -200,6 +200,11 @@ class Event extends Model
         return '/ics' . $this->permalink() . '.ics';
     }
 
+    public function tag_feed_ics_link() {
+        $tag = $this->tags[0]->tag;
+        return route('ics-tag-preview', $tag);
+    }
+
     public function absolute_permalink() {
         return env('APP_URL').$this->permalink();
     }

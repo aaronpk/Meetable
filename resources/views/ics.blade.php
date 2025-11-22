@@ -4,7 +4,7 @@
 <section class="section">
 
     <div class="content">
-        <h2 class="title">Export ICS</h2>
+        <h2 class="title">Subscribe</h2>
 
         <form class="event-form">
             <div class="field">
