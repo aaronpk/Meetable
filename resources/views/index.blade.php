@@ -57,7 +57,7 @@ use App\Setting;
         @include('components/event-list', ['data' => $past_events])
     @endif
 
-    @if(isset($tags))
+    @if(isset($page_type) && $page_type == 'tag')
         <div class="">
             <a href="{{ route('tag-archive', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(archive) Tag Archive</a>
         </div>
