@@ -18,7 +18,7 @@ use App\Response;
 
     <script src="/jquery/jquery-1.12.0.min.js"></script>
 
-    <link href="/bulma-0.9.0/bulma.min.css" rel="stylesheet">
+    <link href="/bulma-1.0.4/bulma.css" rel="stylesheet">
     <link href="/assets/bulma-tooltip-1.2.0.min.css" rel="stylesheet">
 
     <link href="/assets/style.css" rel="stylesheet">

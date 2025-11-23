@@ -335,11 +335,6 @@ ul.photo-album li {
 }
 
 
-.tags a.tag:hover {
-    text-decoration: none;
-    background: #e5e5e5;
-}
-
 .tagcloud {
     max-width: 800px;
 }
@@ -347,8 +342,8 @@ ul.photo-album li {
 .tagcloud .smallest { font-size: 20px; }
 .tagcloud .small { font-size: 26px; }
 .tagcloud .medium { font-size: 32px; }
-.tagcloud .large { font-size: 40px; }
-.tagcloud .largest { font-size: 50px; }
+.tagcloud .large { font-size: 38px; }
+.tagcloud .largest { font-size: 42px; }
 
 
 
