@@ -277,6 +277,7 @@ class Event extends Model
                 }
                 return '<time datetime="'.$start->format('c').'" '.$tzattrs.'>'
                         . $start->format('M j, Y').' '.$start->format('g:ia')
+                        . ($this->has_physical_location() ? ' ('.$start->format('P').')' : '')
                         . '</time>';
             } else {
                 return '<time datetime="'.$start_date->format('Y-m-d').'">'
