@@ -271,12 +271,12 @@ class Event extends Model
             if($this->start_time) {
                 $start = $this->start_datetime();
                 if($this->timezone) {
-                    $tzattrs = 'class="has-tooltip-bottom event-timezone" data-event-time="'.$start->format('g:ia').'" data-tooltip="'.$this->timezone.'"';
+                    $tzattrs = 'class="has-tooltip-bottom event-localize-date '.(!$this->has_physical_location() ? 'is-virtual-event' : '').'" data-timezone="'.$this->timezone.'" data-original-date="'.$start->format('M j, Y g:ia').'" data-dateformat="full"';
                 } else {
                     $tzattrs = '';
                 }
                 return '<time datetime="'.$start->format('c').'" '.$tzattrs.'>'
-                        . $start->format('M j, Y g:ia')
+                        . $start->format('M j, Y').' '.$start->format('g:ia')
                         . '</time>';
             } else {
                 return '<time datetime="'.$start_date->format('Y-m-d').'">'
@@ -712,6 +712,10 @@ class Event extends Model
             elseif($this->location_region) $str[] = $this->location_region;
         }
         return implode(', ', $str);
+    }
+
+    public function has_physical_location() {
+        return $this->location_address || $this->location_locality || $this->location_region || $this->location_country || $this->latitude;
     }
 
     public function html() {

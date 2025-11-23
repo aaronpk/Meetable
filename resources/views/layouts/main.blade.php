@@ -125,7 +125,7 @@ use App\Response;
 
     </main>
 
-    <script src="/assets/script.js"></script>
+    <script src="/assets/script.js?v=2025327"></script>
     @yield('scripts')
 
 </body>

@@ -161,15 +161,22 @@ use App\Setting;
     <div class="date segment with-icon">
         <span class="icon">@icon(clock)</span>
         <span>
-            <div>{{ $event->status == 'postponed' ? 'TBD, originally ' : '' }}{!! $event->display_date() !!}</div>
+            <div>{{ $event->status == 'postponed' ? 'TBD, originally ' : '' }}
+                <time datetime="{{ $event->start_datetime()->format('c') }}"  class="event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}"  data-original-date="{{ $event->start_datetime()->format('M j, Y g:ia') }}" data-dateformat="dateonly" data-show-tooltip="false">
+                    {!! $event->display_date() !!}
+                </time>
+            </div>
             @if(!$event->is_multiday() && $event->display_time())
                 <div class="time">
-                    {!! $event->weekday() !!}
                     @if($event->timezone)
-                        <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-timezone" data-event-time="{{ $event->start_datetime_local('g:ia') }}" data-tooltip="">
-                            <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">{!! $event->display_time() !!}</a>
+                        <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">
+                            <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}" data-original-date="{{ $event->start_datetime()->format('M j, Y g:ia') }}" data-dateformat="timeonly">
+                                {!! $event->display_time() !!}
+                            </time>
+                        </a>
+                        @if($event->has_physical_location())
                             <span class="timezone">({{ $event->timezone }})</span>
-                        </time>
+                        @endif
                     @else
                         {!! $event->display_time() !!}
                     @endif

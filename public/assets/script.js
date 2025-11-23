@@ -6,20 +6,27 @@ $(function(){
   });
 
   // Add local time info into the tooltip in the event lists
-  $(".event-timezone").each(function(){
+  $(".event-localize-date").each(function(){
     var date = new Date($(this).attr("datetime"));
-    var event_timezone = $(this).data("tooltip");
     var event_time = $(this).data("event-time");
-    var local_time = date_to_display_time(date);
-    var local="";
-    if(event_time != local_time) {
-      if(event_timezone)
-        local = "\n";
-      local = local+"("+local_time+" in your timezone)";
+    var local_time;
+    var tooltip="";
+    if($(this).data("dateformat") == "dateonly") {
+        local_time = date_to_display_date(date);
+    } else if($(this).data("dateformat") == "timeonly") {
+        local_time = date_to_display_time(date);
     } else {
-      local = "";
+        local_time = date_to_display_datetime(date);
     }
-    $(this).attr("data-tooltip", event_timezone+local);
+    if($(this).hasClass("is-virtual-event")) {
+      tooltip = $(this).data("original-date").replace(/\s+/g," ").trim()+" in event timezone\n"+$(this).data("timezone");
+      $(this).text(local_time);
+    } else {
+      tooltip = $(this).data("timezone")+"\n("+date_to_display_datetime(date)+" in your timezone)";
+    }
+    if($(this).data("show-tooltip") != false) {
+        $(this).attr("data-tooltip", tooltip);
+    }
   });
 
   // Check for click events on the navbar burger icon
@@ -174,6 +181,29 @@ function tz_minutes_to_offset(minutes) {
   return (minutes > 0 ? '-' : '+') + hours + ":" + min;
 }
 
+function date_to_display_datetime(date) {
+  return date.toLocaleString([], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour:'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
 function date_to_display_time(date) {
-  return date.toLocaleTimeString([], {hour:'2-digit', minute: '2-digit'});
+  return date.toLocaleString([], {
+    hour:'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+}
+
+function date_to_display_date(date) {
+  return date.toLocaleString([], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
 }
