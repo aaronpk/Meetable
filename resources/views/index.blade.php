@@ -39,9 +39,9 @@ use App\Setting;
     <h1 class="title">{{ $page_title }}</h1>
 
     @if(isset($tags) && count($tags))
-    <div class="tags are-medium">
+    <div class="tags {{ isset($page_type) && $page_type == 'tag' ? 'are-large' : 'are-medium' }}">
         @foreach($tags as $t)
-          <a href="{{ route('tag', $t->tag) }}" class="tag is-rounded">#{{ $t->tag }}</a>
+          <a href="{{ route('tag', $t->tag) }}" class="tag is-hoverable is-rounded {{ isset($page_type) && $page_type == 'tag' ? 'is-dark' : '' }}">#{{ $t->tag }}</a>
         @endforeach
     </div>
     @endif
@@ -57,13 +57,13 @@ use App\Setting;
         @include('components/event-list', ['data' => $past_events])
     @endif
 
-    @if(isset($tag))
+    @if(isset($tags))
         <div class="">
-            <a href="{{ route('tag-archive', $tag) }}">@icon(archive) Tag Archive</a>
+            <a href="{{ route('tag-archive', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(archive) Tag Archive</a>
         </div>
 
         <div class="subscribe-ics">
-            <a href="{{ route('ics-tag-preview', $tag) }}">@icon(calendar-alt) iCalendar Feed</a>
+            <a href="{{ route('ics-tag-preview', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(calendar-alt) iCalendar Feed</a>
         </div>
     @elseif(empty($month) && empty($year))
         <div class="subscribe-ics">

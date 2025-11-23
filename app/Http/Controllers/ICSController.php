@@ -155,13 +155,17 @@ class ICSController extends BaseController
     }
 
     public function tag(Request $request, $tag) {
-        $tag = Tag::normalize($tag);
+        $tags = [];
+        foreach(explode(',', $tag) as $t) {
+            $tags[] = Tag::get($t);
+        }
 
-        $events = Event::whereHas('tags', function($query) use ($tag){
-            $query->where('tag', $tag);
-        })
-        ->where('unlisted', 0)
-        ->orderBy('events.start_date', 'desc')->get();
+        $events = Event::where('unlisted', 0)
+          ->where('is_template', 0);
+
+        $events = Event::tagged($events, $tags);
+
+        $events = $events->orderBy('events.start_date', 'desc')->get();
 
         $vCalendar = new \Eluceo\iCal\Component\Calendar(parse_url(env('APP_URL'), PHP_URL_HOST).' '.$tag);
 

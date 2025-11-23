@@ -84,7 +84,11 @@ class Controller extends BaseController
     }
 
     public function tag($tag) {
-        $tag = Tag::normalize($tag);
+        $tags = [];
+        foreach(explode(',', $tag) as $t) {
+            $tags[] = Tag::get($t);
+        }
+
         $year = $month = false;
 
         if(request('year') && is_numeric(request('year'))) {
@@ -95,9 +99,7 @@ class Controller extends BaseController
 
         $events = $this->events_query($year, $month);
 
-        $events = $events->whereHas('tags', function($query) use ($tag){
-            $query->where('tag', $tag);
-        });
+        $events = Event::tagged($events, $tags);
 
         $events = $events->get();
 
@@ -107,8 +109,8 @@ class Controller extends BaseController
 
             $past_events = $this->events_query(false, false, false, false);
 
-            $past_events = $past_events->whereHas('tags', function($query) use ($tag){
-                $query->where('tag', $tag);
+            $past_events = $past_events->whereHas('tags', function($query) use ($tags){
+                $query->whereIn('tag', $tags);
             })->where(function($query)use($nowDate){
                 $query->where('start_date', '<=', $nowDate)
                       ->orWhere('end_date', '<=', $nowDate);
@@ -120,14 +122,43 @@ class Controller extends BaseController
         }
 
         return $this->show_events_from_query($events, [
-            'tag' => $tag,
+            'tags' => $tags,
             'past_events' => $past_events,
-            'page_title' => 'Upcoming events tagged #'.$tag,
+            'page_title' => '',
+            'page_type' => 'tag',
+        ]);
+    }
+
+    public function tag_archive($tag) {
+        $tags = [];
+        foreach(explode(',', $tag) as $t) {
+            $tags[] = Tag::get($t);
+        }
+
+        $events = $this->events_query(false, false, false, false);
+
+        $events = Event::tagged($events, $tags);
+
+        $events = $events->get();
+
+        if(count($events) == 0) {
+            // TODO: maybe show a page like "no events" instead
+            abort(404);
+        }
+
+        return $this->show_events_from_query($events, [
+            'tags' => $tags,
+            'archive' => true,
+            'page_title' => '',
+            'page_type' => 'tag',
         ]);
     }
 
     public function year_tag($year, $tag) {
-        $tag = Tag::normalize($tag);
+        $tags = [];
+        foreach(explode(',', $tag) as $t) {
+            $tags[] = Tag::get($t);
+        }
 
         $now = new DateTime('now', new DateTimeZone('-12:00'));
         $nowDate = $now->format('Y-m-d');
@@ -138,7 +169,7 @@ class Controller extends BaseController
                   ->orWhere('end_date', '>=', $nowDate);
         });
 
-        $upcoming_events = Event::tagged($upcoming_events, $tag);
+        $upcoming_events = Event::tagged($upcoming_events, $tags);
 
         $upcoming_event_ids = $upcoming_events->pluck('id');
         $upcoming_events = $upcoming_events->get();
@@ -149,7 +180,7 @@ class Controller extends BaseController
             OR
             (end_date < "'.$nowDate.'"))
         '));
-        $past_events = Event::tagged($past_events, $tag);
+        $past_events = Event::tagged($past_events, $tags);
         $past_events = $past_events->get();
 
         if(count($upcoming_events) == 0) {
@@ -164,30 +195,9 @@ class Controller extends BaseController
             'month' => false,
             'day' => false,
             'home' => (!$year && !$month && !$day),
-            'page_title' => $year . ' #' . $tag . ' Events'
-        ]);
-    }
-
-    public function tag_archive($tag) {
-        $tag = Tag::normalize($tag);
-
-        $events = $this->events_query(false, false, false, false);
-
-        $events = $events->whereHas('tags', function($query) use ($tag){
-            $query->where('tag', $tag);
-        });
-
-        $events = $events->get();
-
-        if(count($events) == 0) {
-            // TODO: maybe show a page like "no events" instead
-            abort(404);
-        }
-
-        return $this->show_events_from_query($events, [
-            'tag' => $tag,
-            'archive' => true,
-            'page_title' => 'Events tagged #'.$tag,
+            'page_title' => $year . ' Events',
+            'tags' => $tags,
+            'page_type' => 'tag',
         ]);
     }
 
