@@ -16,6 +16,7 @@ You can see a live version of this project at:
 * **Tags** Events can have one or more tags. Commonly-used tags are shown on the home page as well as the "discover" page.
 * **iCal feeds** All lists of events have an iCal feed (home page, tag pages, etc) so you can subscribe to them in an external calendar.
 * **Add to Calendar** Events have an "Add to Calendar" link that exports either an iCal file or links to Google Calendar.
+* **Authentication** Broad authentication support with login methods including: Passkeys, GitHub OAuth, OpenID Connect (OIDC), Vouch Proxy, and Heroku, allowing both single-user and multi-user configurations.
 
 ### Event Pages
 
@@ -31,17 +32,38 @@ Events have a permalink that contains
 
 When logged in, you can add photos directly to an event page. Event pages also accept [webmentions](https://webmention.net) so that people can add photos and notes to the page from their own websites.
 
-
 ## Setup
 
-### Requirements
+You can run Meetable using Docker Compose or install it manually.
+
+### Docker Compose
+
+1\. Download the configuration files to your server:
+```bash
+curl -O https://raw.githubusercontent.com/aaronpk/Meetable/main/docker-compose.yml
+curl -o .env https://raw.githubusercontent.com/aaronpk/Meetable/main/.env.example
+```
+
+2\. Fill in your configuration. At minimum: \
+Set `APP_KEY` to a random 32-character string (for example you can run `crypto.randomUUID().replace(/-/g, '')` in your browser's console).
+Set the `APP_URL`, a secure `DB_PASSWORD` and `DB_ROOT_PASSWORD`.
+
+3\. Start the containers:
+```bash
+docker compose up -d
+```
+4\. Access the site at `http://localhost:8080`.
+
+### Manual Installation
+
+#### Requirements
 
 * PHP 8.2+
 * [Composer](https://getcomposer.org)
 * MySQL/MariaDB
 * Optional: Redis
 
-### Installation
+#### Installation Instructions
 
 This project is based on [Laravel](https://laravel.com), so you can defer to their instructions if you encounter any issues.
 
@@ -105,7 +127,7 @@ php artisan queue:work --stop-when-empty
 ```
 
 
-### Web Server
+#### Web Server
 
 Configure your web server to serve the project's `public` folder from the domain name you've set up.
 

@@ -1,0 +1,54 @@
+x-app-config: &app-config
+  image: ghcr.io/aaronpk/meetable:latest
+  restart: unless-stopped
+  env_file:
+    - .env
+  environment:
+    # Overriding these to force the app to use the docker compose services instead of what might be defined in .env
+    - DB_HOST=db
+    - REDIS_HOST=redis
+    - CACHE_DRIVER=redis
+    - QUEUE_CONNECTION=redis
+    - SESSION_DRIVER=redis
+
+services:
+  app:
+    <<: *app-config
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - meetable_storage:/var/www/html/storage/app
+
+  worker:
+    <<: *app-config
+    command: ["php", "artisan", "queue:work"]
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - meetable_storage:/var/www/html/storage/app
+
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+      MYSQL_USER: ${DB_USERNAME:-meetable}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    volumes:
+      - meetable_db:/var/lib/mysql
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - meetable_redis:/data
+
+volumes:
+  meetable_storage:
+  meetable_db:
+  meetable_redis:
