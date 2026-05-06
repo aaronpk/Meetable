@@ -45,7 +45,7 @@ curl -o .env https://raw.githubusercontent.com/aaronpk/Meetable/main/.env.exampl
 ```
 
 2\. Fill in your configuration. At minimum: \
-Set `APP_KEY` to a random 32-character string (for example you can run `crypto.randomUUID().replace(/-/g, '')` in your browser's console).
+Set `APP_KEY` to a random 32-character string (for example `openssl rand -base64 32` or you can run `crypto.randomUUID().replace(/-/g, '')` in your browser's console).
 Set the `APP_URL`, a secure `DB_PASSWORD` and `DB_ROOT_PASSWORD`.
 
 3\. Start the containers:
