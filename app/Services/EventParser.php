@@ -10,13 +10,7 @@ class EventParser {
 
     public static function eventFromURL($url) {
 
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 4,
-            CURLOPT_TIMEOUT => 10,
-        ]);
-        $response = curl_exec($ch);
+        $response = static::_fetch($url);
 
         $data = json_decode($response, true);
 
@@ -169,6 +163,9 @@ class EventParser {
 
         self::_setICSDates($event, $ical, $ics_event);
 
+        if(self::_isIETFCalendar($ical))
+            self::_applyIETFDetails($event);
+
         return $event;
     }
 
@@ -277,6 +274,96 @@ class EventParser {
 
         // The timezone has to be one the event form can offer in its menu
         return in_array($timezone, DateTimeZone::listIdentifiers(DateTimeZone::ALL)) ? $timezone : null;
+    }
+
+    protected static function _fetch($url) {
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 4,
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return $response;
+    }
+
+    private static function _isIETFCalendar(ICal $ical) {
+        return stripos($ical->cal['VCALENDAR']['PRODID'] ?? '', 'datatracker.ietf.org') !== false;
+    }
+
+    // The IETF datatracker packs a list of links into the event description. The
+    // remote participation link belongs in its own field, the session materials link
+    // is already the website, and the agenda those links point at makes a much better
+    // description than the list of links itself.
+    private static function _applyIETFDetails(Event $event) {
+
+        if(!$event->description)
+            return;
+
+        $agenda_url = null;
+
+        foreach(explode("\n", $event->description) as $line) {
+            $line = trim($line);
+
+            if(preg_match('~^Remote instructions:\s*(https?://\S+)$~i', $line, $match))
+                $event->meeting_url = $match[1];
+            elseif(preg_match('~^Agenda:?\s+(https?://\S+)$~i', $line, $match))
+                $agenda_url = $match[1];
+        }
+
+        if(!$agenda_url)
+            return;
+
+        // Keep the description the feed provided if the agenda can't be fetched
+        if(!($agenda = static::_fetch($agenda_url)))
+            return;
+
+        $event->description = self::_agendaToDescription($agenda);
+    }
+
+    private static function _agendaToDescription($agenda) {
+        // An agenda is uploaded either as an HTML document or as plain text. The
+        // markup of an HTML one already links its URLs, so only the body is needed.
+        if(preg_match('~<body[^>]*>(.*)</body>~is', $agenda, $match))
+            return trim($match[1]);
+
+        return self::_preserveLineBreaks(self::_autolink(trim($agenda)));
+    }
+
+    // Markdown folds consecutive lines into a single paragraph, so every line that is
+    // followed by another gets the two trailing spaces that force a line break
+    private static function _preserveLineBreaks($text) {
+        $lines = explode("\n", str_replace("\r\n", "\n", $text));
+
+        foreach($lines as $i => $line) {
+            $line = rtrim($line);
+
+            // A blank line already separates paragraphs on its own
+            if($line !== '' && isset($lines[$i+1]) && trim($lines[$i+1]) !== '')
+                $line .= '  ';
+
+            $lines[$i] = $line;
+        }
+
+        return implode("\n", $lines);
+    }
+
+    // Markdown only turns a bare URL into a link once it is wrapped in angle brackets
+    private static function _autolink($text) {
+        return preg_replace_callback('~(?<![<(\w])https?://[^\s<>]+~', function($match) {
+            $url = $match[0];
+
+            // Punctuation ending the sentence is not part of the link
+            $trailing = '';
+            while($url !== '' && strpos('.,;:!?', substr($url, -1)) !== false) {
+                $trailing = substr($url, -1).$trailing;
+                $url = substr($url, 0, -1);
+            }
+
+            return '<'.$url.'>'.$trailing;
+        }, $text);
     }
 
 }
