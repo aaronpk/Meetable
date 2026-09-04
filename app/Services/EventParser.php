@@ -3,7 +3,8 @@ namespace App\Services;
 
 use App\Event, App\Tag;
 use p3k\XRay;
-use DateTime;
+use ICal\ICal;
+use DateTime, DateTimeZone, DateInterval;
 
 class EventParser {
 
@@ -20,6 +21,7 @@ class EventParser {
         $data = json_decode($response, true);
 
         if($data && is_array($data) && isset($data['generator']) && $data['generator'] == 'Meetable') {
+            // Check for importing an event from another Meetable instance
 
             $event_data = $data['event'];
 
@@ -33,7 +35,13 @@ class EventParser {
 
             return $event;
 
+        } elseif(substr($response, 0, 15) == 'BEGIN:VCALENDAR') {
+            // Check for ICS feed
+
+            return self::eventFromICS($response);
+
         } else {
+            // Parse using XRay to find Microformats event markup
 
             $xray = new XRay;
             $data = $xray->parse($url, $response);
@@ -106,6 +114,169 @@ class EventParser {
                 return null;
             }
         }
+    }
+
+    // Build an event from an ICS feed. Only single events are supported, so a
+    // recurrence rule is left alone rather than being expanded into its instances.
+    public static function eventFromICS($ics) {
+
+        try {
+            $ical = new ICal(false, [
+                'defaultTimeZone' => 'UTC',
+                'skipRecurrence' => true,
+            ]);
+            $ical->initString($ics);
+            $ics_events = $ical->events();
+        } catch(\Exception $e) {
+            return null;
+        }
+
+        if(!$ics_events)
+            return null;
+
+        // A feed can describe more than one event, so import the one that starts first
+        usort($ics_events, function($a, $b) {
+            return ($a->dtstart_array[2] ?? 0) <=> ($b->dtstart_array[2] ?? 0);
+        });
+        $ics_event = $ics_events[0];
+
+        $event = new Event;
+
+        $event->name = $ics_event->summary ?: '';
+
+        if($ics_event->description)
+            $event->description = $ics_event->description;
+
+        if($ics_event->location)
+            $event->location_name = $ics_event->location;
+
+        if($ics_event->url)
+            $event->website = $ics_event->url;
+
+        // The ICS statuses are a subset of the ones Meetable knows about
+        if($ics_event->status && isset(Event::$STATUSES[strtolower($ics_event->status)]))
+            $event->status = strtolower($ics_event->status);
+
+        if($ics_event->categories) {
+            $tags = [];
+            foreach(explode(',', $ics_event->categories) as $category) {
+                if(($tag = Tag::normalize(trim($category))))
+                    $tags[] = $tag;
+            }
+            if($tags)
+                $event->temp_tag_string = implode(' ', $tags);
+        }
+
+        self::_setICSDates($event, $ical, $ics_event);
+
+        return $event;
+    }
+
+    private static function _setICSDates(Event $event, ICal $ical, $ics_event) {
+
+        if(!isset($ics_event->dtstart_array[2]))
+            return;
+
+        $timezone = self::_icsTimezone($ical, $ics_event);
+
+        // Floating times belong to no timezone, so they were read as UTC above and
+        // are written back out as UTC to recover the wall clock time as written
+        $display_timezone = new DateTimeZone($timezone ?: 'UTC');
+
+        $all_day = self::_icsIsAllDay($ics_event);
+
+        $start = (new DateTime('@'.$ics_event->dtstart_array[2]))->setTimezone($display_timezone);
+
+        $event->start_date = $start->format('Y-m-d');
+
+        if(!$all_day) {
+            $event->start_time = $start->format('H:i:00');
+            if($timezone)
+                $event->timezone = $timezone;
+        }
+
+        if(!($end = self::_icsEnd($ics_event)))
+            return;
+
+        $end->setTimezone($display_timezone);
+
+        if($all_day) {
+            // The end date of an all-day event is exclusive, matching the ICS this app
+            // generates, so the last day of the event is the day before it
+            $end->modify('-1 day');
+        } else {
+            $event->end_time = $end->format('H:i:00');
+        }
+
+        $end_date = $end->format('Y-m-d');
+
+        if($end_date > $event->start_date && !self::_icsCrossesMidnight($event, $end_date))
+            $event->end_date = $end_date;
+    }
+
+    // An event that runs past midnight is stored with only an end time, since the
+    // model already reads an end time before the start time as the following day.
+    // Storing an end date instead would turn it into a multi-day event.
+    private static function _icsCrossesMidnight(Event $event, $end_date) {
+        return $event->start_time && $event->end_time
+            && $event->end_time < $event->start_time
+            && $end_date == date('Y-m-d', strtotime($event->start_date.' +1 day'));
+    }
+
+    private static function _icsEnd($ics_event) {
+        if(isset($ics_event->dtend_array[2]))
+            return new DateTime('@'.$ics_event->dtend_array[2]);
+
+        // An event can give its length as a duration instead of an end date
+        if(isset($ics_event->duration_array[2]) && $ics_event->duration_array[2] instanceof DateInterval)
+            return (new DateTime('@'.$ics_event->dtstart_array[2]))->add($ics_event->duration_array[2]);
+
+        return null;
+    }
+
+    private static function _icsIsAllDay($ics_event) {
+        if(isset($ics_event->dtstart_array[0]['VALUE']) && $ics_event->dtstart_array[0]['VALUE'] == 'DATE')
+            return true;
+
+        // A date with no time part is a date, whether or not it says so
+        return isset($ics_event->dtstart_array[1]) && strpos($ics_event->dtstart_array[1], 'T') === false;
+    }
+
+    private static function _icsTimezone(ICal $ical, $ics_event) {
+
+        // An explicit timezone on the start date wins
+        if(($timezone = self::_icsValidTimezone($ical, $ics_event->dtstart_array[0]['TZID'] ?? null)))
+            return $timezone;
+
+        if(substr($ics_event->dtstart_array[1] ?? '', -1) == 'Z') {
+            // A UTC time doesn't say which timezone the event is actually held in, so
+            // look for a hint from the event or the calendar before settling for UTC
+            if(($timezone = self::_icsValidTimezone($ical, $ics_event->x_meeting_tz)))
+                return $timezone;
+
+            if(($timezone = self::_icsValidTimezone($ical, $ical->calendarTimeZone(true))))
+                return $timezone;
+
+            return 'UTC';
+        }
+
+        // Floating times have no timezone
+        return null;
+    }
+
+    private static function _icsValidTimezone(ICal $ical, $timezone) {
+        if(!$timezone || !is_string($timezone))
+            return null;
+
+        try {
+            // This resolves quoted, CLDR and Windows timezone names to an IANA name
+            $timezone = $ical->timeZoneStringToDateTimeZone($timezone)->getName();
+        } catch(\Exception $e) {
+            return null;
+        }
+
+        // The timezone has to be one the event form can offer in its menu
+        return in_array($timezone, DateTimeZone::listIdentifiers(DateTimeZone::ALL)) ? $timezone : null;
     }
 
 }

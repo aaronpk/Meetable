@@ -9,7 +9,7 @@
 
     <div class="field">
         <input class="input" type="url" autocomplete="off" name="url" required>
-        <div class="help">Enter a URL to import that event, such as an event on another Meetable instance. Currently only Microformats is supported.</div>
+        <div class="help">Enter a URL to import that event, such as an event on another Meetable instance or an ICS feed. Microformats and ICS are supported. If an ICS feed contains several events, the one that starts first is imported.</div>
     </div>
 
     <button class="button is-primary" type="submit">Preview</button>
