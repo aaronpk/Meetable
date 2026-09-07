@@ -15,12 +15,12 @@ services:
   app:
     <<: *app-config
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80/tcp"
     depends_on:
       - db
       - redis
     volumes:
-      - meetable_storage:/var/www/html/storage/app
+      - ./storage:/var/www/html/storage/app
 
   worker:
     <<: *app-config
@@ -29,10 +29,10 @@ services:
       - db
       - redis
     volumes:
-      - meetable_storage:/var/www/html/storage/app
+      - ./storage:/var/www/html/storage/app
 
   db:
-    image: mariadb:10.11
+    image: mariadb:12
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-laravel}
@@ -43,7 +43,7 @@ services:
       - meetable_db:/var/lib/mysql
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     restart: unless-stopped
     volumes:
       - meetable_redis:/data
