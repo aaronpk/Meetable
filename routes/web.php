@@ -1,8 +1,4 @@
 <?php
-use Laragear\WebAuthn\WebAuthn;
-
-WebAuthn::routes();
-
 // Check whether setup has been completed and define installer routes if not
 if(defined('MEETABLE_SETUP')):
 

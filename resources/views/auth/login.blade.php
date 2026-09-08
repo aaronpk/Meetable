@@ -18,15 +18,13 @@
         const login = event => {
             event.preventDefault()
 
-            new WebAuthn().login({
-            }, {
-                remember: null,
-            }).then(response => {
-                window.location = "/"
-            })
-            .catch(error => {
+            Passkeys.login()
+              .then(response => {
+                window.location = response.redirect || "/"
+              })
+              .catch(error => {
                 $("#error").removeClass("hidden")
-            })
+              })
         }
 
         document.getElementById('login-form').addEventListener('submit', login)

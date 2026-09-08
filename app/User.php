@@ -5,16 +5,16 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
-use Laragear\WebAuthn\WebAuthnAuthentication;
+use Laravel\Passkeys\Contracts\PasskeyUser;
+use Laravel\Passkeys\PasskeyAuthenticatable;
 use Storage, Log;
 use Image;
 use p3k\XRay;
 
-class User extends Authenticatable implements WebAuthnAuthenticatable
+class User extends Authenticatable implements PasskeyUser
 {
     use Notifiable;
-    use WebAuthnAuthentication;
+    use PasskeyAuthenticatable;
 
     /**
      * The attributes that are mass assignable.

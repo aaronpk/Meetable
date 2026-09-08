@@ -54,7 +54,7 @@ class Controller extends BaseController
 
         $tags = [];
         if(count($events) > 0) {
-            $query = DB::select(DB::raw('SELECT tag, COUNT(1) AS cities_count, SUM(num) AS events_count
+            $query = DB::select('SELECT tag, COUNT(1) AS cities_count, SUM(num) AS events_count
                 FROM
                 (SELECT tags.tag, events.location_locality AS locality, COUNT(1) AS num
                 FROM events
@@ -65,7 +65,7 @@ class Controller extends BaseController
                 ORDER BY tag) AS data
                 GROUP BY tag
                 ORDER BY cities_count DESC, tag
-                '));
+                ');
             foreach($query as $tag) {
                 // Only show tags used by more than 1 event, otherwise the list is very
                 // long and it isn't very interesting to click a tag and see just one event
@@ -175,11 +175,11 @@ class Controller extends BaseController
         $upcoming_events = $upcoming_events->get();
 
         $past_events = $this->events_query($year, false, false, false);
-        $past_events = $past_events->whereRaw(DB::raw('
+        $past_events = $past_events->whereRaw('
             ((start_date < "'.$nowDate.'" AND end_date IS NULL)
             OR
             (end_date < "'.$nowDate.'"))
-        '));
+        ');
         $past_events = Event::tagged($past_events, $tags);
         $past_events = $past_events->get();
 
@@ -294,7 +294,7 @@ class Controller extends BaseController
         // Group tags by the number of different cities they are used in, and sort by the number of events.
         // This should produce a list where the first tags are the most broad/common across many cities,
         // and the tags lower down in the list are usually city-specific.
-        $query = DB::select(DB::raw('SELECT tag, COUNT(1) AS num_cities, SUM(num) AS num_events
+        $query = DB::select('SELECT tag, COUNT(1) AS num_cities, SUM(num) AS num_events
             FROM
             (SELECT tags.tag, events.location_locality AS locality, COUNT(1) AS num
             FROM events
@@ -305,7 +305,7 @@ class Controller extends BaseController
             ORDER BY tag) AS data
             GROUP BY tag
             ORDER BY num_cities DESC, tag
-            '));
+            ');
 
         $tags = [];
         $max = false;

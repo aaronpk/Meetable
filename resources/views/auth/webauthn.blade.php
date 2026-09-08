@@ -10,6 +10,12 @@
     </div>
 
     <form id="register-form">
+        <div class="field">
+            <label class="label" for="passkey-name">Name this passkey</label>
+            <div class="control">
+                <input class="input" type="text" id="passkey-name" name="name" value="Passkey" required>
+            </div>
+        </div>
         <button type="submit" class="button is-primary">Register passkey</button>
     </form>
 
@@ -17,7 +23,7 @@
     const register = event => {
         event.preventDefault()
 
-        new WebAuthn().register()
+        Passkeys.register(document.getElementById('passkey-name').value)
           .then(response => {
             window.location = '/'
           })
