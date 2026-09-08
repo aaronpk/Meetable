@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use App\Helpers\HerokuS3;
 
@@ -20,10 +22,8 @@ class HerokuS3HelperTest extends TestCase
         $_ENV = $this->_oldenv;
     }
 
-    /**
-     * @test
-     * @dataProvider systemTestProvider
-     */
+    #[Test]
+    #[DataProvider('systemTestProvider')]
     public function get_aws_bucket_from_env($system_env, $expectations) {
         $this->restoreEnv($system_env);
 
@@ -33,10 +33,8 @@ class HerokuS3HelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider systemTestProvider
-     */
+    #[Test]
+    #[DataProvider('systemTestProvider')]
     public function get_aws_root_from_env($system_env, $expectations) {
         $this->restoreEnv($system_env);
 
@@ -46,10 +44,8 @@ class HerokuS3HelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider systemTestProvider
-     */
+    #[Test]
+    #[DataProvider('systemTestProvider')]
     public function get_aws_url_from_env($system_env, $expectations) {
         $this->restoreEnv($system_env);
 
@@ -59,10 +55,8 @@ class HerokuS3HelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider systemTestProvider
-     */
+    #[Test]
+    #[DataProvider('systemTestProvider')]
     public function get_default_aws_region($system_env, $expectations) {
         $this->restoreEnv($system_env);
 
@@ -72,10 +66,8 @@ class HerokuS3HelperTest extends TestCase
         );
     }
 
-    /**
-     * @test
-     * @dataProvider cloudcubeTestProvider
-     */
+    #[Test]
+    #[DataProvider('cloudcubeTestProvider')]
     public function get_default_cloudcube_region(
         $left_most_subdomain, $expectation
     ) {

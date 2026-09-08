@@ -384,6 +384,13 @@ class EventController extends BaseController
           ->orderBy('created_at', 'desc')
           ->first();
 
+        // The oldest revision has nothing before it, so diff it against a blank
+        // revision, which shows every field it set as newly added.
+        if(!$previous) {
+            $previous = new EventRevision;
+            $previous->tags = '[]';
+        }
+
         return view('diff', [
             'current' => $revision,
             'previous' => $previous,

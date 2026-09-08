@@ -82,7 +82,7 @@ Route::middleware('slashes:remove')->group(function(){
     Route::get('/{key}', 'Controller@event_shorturl');
 });
 
-Route::middleware('auth')->middleware('slashes:remove')->group(function(){
+Route::middleware(['auth', 'slashes:remove'])->group(function(){
 
     Route::get('/new', 'EventController@new_event')->name('new-event');
     Route::get('/import', 'EventController@import_event')->name('import-event');

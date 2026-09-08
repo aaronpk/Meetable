@@ -2,25 +2,23 @@
 
 namespace Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use App\Helpers\Uri;
 
 class UriHelperTest extends TestCase
 {
-    /**
-     * @test
-     * @dataProvider uriTestProvider
-     */
+    #[Test]
+    #[DataProvider('uriTestProvider')]
     public function get_uri_path($uri, $expectations)
     {
         $output = Uri::get_uri_path($uri);
         $this->assertEquals($expectations['path'], $output);
     }
 
-    /**
-     * @test
-     * @dataProvider uriTestProvider
-     */
+    #[Test]
+    #[DataProvider('uriTestProvider')]
     public function get_uri_without_path($uri, $expectations) {
         $output = Uri::get_uri_without_path(
             $uri, Uri::get_uri_path($uri)
@@ -28,19 +26,15 @@ class UriHelperTest extends TestCase
         $this->assertEquals($expectations['uri_sans_path'], $output);
     }
 
-    /**
-     * @test
-     * @dataProvider uriTestProvider
-     */
+    #[Test]
+    #[DataProvider('uriTestProvider')]
     public function get_uri_host($uri, $expectations) {
         $output = Uri::get_uri_host($uri);
         $this->assertEquals($expectations['host'], $output);
     }
 
-    /**
-     * @test
-     * @dataProvider uriTestProvider
-     */
+    #[Test]
+    #[DataProvider('uriTestProvider')]
     public function get_uri_domain_parts($uri, $expectations) {
         $output = Uri::get_uri_domain_parts(
             Uri::get_uri_host($uri)

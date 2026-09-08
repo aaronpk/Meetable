@@ -9,7 +9,6 @@ use DateTime, DateTimeZone;
 use DB, Log;
 use ICal\ICal;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use ZBateson\MailMimeParser\MailMimeParser;
 use ZBateson\MailMimeParser\Message;
 use ZBateson\MailMimeParser\Header\HeaderConsts;
@@ -136,7 +135,7 @@ class InboundEmailController extends BaseController
         $event = Event::where('ics_uid', $data->uid)->withTrashed()->first();
         if(!$event) {
             $event = new Event();
-            $event->key = Str::random(12);
+            $event->generate_random_values();
             $event->ics_uid = $data->uid;
             $event->created_by = $user->id;
             $event->last_modified_by = $user->id;

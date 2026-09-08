@@ -185,7 +185,7 @@ use App\Setting;
                 </div>
             @endif
             {!! $event->mf2_date_html() !!}
-            @if(!$event->is_past() && !in_array($event->status, ['cancelled','postponed']))
+            @if($mode != 'archive' && !$event->is_past() && !in_array($event->status, ['cancelled','postponed']))
             <div class="add-to-calendar">
                 <div class="dropdown is-hoverable">
                     <div class="dropdown-trigger">
@@ -195,9 +195,9 @@ use App\Setting;
                     </div>
                     <div class="dropdown-menu" role="menu" id="add-to-calendar-menu">
                         <div class="dropdown-content">
-                            @if(count($event->tags) > 0)
+                            @if(count($event->tag_list) > 0)
                                 <a href="{{ $event->tag_feed_ics_link() }}" class="dropdown-item">
-                                    @icon(calendar-alt) Tag Feed <span class="tag is-rounded">#{{ $event->tags[0]->tag }}</span>
+                                    @icon(calendar-alt) Tag Feed <span class="tag is-rounded">#{{ $event->tag_list[0] }}</span>
                                 </a>
                                 <hr class="dropdown-divider" />
                             @endif

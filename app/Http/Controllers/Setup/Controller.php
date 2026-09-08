@@ -50,7 +50,9 @@ class Controller extends BaseController
         // Attempt to connect to the database with the provided credentials or the defined DB URL
         try {
             if(env('DATABASE_URL'))
-                DB::raw('SELECT VERSION();');
+                // DB::raw only builds an expression, so the query has to be run to
+                // actually prove the configured connection works.
+                DB::select('SELECT VERSION()');
             else
                 $db = new \PDO('mysql:dbname='.request('db_name').';host='.request('db_host'),
                 request('db_username'), request('db_password'));

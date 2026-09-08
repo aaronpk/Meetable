@@ -52,14 +52,24 @@ class Event extends Model
         }
     }
 
+    /**
+     * The column holding the id that responses, photos and revisions hang off.
+     *
+     * An EventRevision is a snapshot of an event's own fields, so it points these
+     * relations at the event it was taken from rather than at its own primary key.
+     */
+    public function eventKeyName() {
+        return $this->getKeyName();
+    }
+
     public function responses() {
-        return $this->hasMany('\App\Response')
+        return $this->hasMany('\App\Response', 'event_id', $this->eventKeyName())
             ->where('approved', true)
             ->orderBy('created_at', 'desc');
     }
 
     public function pending_responses() {
-        return $this->hasMany('\App\Response')
+        return $this->hasMany('\App\Response', 'event_id', $this->eventKeyName())
             ->where('approved', false)
             ->orderBy('created_at', 'desc');
     }
@@ -70,12 +80,12 @@ class Event extends Model
     }
 
     public function revisions() {
-        return $this->hasMany('\App\EventRevision')
+        return $this->hasMany('\App\EventRevision', 'event_id', $this->eventKeyName())
             ->orderBy('created_at', 'desc');
     }
 
     public function photos() {
-        return $this->hasManyThrough('\App\ResponsePhoto', '\App\Response')
+        return $this->hasManyThrough('\App\ResponsePhoto', '\App\Response', 'event_id', 'response_id', $this->eventKeyName(), 'id')
             ->where('approved', true)
             ->orderBy('sort_order', 'asc')
             ->orderBy('response_photos.created_at', 'desc');
@@ -99,7 +109,7 @@ class Event extends Model
     }
 
     public function tags() {
-        return $this->belongsToMany('\App\Tag');
+        return $this->belongsToMany('\App\Tag', 'event_tag', 'event_id', 'tag_id', $this->eventKeyName(), 'id');
     }
 
     public function getTagListAttribute() {
@@ -130,7 +140,7 @@ class Event extends Model
     }
 
     public function children() {
-        return $this->hasMany('\App\Event', 'parent_id')
+        return $this->hasMany('\App\Event', 'parent_id', $this->eventKeyName())
             ->orderBy('sort_date', 'asc');
     }
 
@@ -201,8 +211,7 @@ class Event extends Model
     }
 
     public function tag_feed_ics_link() {
-        $tag = $this->tags[0]->tag;
-        return route('ics-tag-preview', $tag);
+        return route('ics-tag-preview', $this->tag_list[0]);
     }
 
     public function absolute_permalink() {

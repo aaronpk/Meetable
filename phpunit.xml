@@ -20,5 +20,8 @@
     <server name="MAIL_DRIVER" value="array"/>
     <server name="QUEUE_CONNECTION" value="sync"/>
     <server name="SESSION_DRIVER" value="array"/>
+    <server name="AUTH_METHOD" value="session"/>
+    <server name="ALLOW_MANAGE_EVENTS" value="users"/>
+    <server name="ALLOW_MANAGE_SITE" value="users"/>
   </php>
 </phpunit>

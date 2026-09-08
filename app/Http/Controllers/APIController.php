@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use App\Event, App\EventRevision, App\Tag, App\Response, App\User;
 use App\Events\EventCreated, App\Events\EventUpdated;
 use App\Events\WebmentionReceived;
-use Illuminate\Support\Str;
 use Auth, Gate;
 use DateTime, DateTimeZone, Exception;
 use p3k\XRay;
@@ -52,7 +51,7 @@ class APIController extends BaseController
         $event = new Event();
         $event->name = request('name');
 
-        $event->key = Str::random(12);
+        $event->generate_random_values();
         $event->slug = Event::slug_from_name($event->name);
 
         $event->location_name = request('location_name') ?: '';

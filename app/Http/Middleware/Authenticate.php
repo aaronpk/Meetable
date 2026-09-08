@@ -2,7 +2,9 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\Auth\CustomGuard;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Support\Facades\Route;
 use Auth;
 
 class Authenticate extends Middleware
@@ -15,12 +17,15 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if(!$request->expectsJson()) {
-            // Get the URL to redirect to from the active Guard.
-            // This allows different guards to implement this differently.
-            return Auth::guard()->redirectWhenNotAuthenticated($request->url());
-        } else {
-            return abort(401);
+        $guard = Auth::guard();
+
+        // The external auth methods send the visitor off to their own login flow.
+        if($guard instanceof CustomGuard) {
+            return $guard->redirectWhenNotAuthenticated($request->url());
         }
+
+        // The built-in passkey login is served by this app. It isn't registered
+        // until the site has been set up, so fall back to the installer.
+        return Route::has('login') ? route('login') : '/';
     }
 }
