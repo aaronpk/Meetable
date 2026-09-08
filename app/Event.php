@@ -34,7 +34,7 @@ class Event extends Model
         'latitude', 'longitude', 'timezone', 'status',
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url', 'notes_url',
         'summary', 'description', 'cover_image', 'unlisted', 'parent_id', 'hide_from_main_feed',
-        'recurrence_interval',
+        'recurrence_interval', 'recurrence_interval_count',
     ];
 
     public static function slug_from_name($name) {
@@ -433,6 +433,9 @@ class Event extends Model
                 return 'Every week on '.$start->format('l').'s';
             case 'biweekly_dow':
                 return 'Every other week on '.$start->format('l').'s';
+            case 'weekly_n':
+                $weeks = (int)$this->recurrence_interval_count ?: 1;
+                return ($weeks == 1 ? 'Every week' : 'Every '.$weeks.' weeks').' on '.$start->format('l').'s';
             case 'monthly_date':
                 return 'Every month on the '.$start->format('dS');
             case 'yearly':
@@ -449,6 +452,8 @@ class Event extends Model
                 return new DateInterval('P1W');
             case 'biweekly_dow':
                 return new DateInterval('P2W');
+            case 'weekly_n':
+                return new DateInterval('P'.((int)$this->recurrence_interval_count ?: 1).'W');
             case 'monthly_date':
                 return new DateInterval('P1M');
             case 'yearly':
@@ -467,6 +472,8 @@ class Event extends Model
                 return $now->add(new DateInterval('P5W'));
             case 'biweekly_dow':
                 return $now->add(new DateInterval('P9W'));
+            case 'weekly_n':
+                return $now->add(new DateInterval('P'.(((int)$this->recurrence_interval_count ?: 1) * 5).'W'));
             case 'monthly_date':
                 return $now->add(new DateInterval('P4M'));
             case 'yearly':
@@ -505,6 +512,7 @@ class Event extends Model
                     $copy->start_date = $date->format('Y-m-d');
                     $copy->is_template = false;
                     $copy->recurrence_interval = null;
+                    $copy->recurrence_interval_count = null;
                     $copy->sort_date = $copy->sort_date();
                     $copy->reset_live_event_stats();
 

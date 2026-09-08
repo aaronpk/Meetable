@@ -65,6 +65,7 @@ class EventController extends BaseController
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
+            'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
         ]);
 
         $event = new Event();
@@ -75,6 +76,9 @@ class EventController extends BaseController
         if(request('is_template')) {
             $event->is_template = true;
             $event->recurrence_interval = request('recurrence_interval');
+            $event->recurrence_interval_count = request('recurrence_interval') === 'weekly_n'
+                ? (request('recurrence_interval_count') ?: null)
+                : null;
             $event->key = '';
         }
 
@@ -244,6 +248,7 @@ class EventController extends BaseController
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
+            'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
         ]);
 
         if($event->fields_from_ics) {
@@ -312,6 +317,9 @@ class EventController extends BaseController
         // Allow event templates to change the recurrence property
         if($event->is_template) {
             $event->recurrence_interval = request('recurrence_interval');
+            $event->recurrence_interval_count = request('recurrence_interval') === 'weekly_n'
+                ? (request('recurrence_interval_count') ?: null)
+                : null;
         }
 
         $event->last_modified_by = Auth::user()->id;

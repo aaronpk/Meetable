@@ -174,4 +174,35 @@ class EventTest extends TestCase
         $now = new DateTime('2024-12-01T17:31:00');
         $this->assertTrue($event->is_past($now));
     }
+
+    public function testRecurrenceEveryNWeeksInterval() {
+        $event = new Event;
+        $event->start_date = '2024-01-01'; // a Monday
+        $event->recurrence_interval = 'weekly_n';
+        $event->recurrence_interval_count = 3;
+
+        // 'P3W' is normalized to 21 days internally
+        $this->assertEquals(21, $event->recurrence_date_interval()->d);
+        $this->assertEquals('Every 3 weeks on Mondays', $event->recurrence_description());
+    }
+
+    public function testRecurrenceEveryNWeeksEndWindow() {
+        $event = new Event;
+        $event->start_date = '2024-01-01';
+        $event->recurrence_interval = 'weekly_n';
+        $event->recurrence_interval_count = 3;
+
+        // Lookahead is count * 5 weeks = 15 weeks = 105 days ahead of "now"
+        $now = new DateTime();
+        $end = $event->recurrence_end_datetime();
+        $this->assertEquals(105, $now->diff($end)->days);
+    }
+
+    public function testRecurrenceEveryNWeeksFallsBackToWeekly() {
+        $event = new Event;
+        $event->start_date = '2024-01-01';
+        $event->recurrence_interval = 'weekly_n';
+        // No count set: should behave as every 1 week (7 days), not crash
+        $this->assertEquals(7, $event->recurrence_date_interval()->d);
+    }
 }

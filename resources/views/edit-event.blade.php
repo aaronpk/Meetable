@@ -246,6 +246,13 @@ form h2.subtitle {
     <script>
     $(function(){
         var selected_recurrence_interval;
+        var selected_recurrence_interval_count;
+        function toggle_count() {
+            if($("select[name=recurrence_interval]").val() == 'weekly_n')
+                $("#recurrence_count_field").show();
+            else
+                $("#recurrence_count_field").hide();
+        }
         function reload_recurrence_menu() {
             $.post("/event/{{ $event->id }}/recurring/details", {
                 _token: csrf_token(),
@@ -259,8 +266,18 @@ form h2.subtitle {
                     $("select[name=recurrence_interval]").val("{{ $event->recurrence_interval ?: 'weekly_dow' }}");
                 }
 
+                if(selected_recurrence_interval_count) {
+                    $("input[name=recurrence_interval_count]").val(selected_recurrence_interval_count);
+                }
+                toggle_count();
+
                 $("select[name=recurrence_interval]").on('change', function(){
                     selected_recurrence_interval = $(this).val();
+                    toggle_count();
+                });
+
+                $("input[name=recurrence_interval_count]").on('change', function(){
+                    selected_recurrence_interval_count = $(this).val();
                 });
             });
         }
