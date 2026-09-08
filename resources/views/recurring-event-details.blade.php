@@ -7,6 +7,10 @@
                 <option value="biweekly_dow">Every Other Week on {{ $recur_dow }}</option>
                 <option value="weekly_n">Every N Weeks on {{ $recur_dow }}</option>
                 <option value="monthly_date">Every Month on the {{ $recur_date }}</option>
+                <option value="monthly_dow">Every Month on the {{ $recur_dow_ordinal }}</option>
+                @if($recur_dow_from_end)
+                <option value="monthly_dow_last">Every Month on the {{ $recur_dow_from_end }}</option>
+                @endif
                 <option value="yearly">Every Year on {{ $recur_month_date }}</option>
             </select>
         </div>

@@ -28,6 +28,15 @@ class Event extends Model
         'cancelled' => 'Cancelled',
     ];
 
+    public static $RECURRENCE_INTERVALS = [
+        'weekly_dow', 'biweekly_dow', 'weekly_n',
+        'monthly_date', 'monthly_dow', 'monthly_dow_last',
+        'yearly',
+    ];
+
+    // A weekday can fall in at most five different weeks of a month
+    const RECURRENCE_ORDINALS = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th'];
+
     public static $EDITABLE_PROPERTIES = [
         'name', 'start_date', 'end_date', 'start_time', 'end_time',
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
@@ -422,6 +431,36 @@ class Event extends Model
         return $start_html . $end_html;
     }
 
+    /**
+     * Which occurrence of its own weekday the date is within its month, 1 through 5.
+     *
+     * The 17th of a month is always in the third group of seven days, so it is the
+     * third occurrence of whichever weekday it falls on.
+     */
+    public static function week_of_month(DateTime $date) {
+        return (int)ceil((int)$date->format('j') / 7);
+    }
+
+    /**
+     * The same thing counted backwards, where 1 is the last occurrence of that
+     * weekday in the month, 2 the second to last, and so on.
+     */
+    public static function weeks_from_end_of_month(DateTime $date) {
+        return (int)floor(((int)$date->format('t') - (int)$date->format('j')) / 7) + 1;
+    }
+
+    // e.g. "3rd Tuesday"
+    public static function day_of_week_ordinal_label(DateTime $date) {
+        return self::RECURRENCE_ORDINALS[self::week_of_month($date)].' '.$date->format('l');
+    }
+
+    // e.g. "last Friday" or "2nd last Friday"
+    public static function day_of_week_from_end_label(DateTime $date) {
+        $weeks = self::weeks_from_end_of_month($date);
+
+        return ($weeks == 1 ? 'last ' : self::RECURRENCE_ORDINALS[$weeks].' last ').$date->format('l');
+    }
+
     public function recurrence_description() {
         if(!$this->recurrence_interval)
             return '';
@@ -438,11 +477,20 @@ class Event extends Model
                 return ($weeks == 1 ? 'Every week' : 'Every '.$weeks.' weeks').' on '.$start->format('l').'s';
             case 'monthly_date':
                 return 'Every month on the '.$start->format('dS');
+            case 'monthly_dow':
+                return 'Every month on the '.self::day_of_week_ordinal_label($start);
+            case 'monthly_dow_last':
+                return 'Every month on the '.self::day_of_week_from_end_label($start);
             case 'yearly':
-                return 'Every year on '.$start->format('d');
+                return 'Every year on '.$start->format('M j');
         }
     }
 
+    /**
+     * The fixed gap between occurrences, or null for the schedules that don't have
+     * one. "The last Friday of the month" lands 28 or 35 days apart depending on
+     * the month, so those are worked out a month at a time in recurrence_dates().
+     */
     public function recurrence_date_interval() {
         if(!$this->recurrence_interval)
             return null;
@@ -459,6 +507,8 @@ class Event extends Model
             case 'yearly':
                 return new DateInterval('P1Y');
         }
+
+        return null;
     }
 
     public function recurrence_end_datetime() {
@@ -475,30 +525,112 @@ class Event extends Model
             case 'weekly_n':
                 return $now->add(new DateInterval('P'.(((int)$this->recurrence_interval_count ?: 1) * 5).'W'));
             case 'monthly_date':
+            case 'monthly_dow':
+            case 'monthly_dow_last':
                 return $now->add(new DateInterval('P4M'));
             case 'yearly':
                 return $now->add(new DateInterval('P2Y'));
         }
+
+        return null;
+    }
+
+    /**
+     * Every date this event recurs on between its start and the end of the window
+     * we schedule ahead.
+     */
+    public function recurrence_dates() {
+        $start = $this->start_datetime();
+        $end = $this->recurrence_end_datetime();
+
+        if(!$end)
+            return [];
+
+        if($interval = $this->recurrence_date_interval())
+            return iterator_to_array(new DatePeriod($start, $interval, $end));
+
+        if(in_array($this->recurrence_interval, ['monthly_dow', 'monthly_dow_last']))
+            return $this->monthly_day_of_week_dates($start, $end);
+
+        return [];
+    }
+
+    /**
+     * Walks month by month picking out the same weekday position the series
+     * started on, counting either from the start or the end of the month.
+     */
+    private function monthly_day_of_week_dates(DateTime $start, DateTime $end) {
+        $weekday = (int)$start->format('w');
+        $from_end = $this->recurrence_interval == 'monthly_dow_last';
+
+        $position = $from_end
+            ? self::weeks_from_end_of_month($start)
+            : self::week_of_month($start);
+
+        $dates = [];
+        $month = (clone $start)->modify('first day of this month');
+
+        while($month <= $end) {
+            $day = $from_end
+                ? self::day_of_nth_weekday_from_end($month, $weekday, $position)
+                : self::day_of_nth_weekday($month, $weekday, $position);
+
+            if($day) {
+                // Keep the time and timezone the series was defined with
+                $date = (clone $start)->setDate((int)$month->format('Y'), (int)$month->format('n'), $day);
+
+                if($date >= $start && $date <= $end)
+                    $dates[] = $date;
+            }
+
+            $month->modify('first day of next month');
+        }
+
+        return $dates;
+    }
+
+    /**
+     * The day of the month the Nth given weekday falls on, or null when the month
+     * has no Nth one, which happens for a fifth weekday in most months.
+     */
+    private static function day_of_nth_weekday(DateTime $month, $weekday, $n) {
+        $first = (clone $month)->modify('first day of this month');
+
+        $day = 1 + (($weekday - (int)$first->format('w') + 7) % 7) + ($n - 1) * 7;
+
+        return $day <= (int)$first->format('t') ? $day : null;
+    }
+
+    /**
+     * The same, counting back from the end of the month.
+     */
+    private static function day_of_nth_weekday_from_end(DateTime $month, $weekday, $n) {
+        $last = (clone $month)->modify('last day of this month');
+
+        $day = (int)$last->format('j') - (((int)$last->format('w') - $weekday + 7) % 7) - ($n - 1) * 7;
+
+        return $day >= 1 ? $day : null;
     }
 
     public function create_upcoming_recurrences() {
         // Find the next events to schedule out over the next N weeks
-        $interval = $this->recurrence_date_interval();
         $start = $this->start_datetime();
         $now = new DateTime();
+        $end = $this->recurrence_end_datetime();
 
         Log::info($this->name);
         Log::info('Series starts: '.$start->format('Y-m-d'));
         Log::info('Recurrence: '.$this->recurrence_interval);
 
-        $end = $this->recurrence_end_datetime();
+        if(!$end) {
+            Log::warning('  No schedule for this template, skipping');
+            return;
+        }
 
         Log::info('Today: '.$now->format('Y-m-d'));
         Log::info('Target end date: '.$end->format('Y-m-d'));
 
-        $period = new DatePeriod($start, $interval, $end);
-
-        foreach($period as $date) {
+        foreach($this->recurrence_dates() as $date) {
             if($date >= $now) {
                 $exists = Event::where('created_from_template_event_id', $this->id)
                   ->where('start_date', $date->format('Y-m-d'))

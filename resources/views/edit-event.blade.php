@@ -256,15 +256,20 @@ form h2.subtitle {
         function reload_recurrence_menu() {
             $.post("/event/{{ $event->id }}/recurring/details", {
                 _token: csrf_token(),
-                date: $("input[name=start_date]").val(),
-                recurrence: 'foo'
+                date: $("input[name=start_date]").val()
             }, function(response) {
                 $("#recurring_details").html(response);
+                var $interval = $("select[name=recurrence_interval]");
                 if(selected_recurrence_interval) {
-                    $("select[name=recurrence_interval]").val(selected_recurrence_interval);
+                    $interval.val(selected_recurrence_interval);
                 } else {
-                    $("select[name=recurrence_interval]").val("{{ $event->recurrence_interval ?: 'weekly_dow' }}");
+                    $interval.val("{{ $event->recurrence_interval ?: 'weekly_dow' }}");
                 }
+
+                // The options depend on the date, so a previously chosen schedule
+                // may not be offered any more. Fall back to the first one.
+                if($interval.prop("selectedIndex") < 0)
+                    $interval.prop("selectedIndex", 0);
 
                 if(selected_recurrence_interval_count) {
                     $("input[name=recurrence_interval_count]").val(selected_recurrence_interval_count);

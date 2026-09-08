@@ -65,6 +65,7 @@ class EventController extends BaseController
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
+            'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
         ]);
 
@@ -228,16 +229,19 @@ class EventController extends BaseController
     public function recurring_event_details(Request $request, Event $event) {
         Gate::authorize('manage-event', $event);
 
-        $recurrence = request('recurrence');
         $date = new DateTime(request('date'));
 
-
+        // Only the last two occurrences of a weekday are worth offering to count
+        // from the end of the month; anything earlier is clearer counted forwards.
+        $weeks_from_end = Event::weeks_from_end_of_month($date);
 
         return view('recurring-event-details', [
             'event' => $event,
             'recur_month_date' => $date->format('M j'),
             'recur_date' => $date->format('jS'),
             'recur_dow' => $date->format('l'),
+            'recur_dow_ordinal' => Event::day_of_week_ordinal_label($date),
+            'recur_dow_from_end' => $weeks_from_end <= 2 ? Event::day_of_week_from_end_label($date) : null,
         ]);
     }
 
@@ -248,6 +252,7 @@ class EventController extends BaseController
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
+            'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
         ]);
 

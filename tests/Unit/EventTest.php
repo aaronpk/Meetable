@@ -205,4 +205,101 @@ class EventTest extends TestCase
         // No count set: should behave as every 1 week (7 days), not crash
         $this->assertEquals(7, $event->recurrence_date_interval()->d);
     }
+
+    public function testWeekOfMonth() {
+        // January 2026 starts on a Thursday
+        $this->assertEquals(1, Event::week_of_month(new DateTime('2026-01-06'))); // 1st Tuesday
+        $this->assertEquals(3, Event::week_of_month(new DateTime('2026-01-20'))); // 3rd Tuesday
+        $this->assertEquals(4, Event::week_of_month(new DateTime('2026-01-28'))); // 4th Wednesday
+        $this->assertEquals(5, Event::week_of_month(new DateTime('2026-01-30'))); // 5th Friday
+    }
+
+    public function testWeeksFromEndOfMonth() {
+        // January 2026 has 31 days, so its Wednesdays are the 7th through the 28th
+        $this->assertEquals(1, Event::weeks_from_end_of_month(new DateTime('2026-01-28')));
+        $this->assertEquals(2, Event::weeks_from_end_of_month(new DateTime('2026-01-21')));
+        $this->assertEquals(4, Event::weeks_from_end_of_month(new DateTime('2026-01-07')));
+
+        // The last day of a month is always the last of its weekday
+        $this->assertEquals(1, Event::weeks_from_end_of_month(new DateTime('2026-02-28')));
+    }
+
+    public function testMonthlyDayOfWeekDescriptions() {
+        $event = new Event;
+        $event->start_date = '2026-01-20'; // the 3rd Tuesday
+        $event->recurrence_interval = 'monthly_dow';
+        $this->assertEquals('Every month on the 3rd Tuesday', $event->recurrence_description());
+
+        $event->start_date = '2026-01-28'; // the last Wednesday
+        $event->recurrence_interval = 'monthly_dow_last';
+        $this->assertEquals('Every month on the last Wednesday', $event->recurrence_description());
+
+        $event->start_date = '2026-01-21'; // the second to last Wednesday
+        $this->assertEquals('Every month on the 2nd last Wednesday', $event->recurrence_description());
+    }
+
+    /**
+     * These schedules land a different number of days apart depending on the month,
+     * so they have no fixed interval and are worked out month by month instead.
+     */
+    public function testMonthlyDayOfWeekHasNoFixedInterval() {
+        $event = new Event;
+        $event->start_date = '2026-01-20';
+
+        $event->recurrence_interval = 'monthly_dow';
+        $this->assertNull($event->recurrence_date_interval());
+
+        $event->recurrence_interval = 'monthly_dow_last';
+        $this->assertNull($event->recurrence_date_interval());
+    }
+
+    public function testTheNthWeekdayIsPickedInEachMonth() {
+        $start = (new DateTime('first day of next month'))->modify('third tuesday of this month');
+
+        $event = new Event;
+        $event->start_date = $start->format('Y-m-d');
+        $event->recurrence_interval = 'monthly_dow';
+
+        $dates = $event->recurrence_dates();
+
+        $this->assertGreaterThan(1, count($dates));
+        $this->assertEquals($start->format('Y-m-d'), $dates[0]->format('Y-m-d'));
+
+        foreach($dates as $date) {
+            $this->assertEquals('Tuesday', $date->format('l'));
+            $this->assertEquals(3, Event::week_of_month($date), $date->format('Y-m-d').' is not a 3rd Tuesday');
+        }
+    }
+
+    public function testTheLastWeekdayIsPickedInEachMonth() {
+        $start = (new DateTime('first day of next month'))->modify('last friday of this month');
+
+        $event = new Event;
+        $event->start_date = $start->format('Y-m-d');
+        $event->recurrence_interval = 'monthly_dow_last';
+
+        $dates = $event->recurrence_dates();
+
+        $this->assertGreaterThan(1, count($dates));
+
+        foreach($dates as $date) {
+            $this->assertEquals('Friday', $date->format('l'));
+            $this->assertEquals(1, Event::weeks_from_end_of_month($date), $date->format('Y-m-d').' is not a last Friday');
+        }
+    }
+
+    /**
+     * Only ten months in a row have a fifth Wednesday, so those months are skipped
+     * rather than spilling over into the next one.
+     */
+    public function testMonthsWithoutAFifthWeekdayAreSkipped() {
+        $event = new Event;
+        $event->start_date = '2026-01-30'; // the 5th Friday of January 2026
+        $event->recurrence_interval = 'monthly_dow';
+
+        $dates = array_map(fn($d) => $d->format('Y-m-d'), $event->recurrence_dates());
+
+        $this->assertContains('2026-01-30', $dates);
+        $this->assertNotContains('2026-02-27', $dates); // February 2026 has only four Fridays
+    }
 }
