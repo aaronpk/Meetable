@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
+use Laravel\Passkeys\Passkeys;
+use App\User;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,6 +17,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // Meetable keeps its models at the app root rather than under App\Models
+        Passkeys::useUserModel(User::class);
+
         if($this->app->environment('production') && parse_url(env('APP_URL'), PHP_URL_SCHEME) == 'https') {
             $this->app['request']->server->set('HTTPS', true);
         }

@@ -18,8 +18,8 @@ class AuthController extends BaseController
                 return view('auth/register');
             }
 
-            // If there is an admin user, check if there is a webauthn credential
-            $credential = DB::table('webauthn_credentials')->where('authenticatable_id', $user->id)->count();
+            // If there is an admin user, check if there is a passkey registered
+            $credential = DB::table('passkeys')->where('user_id', $user->id)->count();
             if(!$credential) {
                 if(!Auth::user()) {
                     Auth::login($user);
@@ -46,7 +46,7 @@ class AuthController extends BaseController
     public function create_user() {
         if(env('AUTH_METHOD') == 'session' && !Auth::user()) {
             $users = User::where('is_admin', 1)
-              ->join('webauthn_credentials', 'authenticatable_id', '=', 'users.id')
+              ->join('passkeys', 'passkeys.user_id', '=', 'users.id')
               ->count();
             if($users == 0) {
                 // Create the admin user now and log them in

@@ -115,7 +115,7 @@ class HerokuS3HelperTest extends TestCase
     public static function systemTestProvider() {
         return [
             "When CLOUDCUBE_URL is not set" => [
-                'ENV' => [],
+                'system_env' => [],
                 'expectations'=> [
                     'bucket' => null,
                     'aws_url' => null,
@@ -124,7 +124,7 @@ class HerokuS3HelperTest extends TestCase
                 ]
             ],
             "When CLOUDCUBE_URL is an US one" => [
-                'ENV' => [
+                'system_env' => [
                     'CLOUDCUBE_URL' => 'https://cloud-cube.s3.amazonaws.com/xmfnhr2po8rp'
                 ],
                 'expectations'=> [
@@ -135,7 +135,7 @@ class HerokuS3HelperTest extends TestCase
                 ]
             ],
             "When CLOUDCUBE_URL is an EU one" => [
-                'ENV' => [
+                'system_env' => [
                     'CLOUDCUBE_URL' => 'https://cloud-cube-eu.s3.amazonaws.com/my-apps-root'
                 ],
                 'expectations'=> [
@@ -146,7 +146,7 @@ class HerokuS3HelperTest extends TestCase
                 ]
             ],
             "When CLOUDCUBE_URL is an AP one" => [
-                'ENV' => [
+                'system_env' => [
                     'CLOUDCUBE_URL' => 'https://cloud-cube-jp.s3.amazonaws.com/something'
                 ],
                 'expectations'=> [
