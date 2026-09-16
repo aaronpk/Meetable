@@ -53,6 +53,8 @@ class EventRevision extends Event
         $revision->last_modified_by = $event->last_modified_by;
         $revision->created_by = $event->created_by;
         $revision->zoom_meeting_id = $event->zoom_meeting_id ?: '';
+        // Kept on each revision so the change from proposed to scheduled can be spotted
+        $revision->is_proposed = $event->is_proposed ? 1 : 0;
 
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
             // An event that was just inserted hasn't picked up the values the

@@ -60,10 +60,16 @@ trait CreatesEvents
 
             EventRevision::whereIn('event_id', $ids)->forceDelete();
             DB::table('event_tag')->whereIn('event_id', $ids)->delete();
+
+            $option_ids = DB::table('event_date_options')->whereIn('event_id', $ids)->pluck('id');
+            DB::table('event_date_votes')->whereIn('event_date_option_id', $option_ids)->delete();
+            DB::table('event_date_options')->whereIn('event_id', $ids)->delete();
+
             Event::whereIn('id', $ids)->forceDelete();
         }
 
         if($this->test_user) {
+            DB::table('event_date_votes')->where('user_id', $this->test_user->id)->delete();
             DB::table('user_emails')->where('user_id', $this->test_user->id)->delete();
             User::where('id', $this->test_user->id)->delete();
         }

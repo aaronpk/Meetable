@@ -39,7 +39,7 @@ a.title:hover, a.subtitle:hover {
                         <ul>
                         @foreach($events as $event)
                             <li class="event h-event">
-                                {{ \App\Helpers\Dates::format($event->start_date, 'month_day') }}
+                                {{ $event->start_date ? \App\Helpers\Dates::format($event->start_date, 'month_day') : __('events.proposed.date_tbd') }}
                                 &bull;
                                 <a href="{{ $event->permalink() }}" class="u-url p-name">
                                     {{ $event->status_text() }}{{ $event->name }}

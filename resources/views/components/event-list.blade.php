@@ -10,7 +10,11 @@
                         <li class="event h-event">
                             <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{!! $event->status_tag() !!}{{ $event->name }}</a></h3>
 
-                            <p>{!! $event->date_summary() !!}</p>
+                            @if($event->is_proposed)
+                                <p>{{ __('events.proposed.date_tbd') }}</p>
+                            @else
+                                <p>{!! $event->date_summary() !!}</p>
+                            @endif
 
                             @if($event->location_city())
                                 <p>{{ $event->location_city() }}</p>

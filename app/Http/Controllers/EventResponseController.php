@@ -18,6 +18,9 @@ class EventResponseController extends BaseController
     public function save_rsvp(Event $event) {
         Gate::authorize('can-rsvp');
 
+        // There is nothing to RSVP to until a date is chosen
+        abort_if($event->is_proposed, 404);
+
         # Load existing RSVP for this user if there is one already
         $rsvp = $event->rsvp_for_user(Auth::user());
 

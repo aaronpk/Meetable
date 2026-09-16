@@ -25,7 +25,7 @@ use App\Response;
     <link href="/bulma-1.0.4/bulma.css" rel="stylesheet">
     <link href="/assets/bulma-tooltip-1.2.0.min.css" rel="stylesheet">
 
-    <link href="/assets/style.css?v=20260916" rel="stylesheet">
+    <link href="/assets/style.css?v=20260921" rel="stylesheet">
 
     <link rel="manifest" href="/manifest.json">
 
@@ -74,6 +74,9 @@ use App\Response;
                 @endif
                 <a class="navbar-item" href="{{ route('archive') }}">{{ __('common.nav.past_events') }}</a>
                 <a class="navbar-item" href="{{ route('tags') }}">{{ __('common.nav.discover') }}</a>
+                @if(Setting::value('enable_proposed_events'))
+                    <a class="navbar-item" href="{{ route('proposed') }}">{{ __('common.nav.proposed_events') }}</a>
+                @endif
                 @can('create-event')
                     @if(Setting::value('enable_unlisted_events'))
                         <a class="navbar-item" href="{{ route('unlisted') }}">{{ __('common.nav.unlisted_events') }}</a>
@@ -88,6 +91,9 @@ use App\Response;
                         <a class="navbar-link" href="{{ route('new-event') }}">{{ __('common.nav.add_event') }}</a>
                         <div class="navbar-dropdown">
                             <a class="navbar-item" href="{{ route('new-event') }}">{{ __('common.nav.create_new_event') }}</a>
+                            @can('propose-event')
+                                <a class="navbar-item" href="{{ route('new-event', ['propose' => 1]) }}">{{ __('common.nav.propose_event') }}</a>
+                            @endcan
                             <a class="navbar-item" href="{{ route('import-event') }}">{{ __('common.nav.import_from_url') }}</a>
                         </div>
                     </div>
@@ -143,7 +149,7 @@ use App\Response;
 
     </main>
 
-    <script src="/assets/script.js?v=20260917"></script>
+    <script src="/assets/script.js?v=20260920"></script>
     @yield('scripts')
 
 </body>

@@ -65,6 +65,71 @@ $(function(){
     });
   });
 
+  // Voting on the dates of a proposed event. Clicking the answer already given clears it.
+  $("#date-poll").on("click", ".vote-button", function(evt){
+    evt.preventDefault();
+    var $button = $(this);
+    var $row = $button.closest(".poll-option");
+    var $poll = $("#date-poll");
+    var vote = $button.hasClass("is-pressed") ? "" : $button.attr("data-vote");
+
+    $row.find(".vote-button").prop("disabled", true);
+    $.ajax({
+      url: $poll.attr("data-action"),
+      method: "POST",
+      dataType: "json",
+      data: {
+        _token: csrf_token(),
+        option_id: $row.attr("data-option-id"),
+        vote: vote
+      },
+      success: function(response){
+        update_poll($poll, response);
+      },
+      error: function(){
+        alert(lang("vote_failed"));
+      },
+      complete: function(){
+        $row.find(".vote-button").prop("disabled", false);
+      }
+    });
+  });
+
+  // Fills in the counts, voters and leading date from the vote endpoint's response
+  function update_poll($poll, response) {
+    $.each(response.options, function(id, option){
+      var $row = $poll.find('.poll-option[data-option-id="'+id+'"]');
+      $.each(["yes", "ifneedbe", "no"], function(_, vote){
+        var $cell = $row.find(".count-"+vote);
+        $cell.find(".number").text(option[vote]);
+        var $voters = $cell.find(".voters").empty();
+        $.each(option.voters[vote] || [], function(_, voter){
+          var $img = $("<img>", {
+            "class": "vote-avatar",
+            src: voter.photo || "/images/placeholder.png",
+            alt: voter.name,
+            title: voter.name,
+            width: 20,
+            height: 20
+          });
+          if(voter.url) {
+            $voters.append($("<a>", {href: voter.url}).append($img));
+          } else {
+            $voters.append($img);
+          }
+        });
+      });
+      $row.find(".vote-button").removeClass("is-pressed");
+      if(option.user_vote) {
+        $row.find('.vote-button[data-vote="'+option.user_vote+'"]').addClass("is-pressed");
+      }
+    });
+    $poll.find(".poll-option").removeClass("is-leading");
+    if(response.leading_option_id) {
+      $poll.find('.poll-option[data-option-id="'+response.leading_option_id+'"]').addClass("is-leading");
+    }
+  }
+
   $(".tabs li").click(function(){
     $(".tab-content").addClass("hidden");
     $(".tabs li").removeClass("is-active");

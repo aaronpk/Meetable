@@ -58,6 +58,7 @@ class ListEventsTool implements MCPTool
             ->where('unlisted', 0)
             ->where('hide_from_main_feed', 0)
             ->where('is_template', 0)
+            ->where('is_proposed', 0)
             ->orderBy('sort_date');
 
         if (!empty($args['end_date'])) {
