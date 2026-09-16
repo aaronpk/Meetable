@@ -39,7 +39,18 @@ class ICSFeedTest extends TestCase
     {
         $this->get('/ics/tag/'.rawurlencode('a"b;c').'.ics')
             ->assertOk()
-            ->assertHeader('Content-Disposition', 'attachment; filename="events-a-b-c.ics"');
+            ->assertHeader('Content-Disposition', 'attachment; filename=events-a-b-c.ics');
+    }
+
+    public function testTheTagFeedFilenameCanUseAnyScript()
+    {
+        $this->get('/ics/tag/'.rawurlencode('Москва,tokyo').'.ics')
+            ->assertOk()
+            ->assertHeader('Content-Disposition', "attachment; filename=events-tokyo.ics; filename*=utf-8''".rawurlencode('events-москва,tokyo.ics'));
+
+        $this->get('/ics/tag/'.rawurlencode('東京').'.ics')
+            ->assertOk()
+            ->assertHeader('Content-Disposition', "attachment; filename=events.ics; filename*=utf-8''".rawurlencode('events-東京.ics'));
     }
 
     public function testTheFeedIsAlwaysServedAsACalendar()

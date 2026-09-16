@@ -5,7 +5,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Author Name</label>
+                    <label class="label">{{ __('responses.details.author_name') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-author_name" readonly>
@@ -14,7 +14,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Author Photo</label>
+                    <label class="label">{{ __('responses.details.author_photo') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-author_photo" readonly>
@@ -23,7 +23,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Author URL</label>
+                    <label class="label">{{ __('responses.details.author_url') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="url" id="response-author_url" readonly>
@@ -32,7 +32,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Name</label>
+                    <label class="label">{{ __('responses.details.name') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-name" readonly>
@@ -41,7 +41,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Content</label>
+                    <label class="label">{{ __('responses.details.content') }}</label>
                 </div>
                 <div class="field-body">
                     <textarea class="textarea" id="response-content_text" rows="4" readonly></textarea>
@@ -50,7 +50,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">RSVP</label>
+                    <label class="label">{{ __('responses.details.rsvp') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-rsvp" readonly>
@@ -59,7 +59,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Photos</label>
+                    <label class="label">{{ __('responses.details.photos') }}</label>
                 </div>
                 <div class="field-body">
                     <textarea class="textarea" id="response-photos" rows="4" readonly></textarea>
@@ -68,7 +68,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">URL</label>
+                    <label class="label">{{ __('responses.details.url') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="url" id="response-url" readonly>
@@ -77,7 +77,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Webmention Source URL</label>
+                    <label class="label">{{ __('responses.details.source_url') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="url" id="response-source_url" readonly>
@@ -86,7 +86,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Post Type</label>
+                    <label class="label">{{ __('responses.details.post_type') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-post_type" readonly>
@@ -95,7 +95,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Published At</label>
+                    <label class="label">{{ __('responses.details.published_at') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-published" readonly>
@@ -104,7 +104,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Created At</label>
+                    <label class="label">{{ __('responses.details.created_at') }}</label>
                 </div>
                 <div class="field-body">
                     <input class="input" type="text" id="response-created_at" readonly>
@@ -113,7 +113,7 @@
 
             <div class="field is-horizontal">
                 <div class="field-label">
-                    <label class="label">Parsed Post Data</label>
+                    <label class="label">{{ __('responses.details.parsed_data') }}</label>
                 </div>
                 <div class="field-body">
                     <textarea class="textarea" id="response-data" rows="6" readonly></textarea>
@@ -124,5 +124,5 @@
 
         </div>
     </div>
-    <button class="modal-close is-large" aria-label="close"></button>
+    <button class="modal-close is-large" aria-label="{{ __('common.close') }}"></button>
 </div>

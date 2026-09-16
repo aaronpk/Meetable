@@ -7,6 +7,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag, App\Setting;
+use App\Helpers\Dates;
 use DateTime, DateTimeZone, DateInterval, Exception;
 use DB;
 
@@ -195,7 +196,7 @@ class Controller extends BaseController
             'month' => false,
             'day' => false,
             'home' => (!$year && !$month && !$day),
-            'page_title' => $year . ' Events',
+            'page_title' => __('events.title.year', ['year' => $year]),
             'tags' => $tags,
             'page_type' => 'tag',
         ]);
@@ -238,11 +239,11 @@ class Controller extends BaseController
 
         if(!isset($opts['page_title'])) {
             if(!empty($opts['day'])) {
-                $opts['page_title'] = env('APP_NAME').' on '.date('F j, Y', strtotime($opts['year'].'-'.$opts['month'].'-'.$opts['day']));
+                $opts['page_title'] = __('events.title.day', ['site' => env('APP_NAME'), 'date' => Dates::format($opts['year'].'-'.$opts['month'].'-'.$opts['day'], 'date_long')]);
             } elseif(!empty($opts['month'])) {
-                $opts['page_title'] = env('APP_NAME').' in '.date('F Y', strtotime($opts['year'].'-'.$opts['month'].'-01'));
+                $opts['page_title'] = __('events.title.month', ['site' => env('APP_NAME'), 'month' => Dates::format($opts['year'].'-'.$opts['month'].'-01', 'month_year')]);
             } elseif(!empty($opts['year'])) {
-                $opts['page_title'] = env('APP_NAME').' in '.$opts['year'];
+                $opts['page_title'] = __('events.title.year_on_site', ['site' => env('APP_NAME'), 'year' => $opts['year']]);
             } else {
                 $opts['page_title'] = env('APP_NAME');
             }
@@ -509,6 +510,15 @@ class Controller extends BaseController
     public static function hms_to_sec($hms) {
         $parts = explode(':', $hms);
         return $parts[2] + ($parts[1]*60) + ($parts[0]*60*60);
+    }
+
+    // Remembers the language a visitor picked, instead of the one their browser asks for
+    public function set_language($locale) {
+        if(!in_array($locale, \App\Helpers\Locales::available()))
+            abort(404);
+
+        return redirect(\App\Helpers\Uri::same_origin_path(request()->headers->get('referer')))
+            ->withCookie(cookie()->forever(\App\Http\Middleware\SetLocale::COOKIE, $locale));
     }
 
     public function local_time() {

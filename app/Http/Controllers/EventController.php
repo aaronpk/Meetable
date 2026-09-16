@@ -13,6 +13,7 @@ use Auth, Storage, Gate, Log, DB;
 use Image;
 use DateTime;
 use App\Services\Zoom, App\Services\EventParser;
+use App\Helpers\Dates;
 use App\Events\EventCreated, App\Events\EventUpdated;
 
 class EventController extends BaseController
@@ -135,7 +136,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors([__('event_form.zoom_failed')]);
             }
         }
 
@@ -177,7 +178,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'edit',
-            'action_heading' => ($event->recurrence_interval ? 'Edit Recurring' : 'Editing'),
+            'action_heading' => __($event->recurrence_interval ? 'event_form.heading.edit_recurring' : 'event_form.heading.editing', ['name' => $event->name]),
             'form_action' => route('save-event', $event),
         ]);
     }
@@ -201,7 +202,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'clone',
-            'action_heading' => 'Cloning',
+            'action_heading' => __('event_form.heading.cloning', ['name' => $event->name]),
             'form_action' => route('create-event'),
         ]);
     }
@@ -221,7 +222,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'recurring',
-            'action_heading' => 'Create Recurring',
+            'action_heading' => __('event_form.heading.create_recurring', ['name' => $event->name]),
             'form_action' => route('create-event'),
         ]);
     }
@@ -237,9 +238,9 @@ class EventController extends BaseController
 
         return view('recurring-event-details', [
             'event' => $event,
-            'recur_month_date' => $date->format('M j'),
-            'recur_date' => $date->format('jS'),
-            'recur_dow' => $date->format('l'),
+            'recur_month_date' => Dates::format($date, 'month_day'),
+            'recur_date' => Dates::format($date, 'day_ordinal'),
+            'recur_dow' => Dates::format($date, 'weekday'),
             'recur_dow_ordinal' => Event::day_of_week_ordinal_label($date),
             'recur_dow_from_end' => $weeks_from_end <= 2 ? Event::day_of_week_from_end_label($date) : null,
         ]);
@@ -320,7 +321,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors([__('event_form.zoom_failed')]);
             }
         } elseif($event->zoom_meeting_id) {
             $event->update_zoom_meeting();

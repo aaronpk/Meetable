@@ -6,7 +6,7 @@
 @if(!$date || !$timezone)
 
     <div class="notification is-danger">
-        Invalid input
+        {{ __('events.local_time.invalid_input') }}
     </div>
 
 @else
@@ -16,16 +16,16 @@
     <div class="widget">
         <div class="original">
             <div class="header">
-                Event Time
+                {{ __('events.local_time.event_time') }}
             </div>
             <div class="time">
-                {{ $date->format('g:ia') }}
+                {{ \App\Helpers\Dates::format($date, 'time') }}
             </div>
             <div class="timezone">
                 {{ $timezone->getName() }}
             </div>
             <div class="date">
-                {{ $date->format('l, M j, Y') }}
+                {{ \App\Helpers\Dates::format($date, 'weekday_date') }}
             </div>
         </div>
 
@@ -35,7 +35,7 @@
 
         <div class="local">
             <div class="header">
-                Your Local Time
+                {{ __('events.local_time.your_local_time') }}
             </div>
             <div class="time"></div>
             <div class="timezone"></div>
@@ -48,7 +48,7 @@
         @foreach($timezones as $tz)
             <tr>
                 <td class="tz">{{ $tz['name'] }}</td>
-                <td class="dt">{{ $tz['date']->format('D g:ia') }}</td>
+                <td class="dt">{{ \App\Helpers\Dates::format($tz['date'], 'weekday_time') }}</td>
             </tr>
         @endforeach
         </table>
@@ -117,32 +117,12 @@ $(function(){
     }
     $(".local .timezone").text(tz);
 
-    var day;
-    switch(date.getDay()) {
-        case 0: day = 'Sunday'; break;
-        case 1: day = 'Monday'; break;
-        case 2: day = 'Tuesday'; break;
-        case 3: day = 'Wednesday'; break;
-        case 4: day = 'Thursday'; break;
-        case 5: day = 'Friday'; break;
-        case 6: day = 'Saturday'; break;
-    }
-    var month;
-    switch(date.getMonth()) {
-        case 0: month = "Jan"; break;
-        case 1: month = "Feb"; break;
-        case 2: month = "Mar"; break;
-        case 3: month = "Apr"; break;
-        case 4: month = "May"; break;
-        case 5: month = "Jun"; break;
-        case 6: month = "Jul"; break;
-        case 7: month = "Aug"; break;
-        case 8: month = "Sep"; break;
-        case 9: month = "Oct"; break;
-        case 10: month = "Nov"; break;
-        case 11: month = "Dec"; break;
-    }
-    $(".local .date").text(day+", "+month+" "+date.getDate()+", "+(1900+date.getYear()));
+    $(".local .date").text(date.toLocaleDateString(page_locale(), {
+        weekday: 'long',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    }));
 
 });
 

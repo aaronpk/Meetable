@@ -45,6 +45,9 @@ footer > div {
     padding: 6px;
     text-align: center;
 }
+footer .languages > * {
+    margin: 0 0.4em;
+}
 
 .has-delete {
     position: relative;

@@ -3,14 +3,14 @@
 @section('content')
 <section class="section content">
 
-<h2 class="title">Recurring Events</h2>
+<h2 class="title">{{ __('event_form.templates.title') }}</h2>
 
 <div class="content">
     @if(count($events) == 0)
-        <p>There are no recurring events yet. You can schedule a recurring event by creating an event template from an existing event.</p>
-        <p><a href="/">See upcoming events</a></p>
+        <p>{{ __('event_form.templates.none_yet') }}</p>
+        <p><a href="/">{{ __('event_form.templates.see_upcoming') }}</a></p>
     @else
-        <p>You can schedule a recurring event by creating an event template from an <a href="/">existing event</a>.</p>
+        <p>{!! __('event_form.templates.how_to', ['existing_event' => '<a href="/">'.e(__('event_form.templates.existing_event')).'</a>']) !!}</p>
     @endif
 </div>
 
@@ -24,11 +24,11 @@
             <br>
 
             {{ $event->recurrence_description() }}
-            starting {{ (new DateTime($event->start_date))->format('M j, Y') }}
+            {{ __('event_form.templates.starting', ['date' => \App\Helpers\Dates::format($event->start_date, 'date')]) }}
 
             @if(count($instances[$event->id]))
                 <br>
-                Future occurrences:
+                {{ __('event_form.templates.future_occurrences') }}
                 <ul>
                     @foreach($instances[$event->id] as $instance)
                         <li><a href="{{ $instance->permalink() }}">{{ $instance->date_summary_text() }}</a></li>

@@ -4,7 +4,7 @@
 <section class="section event">
 
 <div class="content">
-    <h1>Responses on "{{ $event->name }}"</h1>
+    <h1>{{ __('responses.responses_on', ['name' => $event->name]) }}</h1>
 
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
 </div>
@@ -27,7 +27,7 @@
                         <div class="dropdown is-right">
                             <div class="dropdown-trigger">
                                 <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                                    <span>Actions</span>
+                                    <span>{{ __('event_form.actions') }}</span>
                                     <span class="icon is-small">@icon(angle-down)</span>
                                 </button>
                             </div>
@@ -36,11 +36,11 @@
                                 <div class="dropdown-content">
                                     <a class="dropdown-item view-response-details" href="{{ route('get-response-details', [$event, $response]) }}">
                                         <span class="icon">@icon(info-circle)</span>
-                                        <span>View Details</span>
+                                        <span>{{ __('responses.view_details') }}</span>
                                     </a>
                                     <a class="dropdown-item delete-response" href="{{ route('delete-response', [$event, $response]) }}">
                                         <span class="icon">@icon(trash)</span>
-                                        <span>Delete</span>
+                                        <span>{{ __('common.delete') }}</span>
                                     </a>
                                 </div>
                             </div>

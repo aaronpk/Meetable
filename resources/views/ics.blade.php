@@ -4,14 +4,14 @@
 <section class="section">
 
     <div class="content">
-        <h2 class="title">Subscribe</h2>
+        <h2 class="title">{{ __('events.subscribe.title') }}</h2>
 
         <form class="event-form">
             <div class="field">
                 <input class="input" type="url" name="url" autocomplete="off" readonly="readonly" value="{{ $url }}">
             </div>
 
-            <p>Copy the URL above and subscribe to it in your favorite calendar app!</p>
+            <p>{{ __('events.subscribe.instructions') }}</p>
         </form>
 
     </div>

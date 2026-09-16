@@ -64,6 +64,8 @@ Route::middleware('slashes:remove')->group(function(){
 
     Route::get('/local-time', 'Controller@local_time')->name('local_time');
 
+    Route::get('/language/{locale}', 'Controller@set_language')->name('set-language');
+
     Route::get('/webmention', 'WebmentionController@get');
     Route::post('/webmention', 'WebmentionController@webmention')->name('webmention');
 

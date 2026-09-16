@@ -3,20 +3,20 @@
 @section('content')
 <section class="section">
 
-    <h2 class="subtitle">Register a Passkey</h2>
+    <h2 class="subtitle">{{ __('login.passkey.title') }}</h2>
 
     <div class="notification is-warning">
-        Register a passkey to protect your account. Setup is not complete until you finish this step!
+        {{ __('login.passkey.intro') }}
     </div>
 
     <form id="register-form">
         <div class="field">
-            <label class="label" for="passkey-name">Name this passkey</label>
+            <label class="label" for="passkey-name">{{ __('login.passkey.name_label') }}</label>
             <div class="control">
-                <input class="input" type="text" id="passkey-name" name="name" value="Passkey" required>
+                <input class="input" type="text" id="passkey-name" name="name" value="{{ __('login.passkey.default_name') }}" required>
             </div>
         </div>
-        <button type="submit" class="button is-primary">Register passkey</button>
+        <button type="submit" class="button is-primary">{{ __('login.passkey.register') }}</button>
     </form>
 
     <script>
@@ -28,7 +28,7 @@
             window.location = '/'
           })
           .catch(error => {
-            alert('Something went wrong, try again!')
+            alert(@json(__('login.passkey.register_failed')))
           })
     }
 

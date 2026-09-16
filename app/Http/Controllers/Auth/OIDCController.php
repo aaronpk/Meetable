@@ -42,15 +42,15 @@ class OIDCController extends BaseController
     public function callback() {
         if(!$this->validState('OIDC_STATE')) {
             return view('auth/oidc-error', [
-                'error' => 'Invalid OAuth State',
-                'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
+                'error' => __('login.errors.invalid_state'),
+                'error_description' => __('login.errors.invalid_state_description'),
             ]);
         }
 
         if(!request('code')) {
             return view('auth/oidc-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'The OpenID Connect login process did not complete successfully. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.not_completed', ['provider' => 'OpenID Connect']),
                 'details' => [
                     'error' => request('error'),
                     'error_description' => request('error_description')
@@ -84,8 +84,8 @@ class OIDCController extends BaseController
                 Log::error((string)$e->getResponse()->getBody());
             }
             return view('auth/oidc-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'The OpenID Connect server returned an error.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.oidc_server_error'),
                 'details' => $details
             ]);
         }
@@ -97,8 +97,8 @@ class OIDCController extends BaseController
         if(!$info || !isset($info['id_token'])) {
             Log::info('The OpenID Connect token response had no id_token');
             return view('auth/oidc-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'The OpenID Connect server returned an invalid response.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.oidc_invalid_response'),
             ]);
         }
 
@@ -111,8 +111,8 @@ class OIDCController extends BaseController
 
         if(!is_array($userinfo) || empty($userinfo['sub']) || !is_string($userinfo['sub'])) {
             return view('auth/oidc-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'The OpenID Connect server returned an ID token without a subject.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.oidc_no_subject'),
             ]);
         }
 
@@ -123,8 +123,8 @@ class OIDCController extends BaseController
             if(!in_array($userinfo['sub'], $allowedUsers)) {
                 Log::error('User '.$userinfo['sub'].' is not in the list of allowed users');
                 return view('auth/oidc-error', [
-                    'error' => 'User Not Allowed',
-                    'error_description' => 'Sorry, you are not in the list of allowed users for this website.',
+                    'error' => __('login.errors.not_allowed'),
+                    'error_description' => __('login.errors.not_in_allowed_users'),
                 ]);
             }
         }

@@ -35,5 +35,8 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         Event::fake(self::EVENTS_WITH_REMOTE_LISTENERS);
+
+        // Translations being worked on in resources/lang shouldn't change what the tests see
+        config(['app.available_locales' => ['en']]);
     }
 }

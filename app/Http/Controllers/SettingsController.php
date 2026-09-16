@@ -48,7 +48,7 @@ class SettingsController extends BaseController
             }
         }
 
-        session()->flash('settings-saved', 'The settings have been saved');
+        session()->flash('settings-saved', __('settings.saved'));
         return redirect(route('settings'));
     }
 

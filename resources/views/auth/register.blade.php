@@ -3,29 +3,29 @@
 @section('content')
 <section class="section">
 
-    <h2 class="subtitle">Create Admin User</h2>
+    <h2 class="subtitle">{{ __('login.register.title') }}</h2>
 
     <div class="notification is-warning">
-        Create your admin account now.
+        {{ __('login.register.intro') }}
     </div>
 
     <form action="{{ route('create-user') }}" method="post">
 
         <div class="field">
           <div class="control">
-            <label class="label">Name</label>
+            <label class="label">{{ __('login.register.name') }}</label>
             <input class="input" type="text" name="name">
           </div>
         </div>
 
         <div class="field">
           <div class="control">
-            <label class="label">Email</label>
+            <label class="label">{{ __('login.register.email') }}</label>
             <input class="input" type="email" name="email">
           </div>
         </div>
 
-        <button class="button is-primary" type="submit">Create User</button>
+        <button class="button is-primary" type="submit">{{ __('login.register.create_user') }}</button>
 
         {{ csrf_field() }}
     </form>

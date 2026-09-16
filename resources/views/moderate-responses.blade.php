@@ -4,13 +4,13 @@
 <section class="section event">
 
 <div class="content">
-    <h1>Pending Responses</h1>
+    <h1>{{ __('responses.pending_responses') }}</h1>
 
     @if(isset($event))
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
     @endif
 
-    <p>Deleting a response will prevent that webmention URL from ever appearing again even if it is re-sent.</p>
+    <p>{{ __('responses.delete_warning') }}</p>
 </div>
 
 
@@ -39,15 +39,15 @@
 
                         <a class="button view-response-details" href="{{ route('get-response-details', [$response->event, $response]) }}">
                             <span class="icon">@icon(info-circle)</span>
-                            <span>View Details</span>
+                            <span>{{ __('responses.view_details') }}</span>
                         </a>
                         <a class="button is-primary approve-response" href="{{ route('approve-response', [$response->event, $response]) }}">
                             <span class="icon">@icon(check)</span>
-                            <span>Approve</span>
+                            <span>{{ __('responses.approve') }}</span>
                         </a>
                         <a class="button is-danger delete-response" href="{{ route('delete-response', [$response->event, $response]) }}">
                             <span class="icon">@icon(trash)</span>
-                            <span>Delete</span>
+                            <span>{{ __('common.delete') }}</span>
                         </a>
 
                     </div>

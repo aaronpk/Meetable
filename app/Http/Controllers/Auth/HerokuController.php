@@ -31,15 +31,15 @@ class HerokuController extends BaseController
     public function callback() {
         if(!$this->validState('HEROKU_OAUTH_STATE')) {
             return view('auth/oauth-error', [
-                'error' => 'Invalid OAuth State',
-                'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
+                'error' => __('login.errors.invalid_state'),
+                'error_description' => __('login.errors.invalid_state_description'),
             ]);
         }
 
         if(!request('code')) {
             return view('auth/oauth-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'The Heroku login process did not complete successfully. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.not_completed', ['provider' => 'Heroku']),
             ]);
         }
 
@@ -60,8 +60,8 @@ class HerokuController extends BaseController
 
         if(!isset($data['access_token'])) {
             return view('auth/oauth-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'Unable to get an access token from Heroku. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.no_access_token', ['provider' => 'Heroku']),
             ]);
         }
 
@@ -80,8 +80,8 @@ class HerokuController extends BaseController
 
         if(!isset($userdata['id'])) {
             return view('auth/oauth-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'Unable to get user info from Heroku. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.no_user_info', ['provider' => 'Heroku']),
             ]);
         }
 
@@ -106,8 +106,8 @@ class HerokuController extends BaseController
             $user = User::where('identifier', $userdata['id'])->first();
             if(!$user) {
                 return view('auth/oauth-error', [
-                    'error' => 'User Not Allowed',
-                    'error_description' => 'Sorry, you are not in the list of allowed users for this website.',
+                    'error' => __('login.errors.not_allowed'),
+                    'error_description' => __('login.errors.not_in_allowed_users'),
                 ]);
             }
             $user->name = $userdata['name'];

@@ -101,9 +101,9 @@ class SafeHTTP implements Transport {
             'ssl_unsupported_cipher', 'too_many_redirects', 'unknown'];
 
         if(in_array($data['error'] ?? null, $fetch_errors))
-            return 'The source URL could not be fetched';
+            return __('responses.webmention.fetch_failed');
 
-        return $data['error_description'] ?? 'The source URL could not be parsed';
+        return $data['error_description'] ?? __('responses.webmention.parse_failed');
     }
 
     // An XRay parser that can only make requests through this client

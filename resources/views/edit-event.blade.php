@@ -25,7 +25,7 @@ use App\Setting, App\Event;
     <div class="dropdown is-right">
         <div class="dropdown-trigger">
             <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                <span>Actions</span>
+                <span>{{ __('event_form.actions') }}</span>
                 <span class="icon is-small">@icon(angle-down)</span>
             </button>
         </div>
@@ -34,7 +34,7 @@ use App\Setting, App\Event;
             <div class="dropdown-content">
                 <a class="dropdown-item delete-event" href="{{ route('delete-event', $event) }}">
                     <span class="icon">@icon(trash)</span>
-                    <span>Delete Event</span>
+                    <span>{{ __('event_form.delete_event') }}</span>
                 </a>
             </div>
         </div>
@@ -45,7 +45,7 @@ use App\Setting, App\Event;
 @endif
 
 <div class="content">
-    <h1>{{ $event->id ? ($action_heading.' "'.$event->name.'"') : 'Add an Event' }}</h1>
+    <h1>{{ $event->id ? $action_heading : __('event_form.heading.add') }}</h1>
 
     @if($event->id && !$event->recurrence_interval)
         <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
@@ -69,7 +69,7 @@ form h2.subtitle {
 @if($errors->any())
     <div class="message is-danger">
         <div class="message-body content">
-            <p><b>There was a problem {{ $mode == 'create' ? 'creating' : 'saving' }} the event</b></p>
+            <p><b>{{ $mode == 'create' ? __('event_form.problem_creating') : __('event_form.problem_saving') }}</b></p>
             <ul>
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -83,7 +83,7 @@ form h2.subtitle {
 
     @if($event->parent)
         <div class="field">
-            <p><i>{{ $mode == 'create' ? 'Creating' : 'Editing' }} an event under <b><a href="{{ $event->parent->permalink() }}">{{ $event->parent->name }}</a></b></i></p>
+            <p><i>{!! __($mode == 'create' ? 'event_form.creating_under_parent' : 'event_form.editing_under_parent', ['parent' => '<b><a href="'.e($event->parent->permalink()).'">'.e($event->parent->name).'</a></b>']) !!}</i></p>
             <input type="hidden" name="parent_id" value="{{ $event->parent->id }}">
         </div>
 
@@ -91,7 +91,7 @@ form h2.subtitle {
             <div class="control is-expanded">
                 <label class="checkbox">
                     <input type="checkbox" name="hide_from_main_feed" value="1" {{ $event->hide_from_main_feed ? 'checked' : '' }}>
-                    Hide from main feed (Only show this event on the parent event)
+                    {{ __('event_form.hide_from_main_feed') }}
                 </label>
             </div>
         </div>
@@ -102,23 +102,23 @@ form h2.subtitle {
         <div class="message is-warning">
             <div class="message-body content">
                 @if($mode == 'recurring')
-                    You are creating a recurring event template. After you save this template, copies will be created based on the schedule you define below.
+                    {{ __('event_form.creating_template') }}
                 @else
-                    <p>This is a template event and does not appear on the calendar itself. Events are created as a copy of this event based on the schedule defined below.</p>
-                    <p>Changes you make will apply to future events and not to past events.</p>
+                    <p>{{ __('event_form.template_explanation') }}</p>
+                    <p>{{ __('event_form.template_changes') }}</p>
                 @endif
             </div>
         </div>
     @endif
 
-    <h2 class="subtitle">What's the name of the event?</h2>
+    <h2 class="subtitle">{{ __('event_form.name_question') }}</h2>
 
     <div class="field">
         <input class="input @error('name') is-danger @enderror" type="text" autocomplete="off" name="name" value="{{ old('name') ?: $event->name }}" required>
     </div>
 
     <!-- cover photo will be cropped to 1440x640 -->
-    <h2 class="subtitle">Add a cover image (optional)</h2>
+    <h2 class="subtitle">{{ __('event_form.cover_image_question') }}</h2>
 
     <div id="cover-photo-preview" class="{{ (old('cover_image') ?: $event->cover_image) ? '' : 'hidden' }} has-delete">
         <button class="delete"></button>
@@ -132,23 +132,23 @@ form h2.subtitle {
                 <span class="file-cta" id="drop-area">
                     <span class="file-icon">@icon(upload)</span>
                     <span class="file-icon-loading hidden">@spinning_icon(spinner)</span>
-                    <span class="file-label">Choose an image...</span>
+                    <span class="file-label">{{ __('event_form.choose_image') }}</span>
                 </span>
                 <span class="file-name hidden"></span>
             </label>
         </div>
     </div>
-    <div class="help">cover images should be at least 1440px wide and will be cropped to 1440x640</div>
+    <div class="help">{{ __('event_form.cover_image_help') }}</div>
 
 
-    <h2 class="subtitle">Where will the event take place?</h2>
+    <h2 class="subtitle">{{ __('event_form.location_question') }}</h2>
 
     @if(Setting::value('googlemaps_api_key'))
         <div class="field">
             <div class="dropdown" style="display: block;">
                 <div class="dropdown-trigger" style="">
                     <div class="control has-icons-left">
-                        <input class="input" type="text" autocomplete="off" name="location" id="location_search" aria-haspopup="true" aria-controls="location_menu" placeholder="Search for a location">
+                        <input class="input" type="text" autocomplete="off" name="location" id="location_search" aria-haspopup="true" aria-controls="location_menu" placeholder="{{ __('event_form.search_location') }}">
                         <span class="icon is-left">@icon(search)</span>
                     </div>
                 </div>
@@ -163,25 +163,25 @@ form h2.subtitle {
 
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
-            <label class="label">Venue</label>
+            <label class="label">{{ __('event_form.venue') }}</label>
             <input class="input" type="text" autocomplete="off" name="location_name" value="{{ old('location_name') ?: $event->location_name }}">
         </div>
         <div class="control is-expanded">
-            <label class="label">Address</label>
+            <label class="label">{{ __('event_form.address') }}</label>
             <input class="input" type="text" autocomplete="off" name="location_address" value="{{ old('location_address') ?: $event->location_address }}">
         </div>
     </div>
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
-            <label class="label">City</label>
+            <label class="label">{{ __('event_form.city') }}</label>
             <input class="input" type="text" autocomplete="off" name="location_locality" value="{{ old('location_locality') ?: $event->location_locality }}">
         </div>
         <div class="control is-expanded">
-            <label class="label">State</label>
+            <label class="label">{{ __('event_form.state') }}</label>
             <input class="input" type="text" autocomplete="off" name="location_region" value="{{ old('location_region') ?: $event->location_region }}">
         </div>
         <div class="control is-expanded">
-            <label class="label">Country</label>
+            <label class="label">{{ __('event_form.country') }}</label>
             <input class="input" type="text" autocomplete="off" name="location_country" value="{{ old('location_country') ?: $event->location_country }}">
         </div>
     </div>
@@ -189,43 +189,43 @@ form h2.subtitle {
 
 
     @if($mode == 'recurring' || $event->recurrence_interval)
-    <h2 class="subtitle">When is the next occurrence of the event?</h2>
+    <h2 class="subtitle">{{ __('event_form.next_occurrence_question') }}</h2>
     @else
-    <h2 class="subtitle">When is the event?</h2>
+    <h2 class="subtitle">{{ __('event_form.when_question') }}</h2>
     @endif
 
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
-            <label class="label">Start Date</label>
+            <label class="label">{{ __('event_form.start_date') }}</label>
             <input class="input @error('start_date') is-danger @enderror" type="date" name="start_date" autocomplete="off" value="{{ old('start_date') ?: (($mode == 'create' && $event->parent) ? $event->parent->start_date : $event->start_date) }}" required>
         </div>
 
         @if($mode != 'recurring' && !$event->recurrence_interval)
         <div class="control is-expanded">
-            <label class="label">End Date (optional)</label>
+            <label class="label">{{ __('event_form.end_date') }}</label>
             <input class="input" type="date" name="end_date" autocomplete="off" value="{{ old('end_date') ?: $event->end_date }}">
-            <div class="help">for multi-day events</div>
+            <div class="help">{{ __('event_form.end_date_help') }}</div>
         </div>
         @endif
     </div>
 
     <div class="field is-grouped is-grouped-multiline" id="time-fields">
         <div class="control is-expanded">
-            <label class="label">Start Time <span id="start-time-optional">(optional)</span></label>
+            <label class="label">{{ __('event_form.start_time') }} <span id="start-time-optional">{{ __('event_form.optional') }}</span></label>
             <input class="input" type="time" name="start_time" autocomplete="off" value="{{ old('start_time') ?: $event->start_time }}">
-            <div class="help">leave start time blank for multi-day events</div>
+            <div class="help">{{ __('event_form.start_time_help') }}</div>
         </div>
 
         <div class="control is-expanded">
-            <label class="label">End Time (optional)</label>
+            <label class="label">{{ __('event_form.end_time') }}</label>
             <input class="input" type="time" name="end_time" autocomplete="off" value="{{ old('end_time') ?: $event->end_time }}">
-            <div class="help">leave end time blank for multi-day events</div>
+            <div class="help">{{ __('event_form.end_time_help') }}</div>
         </div>
     </div>
 
     <div class="field">
         <div class="control is-expanded">
-            <label class="label">Timezone <span id="timezone-optional">(optional)</span></label>
+            <label class="label">{{ __('event_form.timezone') }} <span id="timezone-optional">{{ __('event_form.optional') }}</span></label>
             <div class="select is-fullwidth">
                 <select name="timezone">
                     @foreach(\App\Event::timezones() as $tz)
@@ -233,12 +233,12 @@ form h2.subtitle {
                     @endforeach
                 </select>
             </div>
-            <div class="help">provide a timezone for online events and to help sort events on the same day</div>
+            <div class="help">{{ __('event_form.timezone_help') }}</div>
         </div>
     </div>
 
     @if($mode == 'recurring' || $event->recurrence_interval)
-    <h2 class="subtitle">How often do you want to repeat this event?</h2>
+    <h2 class="subtitle">{{ __('event_form.repeat_question') }}</h2>
 
     <div id="recurring_details">
     </div>
@@ -294,81 +294,81 @@ form h2.subtitle {
     <input type="hidden" name="created_from_template_event_id" value="{{ $event->id }}">
     @endif
 
-    <h2 class="subtitle">Details</h2>
+    <h2 class="subtitle">{{ __('event_form.details') }}</h2>
 
     <div class="field">
-        <label class="label">Website</label>
+        <label class="label">{{ __('event_form.website') }}</label>
         <input class="input" type="url" autocomplete="off" name="website" value="{{ old('website') ?: $event->website }}">
-        <div class="help">provide a link to the event's main website if any</div>
+        <div class="help">{{ __('event_form.website_help') }}</div>
     </div>
 
     @if(Setting::value('enable_ticket_url'))
     <div class="field">
-        <label class="label">Registration URL</label>
+        <label class="label">{{ __('event_form.registration_url') }}</label>
         <input class="input" type="url" autocomplete="off" name="tickets_url" value="{{ old('tickets_url') ?: $event->tickets_url }}">
-        <div class="help">if the event requires registration, link to the registration page here. this will also disable RSVPs on this website.</div>
+        <div class="help">{{ __('event_form.registration_url_help') }}</div>
     </div>
     @endif
 
     <div class="field">
-        <label class="label">Code of Conduct</label>
+        <label class="label">{{ __('event_form.code_of_conduct') }}</label>
         <input class="input" type="text" autocomplete="off" name="code_of_conduct_url" value="{{ old('code_of_conduct_url') ?: $event->code_of_conduct_url }}">
-        <div class="help">provide one or more URLs to codes of conduct that are applicable to this event</div>
+        <div class="help">{{ __('event_form.code_of_conduct_help') }}</div>
     </div>
 
     @if(Setting::value('zoom_client_id'))
     <div class="field">
         <label class="checkbox">
             <input type="checkbox" name="create_zoom_meeting" value="1">
-            Schedule a Zoom Meeting
+            {{ __('event_form.schedule_zoom') }}
         </label>
-        <div class="help">check the box above to schedule a zoom meeting for this event. the meeting url will be shown on the event page 15 minutes before the start. note: the host will need to log in to zoom as {{ Setting::value('zoom_email') }} to start the meeting.</div>
+        <div class="help">{{ __('event_form.schedule_zoom_help', ['email' => Setting::value('zoom_email')]) }}</div>
     </div>
     @endif
 
     <div class="field" id="meeting-url-field">
-        <label class="label">Meeting URL</label>
+        <label class="label">{{ __('event_form.meeting_url') }}</label>
         <input class="input @error('meeting_url') is-danger @enderror" type="url" autocomplete="off" name="meeting_url" value="{{ old('meeting_url') ?: $event->meeting_url }}">
-        <div class="help">if this is a virtual event, enter a url to join the virtual meeting. <b>this will be shown only 15 minutes before the event start</b>, and hidden afterwards</div>
+        <div class="help">{!! __('event_form.meeting_url_help', ['shown_when' => '<b>'.e(__('event_form.meeting_url_help_shown_when')).'</b>']) !!}</div>
     </div>
 
     <div class="field">
-        <label class="label">Link to Notes</label>
+        <label class="label">{{ __('event_form.notes_url') }}</label>
         <input class="input" type="url" autocomplete="off" name="notes_url" value="{{ old('notes_url') ?: $event->notes_url }}">
-        <div class="help">link to etherpad or archived notes for this event</div>
+        <div class="help">{{ __('event_form.notes_url_help') }}</div>
     </div>
 
     <div class="field">
-        <label class="label">Summary</label>
+        <label class="label">{{ __('event_form.summary') }}</label>
         <textarea class="input" name="summary" style="max-height: none; height: {{ $event->summary ? '15vh' : '15vh' }}">{{ old('summary') ?: $event->summary }}</textarea>
-        <div class="help">markdown and HTML are supported</div>
+        <div class="help">{{ __('event_form.markdown_supported') }}</div>
     </div>
 
     <div class="field">
-        <label class="label">Description</label>
+        <label class="label">{{ __('event_form.description') }}</label>
         <textarea class="input" name="description" style="max-height: none; height: {{ $event->description ? '75vh' : '25vh' }}">{{ old('description') ?: $event->description }}</textarea>
-        <div class="help">markdown and HTML are supported</div>
+        <div class="help">{{ __('event_form.markdown_supported') }}</div>
     </div>
 
     <div class="field">
-        <label class="label">Tags</label>
+        <label class="label">{{ __('event_form.tags') }}</label>
         <input class="input" type="text" name="tags" value="{{ old('tags') ?: ($event->parent ? $event->parent->tags_string() : $event->tags_string()) }}" autocomplete="off">
-        <div class="help">space separated, lowercase</div>
+        <div class="help">{{ __('event_form.tags_help') }}</div>
     </div>
 
     <div class="field" id="video-url-field">
-        <label class="label">Video URL</label>
+        <label class="label">{{ __('event_form.video_url') }}</label>
         <input class="input @error('video_url') is-danger @enderror" type="url" autocomplete="off" name="video_url" value="{{ old('video_url') ?: ($mode == 'clone' ? '' : $event->video_url) }}">
-        <div class="help">After the event is over, you can add a link to a recording here. YouTube and Vimeo videos will be embedded in the page, otherwise only the link will be displayed.</div>
+        <div class="help">{{ __('event_form.video_url_help') }}</div>
     </div>
 
     <div class="field">
         <div class="control is-expanded">
-            <label class="label">Status</label>
+            <label class="label">{{ __('event_form.status') }}</label>
             <div class="select is-fullwidth">
                 <select name="status">
                     @foreach(Event::$STATUSES as $s=>$t)
-                    <option value="{{ $s }}" {{ (old('status') ?: $event->status) == $s ? 'selected' : '' }}>{{ $t }}</option>
+                    <option value="{{ $s }}" {{ (old('status') ?: $event->status) == $s ? 'selected' : '' }}>{{ Event::status_label($s) }}</option>
                     @endforeach
                 </select>
             </div>
@@ -380,19 +380,19 @@ form h2.subtitle {
         <div class="control is-expanded">
             <label class="checkbox">
                 <input type="checkbox" name="unlisted" value="1" {{ $event->unlisted ? 'checked' : '' }}>
-                Unlisted event (prevents this event from showing on the home page and other feeds)
+                {{ __('event_form.unlisted') }}
             </label>
         </div>
     </div>
     @endif
 
     <div class="field">
-        <label class="label">Edit Summary</label>
+        <label class="label">{{ __('event_form.edit_summary') }}</label>
         <input class="input" type="text" name="edit_summary" value="{{ old('edit_summary') }}" autocomplete="off">
-        <div class="help">a brief description of your changes</div>
+        <div class="help">{{ __('event_form.edit_summary_help') }}</div>
     </div>
 
-    <button class="button is-primary" type="submit" id="save-button">Save</button>
+    <button class="button is-primary" type="submit" id="save-button">{{ __('common.save') }}</button>
 
     <input type="hidden" name="latitude" value="{{ old('latitude') ?: $event->latitude }}">
     <input type="hidden" name="longitude" value="{{ old('longitude') ?: $event->longitude }}">

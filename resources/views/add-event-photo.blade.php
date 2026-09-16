@@ -12,7 +12,7 @@
 
 <form action="{{ route('upload-event-photo', $event) }}" method="post" enctype="multipart/form-data" class="event-form">
 
-    <h2 class="title">Add a Photo</h2>
+    <h2 class="title">{{ __('event_form.photo.title') }}</h2>
 
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
 
@@ -29,7 +29,7 @@
                 <input id="file-input-field" class="file-input" type="file" name="photo" accept=".jpg,image/jpeg,.png,.apng,image/png,.avif,image/avif,.webp,image/webp">
                 <span class="file-cta" id="drop-area">
                     <span class="file-icon">@icon(upload)</span>
-                    <span class="file-label">Choose a photo...</span>
+                    <span class="file-label">{{ __('event_form.photo.choose_photo') }}</span>
                 </span>
                 <span class="file-name hidden" style="width: 100%; max-width: 100%;"></span>
             </label>
@@ -37,11 +37,11 @@
     </div>
 
     <div class="field">
-        <textarea class="textarea photo-alt-text" name="alt" rows="3" placeholder="alt text"></textarea>
+        <textarea class="textarea photo-alt-text" name="alt" rows="3" placeholder="{{ __('responses.alt_text_placeholder') }}"></textarea>
     </div>
 
 
-    <button class="button is-primary" type="submit" disabled>Add Photo</button>
+    <button class="button is-primary" type="submit" disabled>{{ __('event_form.photo.add_photo') }}</button>
 
     {{ csrf_field() }}
 </form>

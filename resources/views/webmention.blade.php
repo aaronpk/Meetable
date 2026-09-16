@@ -18,16 +18,16 @@
     <form action="{{ route('webmention') }}" method="post">
 
         <div class="field">
-            <label class="label">Your URL</label>
+            <label class="label">{{ __('responses.webmention.your_url') }}</label>
             <input class="input" type="url" autocomplete="off" name="source" value="{{ $source ?? '' }}">
         </div>
 
         <div class="field">
-            <label class="label">Event URL</label>
+            <label class="label">{{ __('responses.webmention.event_url') }}</label>
             <input class="input" type="url" autocomplete="off" name="target">
         </div>
 
-        <button class="button is-primary" type="submit">Send Webmention</button>
+        <button class="button is-primary" type="submit">{{ __('responses.webmention.send') }}</button>
         <input type="hidden" name="from" value="browser">
 
         {{ csrf_field() }}

@@ -49,25 +49,25 @@ use App\Setting;
     @if(count($data))
         @include('components/event-list', ['data' => $data])
     @else
-        <div class="content"><p>No {{ isset($tag) && !isset($archive) ? 'upcoming ' : '' }}events</p><div class="h-feed"></div></div>
+        <div class="content"><p>{{ isset($tag) && !isset($archive) ? __('events.no_upcoming_events') : __('events.no_events') }}</p><div class="h-feed"></div></div>
     @endif
 
     @if(isset($past_events) && count($past_events))
-        <h2 class="subtitle" style="margin-top: 2em; font-weight: bold;">Past Events</h2>
+        <h2 class="subtitle" style="margin-top: 2em; font-weight: bold;">{{ __('events.past_events') }}</h2>
         @include('components/event-list', ['data' => $past_events])
     @endif
 
     @if(isset($page_type) && $page_type == 'tag')
         <div class="">
-            <a href="{{ route('tag-archive', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(archive) Tag Archive</a>
+            <a href="{{ route('tag-archive', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(archive) {{ __('events.tag_archive') }}</a>
         </div>
 
         <div class="subscribe-ics">
-            <a href="{{ route('ics-tag-preview', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(calendar-alt) iCalendar Feed</a>
+            <a href="{{ route('ics-tag-preview', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(calendar-alt) {{ __('events.icalendar_feed') }}</a>
         </div>
     @elseif(empty($month) && empty($year))
         <div class="subscribe-ics">
-            <a href="{{ route('ics-index-preview') }}">@icon(calendar-alt) iCalendar Feed</a>
+            <a href="{{ route('ics-index-preview') }}">@icon(calendar-alt) {{ __('events.icalendar_feed') }}</a>
         </div>
     @endif
 

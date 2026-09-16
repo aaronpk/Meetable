@@ -1,5 +1,5 @@
 @extends('errors::minimal')
 
-@section('title', __('Database Error'))
+@section('title', __('errors.database_error'))
 @section('code', 'DB')
-@section('message', __('Database Error: Could not connect to database'))
+@section('message', __('errors.database_error_message'))

@@ -6,6 +6,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\DiscordNotification, App\Event, App\Tag, App\Setting;
 use App\Services\Discord, App\Services\DiscordException;
+use App\Helpers\Locales;
 use DateTime, DateInterval;
 use Auth, Gate, Log;
 
@@ -61,12 +62,12 @@ class DiscordNotificationController extends BaseController
 
         $expected_state = session()->pull('DISCORD_INSTALL_STATE');
         if(!is_string($expected_state) || !is_string(request('state')) || !hash_equals($expected_state, request('state'))) {
-            session()->flash('discord-error', 'The bot installation could not be verified. Please try again.');
+            session()->flash('discord-error', __('discord.messages.install_not_verified'));
             return redirect(route('discord-notifications'));
         }
 
         if(request('error')) {
-            session()->flash('discord-error', 'The bot was not installed: '.(request('error_description') ?: request('error')));
+            session()->flash('discord-error', __('discord.messages.not_installed', ['error' => request('error_description') ?: request('error')]));
             return redirect(route('discord-notifications'));
         }
 
@@ -90,9 +91,9 @@ class DiscordNotificationController extends BaseController
 
         if($guild) {
             Discord::forgetChannels();
-            session()->flash('discord-success', 'The bot was installed in '.$guild['name']);
+            session()->flash('discord-success', __('discord.messages.installed', ['server' => $guild['name']]));
         } else {
-            session()->flash('discord-error', 'The bot does not appear to be in the Discord server yet. Make sure it was added to the right server.');
+            session()->flash('discord-error', __('discord.messages.not_in_server'));
         }
 
         return redirect(route('discord-notifications'));
@@ -147,21 +148,21 @@ class DiscordNotificationController extends BaseController
 
         $tag = Tag::normalize((string)request('tag'));
         if(!$tag)
-            $errors[] = 'Enter a tag';
+            $errors[] = __('discord.messages.enter_tag');
 
         $unit = request('time_unit');
         $number = request('time_before');
         if(!isset(DiscordNotification::$TIME_UNITS[$unit]) || !is_numeric($number) || (int)$number != $number) {
-            $errors[] = 'Enter a whole number for the time before the event';
+            $errors[] = __('discord.messages.whole_number');
             $minutes_before = 0;
         } else {
             $minutes_before = (int)$number * DiscordNotification::$TIME_UNITS[$unit];
             if($minutes_before < 1 || $minutes_before > DiscordNotification::MAX_MINUTES_BEFORE)
-                $errors[] = 'The time before the event must be between 1 minute and 30 days';
+                $errors[] = __('discord.messages.time_range');
         }
 
         if(mb_strlen((string)request('message')) > 2000)
-            $errors[] = 'The message can be at most 2000 characters';
+            $errors[] = __('discord.messages.message_too_long');
 
         $channel = null;
         try {
@@ -172,7 +173,7 @@ class DiscordNotificationController extends BaseController
                     $channel = $c;
             }
             if(!$channel)
-                $errors[] = 'Choose a channel';
+                $errors[] = __('discord.messages.choose_channel');
         } catch(DiscordException $e) {
             $errors[] = $e->getMessage();
         }
@@ -191,7 +192,7 @@ class DiscordNotificationController extends BaseController
         $notification->last_modified_by = Auth::user()->id;
         $notification->save();
 
-        session()->flash('discord-success', 'The notification was saved');
+        session()->flash('discord-success', __('discord.messages.saved'));
         return redirect(route('discord-notifications'));
     }
 
@@ -201,7 +202,7 @@ class DiscordNotificationController extends BaseController
         $notification->sends()->delete();
         $notification->delete();
 
-        session()->flash('discord-success', 'The notification was deleted');
+        session()->flash('discord-success', __('discord.messages.deleted'));
         return redirect(route('discord-notifications'));
     }
 
@@ -212,31 +213,31 @@ class DiscordNotificationController extends BaseController
 
         if($event) {
             $payload = Discord::buildEventMessage($notification, $event);
-            $description = 'using the next "'.$event->name.'" event';
+            $description = __('discord.messages.test_using_event', ['name' => $event->name]);
         } else {
             // No upcoming event has this tag, so post an example of what the message will look like
             $start = new DateTime();
             $start->add(new DateInterval('PT'.$notification->minutes_before.'M'));
 
             $event = new Event;
-            $event->name = 'Example Event';
+            $event->name = __('discord.example.name', [], Locales::site());
             $event->start_date = $start->format('Y-m-d');
             $event->start_time = $start->format('H:i:s');
             $event->timezone = 'UTC';
             $event->status = 'confirmed';
-            $event->summary = 'There are no upcoming events tagged #'.$notification->tag.', so this is an example of what the notification will look like.';
+            $event->summary = __('discord.example.summary', ['tag' => $notification->tag], Locales::site());
 
             $payload = Discord::buildEventMessage($notification, $event);
-            $payload['embeds'][0]['url'] = env('APP_URL').'/tag/'.$notification->tag;
-            $description = 'with an example event';
+            $payload['embeds'][0]['url'] = env('APP_URL').'/tag/'.rawurlencode($notification->tag);
+            $description = __('discord.messages.test_with_example');
         }
 
         try {
             Discord::sendMessage($notification->channel_id, $payload);
-            session()->flash('discord-success', 'A test message was posted to #'.$notification->channel_name.' '.$description);
+            session()->flash('discord-success', __('discord.messages.test_posted', ['channel' => $notification->channel_name, 'description' => $description]));
         } catch(DiscordException $e) {
             Log::error('Discord test notification failed: '.$e->getMessage());
-            session()->flash('discord-error', 'The test message could not be posted to #'.$notification->channel_name.'. '.$e->getMessage());
+            session()->flash('discord-error', __('discord.messages.test_failed', ['channel' => $notification->channel_name, 'error' => $e->getMessage()]));
         }
 
         return redirect(route('discord-notifications'));

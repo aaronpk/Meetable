@@ -80,7 +80,20 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => env('APP_LOCALE', 'en'),
+
+    /*
+    | Each page is shown in the visitor's preferred language when there is a
+    | translation for it, so 'locale' above changes per request. The site's own
+    | language is kept here for text everyone sees, like Discord posts.
+    |
+    | 'available_locales' lists the languages visitors can get. Leave it null to
+    | offer every language that has a folder in resources/lang.
+    */
+
+    'site_locale' => env('APP_LOCALE', 'en'),
+
+    'available_locales' => null,
 
     /*
     |--------------------------------------------------------------------------

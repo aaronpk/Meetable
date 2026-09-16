@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use DateTime, DateTimeZone, DateInterval, DatePeriod;
 use DB, Str, Log;
 use App\Services\Zoom;
+use App\Helpers\Dates;
 
 class Event extends Model
 {
@@ -34,9 +35,6 @@ class Event extends Model
         'yearly',
     ];
 
-    // A weekday can fall in at most five different weeks of a month
-    const RECURRENCE_ORDINALS = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th'];
-
     // Fields holding links. code_of_conduct_url can hold several, separated by spaces.
     public static $URL_PROPERTIES = [
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url', 'notes_url', 'cover_image',
@@ -48,7 +46,7 @@ class Event extends Model
             $rules[$property] = ['nullable', function($attribute, $value, $fail) {
                 foreach(explode(' ', (string)$value) as $url) {
                     if(\App\Helpers\Uri::has_unsafe_scheme($url))
-                        return $fail('The '.str_replace('_', ' ', $attribute).' must be an http or https link.');
+                        return $fail(__('event_form.url_must_be_http', ['field' => __('event_form.url_field_names.'.$attribute)]));
                 }
             }];
         }
@@ -72,8 +70,15 @@ class Event extends Model
         'recurrence_interval', 'recurrence_interval_count',
     ];
 
+    // Keeps letters and numbers from any script, so names that aren't written in the Latin
+    // alphabet still get a readable slug, e.g. "Москва встреча" becomes "москва-встреча".
+    // Normalizer comes from symfony/polyfill-intl-normalizer when intl isn't installed,
+    // so a name gets the same slug on every server.
     public static function slug_from_name($name) {
-        return preg_replace('/--+/', '-', mb_ereg_replace('[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+', '-', mb_strtolower($name)));
+        $name = \Normalizer::normalize((string)$name, \Normalizer::FORM_C) ?: (string)$name;
+
+        // preg_replace returns null for text that isn't valid UTF-8
+        return trim(preg_replace('/[^\p{L}\p{M}\p{N}]+/u', '-', mb_strtolower($name)) ?? '', '-');
     }
 
     public static function find_from_url($url) {
@@ -238,7 +243,7 @@ class Event extends Model
 
     public function permalink() {
         $date = new DateTime($this->start_date);
-        return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? $this->slug.'-' : '') . $this->key;
+        return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? rawurlencode($this->slug).'-' : '') . $this->key;
     }
 
     public function ics_permalink() {
@@ -294,38 +299,36 @@ class Event extends Model
             $end_date = new DateTime($this->end_date);
 
             if($start_date->format('Y') != $end_date->format('Y')) {
-                $start_text = $start_date->format('M j, Y');
-                $end_text = $end_date->format('M j, Y');
-            } elseif($start_date->format('F') == $end_date->format('F')) {
-                $start_text = $start_date->format('M j');
-                $end_text = $end_date->format('j, Y');
+                $start_text = Dates::format($start_date, 'date');
+                $end_text = Dates::format($end_date, 'date');
+            } elseif($start_date->format('m') == $end_date->format('m')) {
+                $start_text = Dates::format($start_date, 'month_day');
+                $end_text = Dates::format($end_date, 'day_year');
             } else {
-                $start_text = $start_date->format('M j');
-                $end_text = $end_date->format('M j, Y');
+                $start_text = Dates::format($start_date, 'month_day');
+                $end_text = Dates::format($end_date, 'date');
             }
 
-            return '<time datetime="'.$start_date->format('Y-m-d').'">'
-                    . $start_text
-                    . '</time> - '
-                    . '<time datetime="'.$end_date->format('Y-m-d').'">'
-                    . $end_text
-                    . '</time>';
+            return __('dates.range', [
+                'start' => '<time datetime="'.$start_date->format('Y-m-d').'">'.e($start_text).'</time>',
+                'end' => '<time datetime="'.$end_date->format('Y-m-d').'">'.e($end_text).'</time>',
+            ]);
 
         } else {
             if($this->start_time) {
                 $start = $this->start_datetime();
                 if($this->timezone) {
-                    $tzattrs = 'class="has-tooltip-bottom event-localize-date '.(!$this->has_physical_location() ? 'is-virtual-event' : '').'" data-timezone="'.$this->timezone.'" data-original-date="'.$start->format('M j, Y g:ia').'" data-dateformat="full"';
+                    $tzattrs = 'class="has-tooltip-bottom event-localize-date '.(!$this->has_physical_location() ? 'is-virtual-event' : '').'" data-timezone="'.$this->timezone.'" data-original-date="'.e(Dates::format($start, 'datetime')).'" data-dateformat="full"';
                 } else {
                     $tzattrs = '';
                 }
                 return '<time datetime="'.$start->format('c').'" '.$tzattrs.'>'
-                        . $start->format('M j, Y').' '.$start->format('g:ia')
+                        . e(Dates::format($start, 'datetime'))
                         . ($this->has_physical_location() ? ' ('.$this->timezone.')' : '')
                         . '</time>';
             } else {
                 return '<time datetime="'.$start_date->format('Y-m-d').'">'
-                        . $start_date->format('M j, Y')
+                        . e(Dates::format($start_date, 'date'))
                         . '</time>';
             }
         }
@@ -378,15 +381,20 @@ class Event extends Model
             $end_date = new DateTime($this->end_date);
 
             if($start_date->format('Y') != $end_date->format('Y')) {
-                return $start_date->format('F j, Y') . ' - ' . $end_date->format('F j, Y');
-            } elseif($start_date->format('F') == $end_date->format('F')) {
-                return $start_date->format('F j') . ' - ' . $end_date->format('j, Y');
+                $start_format = 'date_long';
+                $end_format = 'date_long';
+            } elseif($start_date->format('m') == $end_date->format('m')) {
+                $start_format = 'month_day_long';
+                $end_format = 'day_year';
             } else {
-                return $start_date->format('F j') . ' - ' . $end_date->format('F j, Y');
+                $start_format = 'month_day_long';
+                $end_format = 'date_long';
             }
 
+            return __('dates.range', ['start' => Dates::format($start_date, $start_format), 'end' => Dates::format($end_date, $end_format)]);
+
         } else {
-            return $start_date->format('F j, Y');
+            return Dates::format($start_date, 'date_long');
         }
     }
 
@@ -398,13 +406,14 @@ class Event extends Model
 
         if($this->end_time) {
             $end_time = new DateTime($this->end_time);
+            // Leave out am/pm on the start time when it's the same as the end time's
             if($start_time->format('a') == $end_time->format('a'))
-                $start_format = 'g:i';
+                $start_format = 'time_no_meridiem';
             else
-                $start_format = 'g:ia';
-            $str = $start_time->format($start_format) . ' - ' . $end_time->format('g:ia');
+                $start_format = 'time';
+            $str = __('dates.range', ['start' => Dates::format($start_time, $start_format), 'end' => Dates::format($end_time, 'time')]);
         } else {
-            $str = $start_time->format('g:ia');
+            $str = Dates::format($start_time, 'time');
         }
 
         return $str;
@@ -420,7 +429,7 @@ class Event extends Model
 
     public function weekday() {
         $start_date = new DateTime($this->start_date);
-        return $start_date->format('D');
+        return Dates::format($start_date, 'weekday_short');
     }
 
     public function start_and_end_dates() {
@@ -477,14 +486,23 @@ class Event extends Model
 
     // e.g. "3rd Tuesday"
     public static function day_of_week_ordinal_label(DateTime $date) {
-        return self::RECURRENCE_ORDINALS[self::week_of_month($date)].' '.$date->format('l');
+        return __('recurrence.nth_weekday', [
+            'ordinal' => __('recurrence.ordinals.'.self::week_of_month($date)),
+            'weekday' => Dates::format($date, 'weekday'),
+        ]);
     }
 
     // e.g. "last Friday" or "2nd last Friday"
     public static function day_of_week_from_end_label(DateTime $date) {
         $weeks = self::weeks_from_end_of_month($date);
 
-        return ($weeks == 1 ? 'last ' : self::RECURRENCE_ORDINALS[$weeks].' last ').$date->format('l');
+        if($weeks == 1)
+            return __('recurrence.last_weekday', ['weekday' => Dates::format($date, 'weekday')]);
+
+        return __('recurrence.nth_last_weekday', [
+            'ordinal' => __('recurrence.ordinals.'.$weeks),
+            'weekday' => Dates::format($date, 'weekday'),
+        ]);
     }
 
     public function recurrence_description() {
@@ -492,23 +510,24 @@ class Event extends Model
             return '';
 
         $start = new DateTime($this->start_date);
+        $weekdays = __('recurrence.weekdays.'.$start->format('w'));
 
         switch($this->recurrence_interval) {
             case 'weekly_dow':
-                return 'Every week on '.$start->format('l').'s';
+                return __('recurrence.description.weekly', ['weekdays' => $weekdays]);
             case 'biweekly_dow':
-                return 'Every other week on '.$start->format('l').'s';
+                return __('recurrence.description.biweekly', ['weekdays' => $weekdays]);
             case 'weekly_n':
                 $weeks = (int)$this->recurrence_interval_count ?: 1;
-                return ($weeks == 1 ? 'Every week' : 'Every '.$weeks.' weeks').' on '.$start->format('l').'s';
+                return trans_choice('recurrence.description.every_n_weeks', $weeks, ['weekdays' => $weekdays]);
             case 'monthly_date':
-                return 'Every month on the '.$start->format('dS');
+                return __('recurrence.description.monthly_date', ['day' => Dates::format($start, 'day_ordinal')]);
             case 'monthly_dow':
-                return 'Every month on the '.self::day_of_week_ordinal_label($start);
+                return __('recurrence.description.monthly_dow', ['position' => self::day_of_week_ordinal_label($start)]);
             case 'monthly_dow_last':
-                return 'Every month on the '.self::day_of_week_from_end_label($start);
+                return __('recurrence.description.monthly_dow', ['position' => self::day_of_week_from_end_label($start)]);
             case 'yearly':
-                return 'Every year on '.$start->format('M j');
+                return __('recurrence.description.yearly', ['date' => Dates::format($start, 'month_day')]);
         }
     }
 
@@ -774,7 +793,8 @@ class Event extends Model
                 $occurrence->save();
 
                 $revision = EventRevision::createFromEvent($occurrence);
-                $revision->edit_summary = 'Updated from the recurring event template';
+                // Stored and shown to everyone, so in the site's language rather than the editor's
+                $revision->edit_summary = __('recurrence.updated_from_template', [], \App\Helpers\Locales::site());
                 $revision->save();
             }
         }
@@ -924,7 +944,7 @@ class Event extends Model
         if($this->meeting_url && $this->is_ongoing()) {
             $icon = 'play-circle';
             $class = 'success';
-            $text = 'Live Now';
+            $text = __('events.status.live_now');
         } else if($this->status == 'confirmed') {
             return '';
         }
@@ -933,17 +953,17 @@ class Event extends Model
             case 'cancelled':
               $icon = 'exclamation-triangle';
               $class = 'danger';
-              $text = 'Cancelled';
+              $text = self::status_label('cancelled');
               break;
             case 'postponed':
               $icon = 'question-circle';
               $class = 'warning';
-              $text = 'Postponed';
+              $text = self::status_label('postponed');
               break;
             case 'tentative':
               $icon = 'question-circle';
               $class = 'warning';
-              $text = 'Tentative';
+              $text = self::status_label('tentative');
               break;
             default:
               return '';
@@ -951,17 +971,22 @@ class Event extends Model
 
         return '<span class="status tag is-'.$class.'">'
             .'<svg class="svg-icon" style="margin-right:5px;"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#'.$icon.'"></use></svg>'
-            .substr(strtoupper($text), 0, 1)
-            .'<span class="lower">'.substr(strtoupper($text), 1).'</span>'
+            .e(mb_substr(mb_strtoupper($text), 0, 1))
+            .'<span class="lower">'.e(mb_substr(mb_strtoupper($text), 1)).'</span>'
             .'<span class="hidden">:</span>'
             .'</span> ';
+    }
+
+    // The name of a status, like "Cancelled", or the status itself if it isn't one of $STATUSES
+    public static function status_label($status) {
+        return isset(self::$STATUSES[$status]) ? __('events.status.'.$status) : $status;
     }
 
     public function status_text() {
         if($this->status == 'confirmed')
             return '';
 
-        return strtoupper($this->status).': ';
+        return mb_strtoupper(self::status_label($this->status)).': ';
     }
 
     public function location_summary() {

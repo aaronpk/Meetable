@@ -16,7 +16,7 @@ $user = Auth::user();
 
 <div class="field">
   <div class="control">
-    <label class="label">Name</label>
+    <label class="label">{{ __('profile.name') }}</label>
     <input class="input" name="name" readonly value="{{ $user->name }}">
   </div>
 </div>
@@ -24,23 +24,23 @@ $user = Auth::user();
 @if($user->url)
 <div class="field">
   <div class="control">
-    <label class="label">Website</label>
+    <label class="label">{{ __('profile.website') }}</label>
     <input class="input" name="url" readonly value="{{ $user->url }}">
   </div>
 </div>
 @endif
 
 <div class="notification is-warning">
-    Your profile information is set when you log in.
+    {{ __('profile.set_when_logging_in') }}
 </div>
 
 
 @if(env('AUTH_METHOD') == 'vouch')
 <form action="{{ route('profile-refresh') }}" method="post" class="settings-form">
 
-    <p class="help">Click the button below to re-fetch your profile info from your website.</p>
+    <p class="help">{{ __('profile.refresh_help') }}</p>
 
-    <button class="button is-primary" type="submit">Fetch Profile Info</button>
+    <button class="button is-primary" type="submit">{{ __('profile.refresh') }}</button>
 
     {{ csrf_field() }}
 

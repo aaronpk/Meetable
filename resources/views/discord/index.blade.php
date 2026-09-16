@@ -3,7 +3,7 @@
 @section('content')
 <section class="section content">
 
-<h2 class="title">Discord Notifications</h2>
+<h2 class="title">{{ __('discord.title') }}</h2>
 
 @if($message = session('discord-success'))
     <div class="notification is-primary">{{ $message }}</div>
@@ -15,33 +15,40 @@
     <div class="notification is-danger">{{ $error }}</div>
 @endif
 
-<p>Post a message to a Discord channel before events with a particular tag start.</p>
+<p>{{ __('discord.intro') }}</p>
 
 <div class="box">
     @if(!$bot_configured)
-        <p><strong>The Discord bot is not configured yet.</strong></p>
-        <p>To set it up, the site owner needs to:</p>
+        <p><strong>{{ __('discord.setup.not_configured') }}</strong></p>
+        <p>{{ __('discord.setup.steps_intro') }}</p>
         <ol>
-            <li>Open the <a href="https://discord.com/developers/applications/{{ env('DISCORD_CLIENT_ID') }}/bot">Bot settings</a> for this Discord application, reset the token, and add it to the <code>.env</code> file as <code>DISCORD_BOT_TOKEN</code></li>
-            <li>Add <code>{{ route('discord-install-callback') }}</code> as a redirect URL in the application's <a href="https://discord.com/developers/applications/{{ env('DISCORD_CLIENT_ID') }}/oauth2">OAuth2 settings</a></li>
+            <li>{!! __('discord.setup.step_token', [
+                'bot_settings' => '<a href="https://discord.com/developers/applications/'.e(env('DISCORD_CLIENT_ID')).'/bot">'.e(__('discord.setup.bot_settings')).'</a>',
+                'env_file' => '<code>.env</code>',
+                'variable' => '<code>DISCORD_BOT_TOKEN</code>',
+            ]) !!}</li>
+            <li>{!! __('discord.setup.step_redirect', [
+                'url' => '<code>'.e(route('discord-install-callback')).'</code>',
+                'oauth_settings' => '<a href="https://discord.com/developers/applications/'.e(env('DISCORD_CLIENT_ID')).'/oauth2">'.e(__('discord.setup.oauth_settings')).'</a>',
+            ]) !!}</li>
         </ol>
     @elseif(!$guild)
-        <p><strong>The bot has not been added to the Discord server yet.</strong></p>
-        <p>Someone with the "Manage Server" permission in Discord needs to add the bot so it can post to channels.</p>
-        <a href="{{ route('discord-install') }}" class="button is-primary">Add the bot to Discord</a>
+        <p><strong>{{ __('discord.setup.not_installed') }}</strong></p>
+        <p>{{ __('discord.setup.needs_admin') }}</p>
+        <a href="{{ route('discord-install') }}" class="button is-primary">{{ __('discord.setup.add_bot') }}</a>
     @else
-        <p>The bot is installed in <strong>{{ $guild['name'] }}</strong>.</p>
-        <p class="help">Make sure the bot can view and send messages in the channels you choose. Use the "Send Test" button to check.
-            If the bot was removed from the server, <a href="{{ route('discord-install') }}">add it again</a>.</p>
+        <p>{!! __('discord.setup.installed_in', ['server' => '<strong>'.e($guild['name']).'</strong>']) !!}</p>
+        <p class="help">{{ __('discord.setup.check_permissions') }}
+            {!! __('discord.setup.reinstall', ['add_it_again' => '<a href="'.e(route('discord-install')).'">'.e(__('discord.setup.add_it_again')).'</a>']) !!}</p>
     @endif
 </div>
 
 @if($bot_configured && $guild)
-    <p><a href="{{ route('new-discord-notification') }}" class="button is-primary">Add Notification</a></p>
+    <p><a href="{{ route('new-discord-notification') }}" class="button is-primary">{{ __('discord.add_notification') }}</a></p>
 @endif
 
 @if(collect($channels)->contains('can_post', false) && $notifications->contains(fn($n) => isset($channels[$n->channel_id]) && !$channels[$n->channel_id]['can_post']))
-    <div class="notification is-warning">The bot can't post in some of these channels. {{ App\Services\Discord::channelAccessHelp() }}</div>
+    <div class="notification is-warning">{{ __('discord.cant_post_in_some') }} {{ App\Services\Discord::channelAccessHelp() }}</div>
 @endif
 
 @if(count($notifications))
@@ -49,10 +56,10 @@
 <table class="table is-fullwidth">
     <thead>
         <tr>
-            <th>Tag</th>
-            <th>Channel</th>
-            <th>When</th>
-            <th>Message</th>
+            <th>{{ __('discord.columns.tag') }}</th>
+            <th>{{ __('discord.columns.channel') }}</th>
+            <th>{{ __('discord.columns.when') }}</th>
+            <th>{{ __('discord.columns.message') }}</th>
             <th></th>
         </tr>
     </thead>
@@ -63,28 +70,28 @@
             <td>
                 #{{ $notification->channel_name }}
                 @if(isset($channels[$notification->channel_id]) && !$channels[$notification->channel_id]['can_post'])
-                    <br><span class="tag is-danger is-light" title="{{ App\Services\Discord::channelAccessHelp() }}">Bot needs access</span>
+                    <br><span class="tag is-danger is-light" title="{{ App\Services\Discord::channelAccessHelp() }}">{{ __('discord.bot_needs_access') }}</span>
                 @elseif($channels && !isset($channels[$notification->channel_id]))
-                    <br><span class="tag is-danger is-light">Channel not found</span>
+                    <br><span class="tag is-danger is-light">{{ __('discord.channel_not_found') }}</span>
                 @endif
             </td>
             <td>
-                {{ $notification->timeBeforeText() }} before
+                {{ __('discord.time_before', ['time' => $notification->timeBeforeText()]) }}
                 @if(!$notification->enabled)
-                    <br><span class="tag is-warning">Disabled</span>
+                    <br><span class="tag is-warning">{{ __('discord.disabled') }}</span>
                 @endif
             </td>
             <td>{{ Str::limit($notification->message, 100) }}</td>
             <td>
                 <div class="buttons are-small" style="flex-wrap: nowrap;">
-                    <a href="{{ route('edit-discord-notification', $notification) }}" class="button">Edit</a>
+                    <a href="{{ route('edit-discord-notification', $notification) }}" class="button">{{ __('common.edit') }}</a>
                     <form action="{{ route('test-discord-notification', $notification) }}" method="post">
                         {{ csrf_field() }}
-                        <button type="submit" class="button">Send Test</button>
+                        <button type="submit" class="button">{{ __('discord.send_test') }}</button>
                     </form>
-                    <form action="{{ route('delete-discord-notification', $notification) }}" method="post" onsubmit="return confirm('Delete this notification?')">
+                    <form action="{{ route('delete-discord-notification', $notification) }}" method="post" onsubmit="return confirm({{ \Illuminate\Support\Js::from(__('discord.delete_confirm')) }})">
                         {{ csrf_field() }}
-                        <button type="submit" class="button is-danger is-light">Delete</button>
+                        <button type="submit" class="button is-danger is-light">{{ __('common.delete') }}</button>
                     </form>
                 </div>
             </td>
@@ -94,7 +101,7 @@
 </table>
 </div>
 @elseif($bot_configured && $guild)
-    <p>No notifications have been set up yet.</p>
+    <p>{{ __('discord.none_yet') }}</p>
 @endif
 
 </section>
