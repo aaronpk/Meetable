@@ -132,6 +132,9 @@ class APIController extends BaseController
             return $this->error('Event not found');
         }
 
+        // Responses added here are approved right away, so this is limited to people who can manage the event
+        Gate::authorize('manage-event', $event);
+
         // Check if this response was already received via webmention and reject if so
         $response = $event->responses()->where('source_url', $url)->first();
 
@@ -158,7 +161,7 @@ class APIController extends BaseController
             $response->event_id = $event->id;
             $response->approved = true;
             $response->approved_by = Auth::user()->id;
-            $response->approved_at = date('Y:m:d H:i:s');
+            $response->approved_at = date('Y-m-d H:i:s');
             if(Auth::user()->is_admin) {
                 // Allow admin users to override the created_by to other users
                 $by = Auth::user()->id;
