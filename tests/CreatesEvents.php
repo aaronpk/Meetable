@@ -56,7 +56,7 @@ trait CreatesEvents
     protected function deleteTestData(): void
     {
         if($this->test_event_names) {
-            $ids = Event::whereIn('name', $this->test_event_names)->pluck('id');
+            $ids = Event::withTrashed()->whereIn('name', $this->test_event_names)->pluck('id');
 
             EventRevision::whereIn('event_id', $ids)->forceDelete();
             DB::table('event_tag')->whereIn('event_id', $ids)->delete();

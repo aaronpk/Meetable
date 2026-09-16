@@ -100,6 +100,44 @@ class RecurringEventTest extends TestCase
             ->assertSessionHasErrors('recurrence_interval');
     }
 
+    public function testADeletedOccurrenceIsNotCreatedAgain()
+    {
+        $template = $this->createTemplate(new DateTime('+1 day'), 'weekly_dow');
+        $occurrence = $this->instancesOf($template)[1];
+        $date = $occurrence->start_date;
+        $count = count($this->instancesOf($template));
+
+        $this->actingAs($this->testUser())
+            ->post('/event/'.$occurrence->id.'/delete')
+            ->assertRedirect();
+
+        $this->artisan('recurring:schedule')->assertExitCode(0);
+
+        $this->assertCount($count - 1, $this->instancesOf($template));
+        $this->assertEquals(0, Event::where('created_from_template_event_id', $template->id)->where('start_date', $date)->count());
+    }
+
+    public function testAMovedOccurrenceIsNotDuplicated()
+    {
+        $template = $this->createTemplate(new DateTime('+1 day'), 'weekly_dow');
+        $occurrence = $this->instancesOf($template)[1];
+        $scheduled_date = $occurrence->start_date;
+        $count = count($this->instancesOf($template));
+
+        $this->actingAs($this->testUser())
+            ->post('/event/'.$occurrence->id.'/save', [
+                'name' => $occurrence->name,
+                'start_date' => (new DateTime($scheduled_date))->modify('+1 day')->format('Y-m-d'),
+                'status' => 'confirmed',
+            ])
+            ->assertRedirect();
+
+        $this->artisan('recurring:schedule')->assertExitCode(0);
+
+        $this->assertCount($count, $this->instancesOf($template));
+        $this->assertEquals(0, Event::where('created_from_template_event_id', $template->id)->where('start_date', $scheduled_date)->count());
+    }
+
     private function createTemplate(DateTime $start, string $interval): Event
     {
         $name = 'Test Recurring '.uniqid();

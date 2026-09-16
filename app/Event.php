@@ -658,8 +658,11 @@ class Event extends Model
 
         foreach($this->recurrence_dates() as $date) {
             if($date >= $now) {
-                $exists = Event::where('created_from_template_event_id', $this->id)
-                  ->where('start_date', $date->format('Y-m-d'))
+                // Look for an occurrence created for this date, even if it has since been
+                // moved to another date or deleted, so it isn't created again
+                $exists = Event::withTrashed()
+                  ->where('created_from_template_event_id', $this->id)
+                  ->where('created_from_template_date', $date->format('Y-m-d'))
                   ->count();
                 if($exists == 0) {
                     Log::info('  Creating instance on '.$date->format('Y-m-d'));
@@ -667,6 +670,7 @@ class Event extends Model
                     $copy = $this->replicate();
                     $copy->generate_random_values();
                     $copy->created_from_template_event_id = $this->id;
+                    $copy->created_from_template_date = $date->format('Y-m-d');
                     $copy->start_date = $date->format('Y-m-d');
                     $copy->is_template = false;
                     $copy->recurrence_interval = null;
