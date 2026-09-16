@@ -19,13 +19,13 @@
                 {{ __('events.local_time.event_time') }}
             </div>
             <div class="time">
-                {{ $date->format('g:ia') }}
+                {{ \App\Helpers\Dates::format($date, 'time') }}
             </div>
             <div class="timezone">
                 {{ $timezone->getName() }}
             </div>
             <div class="date">
-                {{ $date->format('l, M j, Y') }}
+                {{ \App\Helpers\Dates::format($date, 'weekday_date') }}
             </div>
         </div>
 
@@ -48,7 +48,7 @@
         @foreach($timezones as $tz)
             <tr>
                 <td class="tz">{{ $tz['name'] }}</td>
-                <td class="dt">{{ $tz['date']->format('D g:ia') }}</td>
+                <td class="dt">{{ \App\Helpers\Dates::format($tz['date'], 'weekday_time') }}</td>
             </tr>
         @endforeach
         </table>

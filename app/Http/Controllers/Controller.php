@@ -7,6 +7,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag, App\Setting;
+use App\Helpers\Dates;
 use DateTime, DateTimeZone, DateInterval, Exception;
 use DB;
 
@@ -238,9 +239,9 @@ class Controller extends BaseController
 
         if(!isset($opts['page_title'])) {
             if(!empty($opts['day'])) {
-                $opts['page_title'] = __('events.title.day', ['site' => env('APP_NAME'), 'date' => date('F j, Y', strtotime($opts['year'].'-'.$opts['month'].'-'.$opts['day']))]);
+                $opts['page_title'] = __('events.title.day', ['site' => env('APP_NAME'), 'date' => Dates::format($opts['year'].'-'.$opts['month'].'-'.$opts['day'], 'date_long')]);
             } elseif(!empty($opts['month'])) {
-                $opts['page_title'] = __('events.title.month', ['site' => env('APP_NAME'), 'month' => date('F Y', strtotime($opts['year'].'-'.$opts['month'].'-01'))]);
+                $opts['page_title'] = __('events.title.month', ['site' => env('APP_NAME'), 'month' => Dates::format($opts['year'].'-'.$opts['month'].'-01', 'month_year')]);
             } elseif(!empty($opts['year'])) {
                 $opts['page_title'] = __('events.title.year_on_site', ['site' => env('APP_NAME'), 'year' => $opts['year']]);
             } else {

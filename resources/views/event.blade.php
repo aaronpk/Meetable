@@ -164,7 +164,7 @@ use App\Setting;
         <span class="icon">@icon(clock)</span>
         <span>
             <div>{{ $event->status == 'postponed' ? __('events.tbd_originally').' ' : '' }}
-                <time datetime="{{ $event->start_datetime()->format('c') }}"  class="event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}"  data-original-date="{{ $event->start_datetime()->format('M j, Y g:ia') }}" data-dateformat="dateonly" data-show-tooltip="false">
+                <time datetime="{{ $event->start_datetime()->format('c') }}"  class="event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}"  data-original-date="{{ \App\Helpers\Dates::format($event->start_datetime(), 'datetime') }}" data-dateformat="dateonly" data-show-tooltip="false">
                     {!! $event->display_date() !!}
                 </time>
             </div>
@@ -172,7 +172,7 @@ use App\Setting;
                 <div class="time">
                     @if($event->timezone)
                         <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">
-                            <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}" data-original-date="{{ $event->start_datetime()->format('M j, Y g:ia') }}" data-dateformat="timeonly">
+                            <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}" data-original-date="{{ \App\Helpers\Dates::format($event->start_datetime(), 'datetime') }}" data-dateformat="timeonly">
                                 {!! $event->display_time() !!}
                             </time>
                         </a>
@@ -491,7 +491,7 @@ use App\Setting;
                         <p class="post-name"><a href="{{ $post->link() }}">{{ $post->name }}</a></p>
                         <p>
                             @if($post->published)
-                                {!! __('responses.blog_post_by_on', ['author' => '<a href="'.e($post->author_url()).'">'.e($post->author_display_name()).'</a>', 'date' => e(date('M j, Y', strtotime($post->published)))]) !!}
+                                {!! __('responses.blog_post_by_on', ['author' => '<a href="'.e($post->author_url()).'">'.e($post->author_display_name()).'</a>', 'date' => e(\App\Helpers\Dates::format($post->published, 'date'))]) !!}
                             @else
                                 {!! __('responses.blog_post_by', ['author' => '<a href="'.e($post->author_url()).'">'.e($post->author_display_name()).'</a>']) !!}
                             @endif
@@ -525,7 +525,7 @@ use App\Setting;
                         <span class="meta">
                             <a href="{{ $comment->link() }}">
                                 <time datetime="{{ date('c', strtotime($comment->published)) }}">
-                                    {{ date('M j, Y', strtotime($comment->published)) }}
+                                    {{ \App\Helpers\Dates::format($comment->published, 'date') }}
                                 </time>
                             </a>
                         </span>

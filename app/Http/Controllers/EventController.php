@@ -13,6 +13,7 @@ use Auth, Storage, Gate, Log, DB;
 use Image;
 use DateTime;
 use App\Services\Zoom, App\Services\EventParser;
+use App\Helpers\Dates;
 use App\Events\EventCreated, App\Events\EventUpdated;
 
 class EventController extends BaseController
@@ -237,9 +238,9 @@ class EventController extends BaseController
 
         return view('recurring-event-details', [
             'event' => $event,
-            'recur_month_date' => $date->format('M j'),
-            'recur_date' => $date->format('jS'),
-            'recur_dow' => $date->format('l'),
+            'recur_month_date' => Dates::format($date, 'month_day'),
+            'recur_date' => Dates::format($date, 'day_ordinal'),
+            'recur_dow' => Dates::format($date, 'weekday'),
             'recur_dow_ordinal' => Event::day_of_week_ordinal_label($date),
             'recur_dow_from_end' => $weeks_from_end <= 2 ? Event::day_of_week_from_end_label($date) : null,
         ]);

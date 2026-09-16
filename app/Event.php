@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use DateTime, DateTimeZone, DateInterval, DatePeriod;
 use DB, Str, Log;
 use App\Services\Zoom;
+use App\Helpers\Dates;
 
 class Event extends Model
 {
@@ -294,38 +295,36 @@ class Event extends Model
             $end_date = new DateTime($this->end_date);
 
             if($start_date->format('Y') != $end_date->format('Y')) {
-                $start_text = $start_date->format('M j, Y');
-                $end_text = $end_date->format('M j, Y');
-            } elseif($start_date->format('F') == $end_date->format('F')) {
-                $start_text = $start_date->format('M j');
-                $end_text = $end_date->format('j, Y');
+                $start_text = Dates::format($start_date, 'date');
+                $end_text = Dates::format($end_date, 'date');
+            } elseif($start_date->format('m') == $end_date->format('m')) {
+                $start_text = Dates::format($start_date, 'month_day');
+                $end_text = Dates::format($end_date, 'day_year');
             } else {
-                $start_text = $start_date->format('M j');
-                $end_text = $end_date->format('M j, Y');
+                $start_text = Dates::format($start_date, 'month_day');
+                $end_text = Dates::format($end_date, 'date');
             }
 
-            return '<time datetime="'.$start_date->format('Y-m-d').'">'
-                    . $start_text
-                    . '</time> - '
-                    . '<time datetime="'.$end_date->format('Y-m-d').'">'
-                    . $end_text
-                    . '</time>';
+            return __('dates.range', [
+                'start' => '<time datetime="'.$start_date->format('Y-m-d').'">'.e($start_text).'</time>',
+                'end' => '<time datetime="'.$end_date->format('Y-m-d').'">'.e($end_text).'</time>',
+            ]);
 
         } else {
             if($this->start_time) {
                 $start = $this->start_datetime();
                 if($this->timezone) {
-                    $tzattrs = 'class="has-tooltip-bottom event-localize-date '.(!$this->has_physical_location() ? 'is-virtual-event' : '').'" data-timezone="'.$this->timezone.'" data-original-date="'.$start->format('M j, Y g:ia').'" data-dateformat="full"';
+                    $tzattrs = 'class="has-tooltip-bottom event-localize-date '.(!$this->has_physical_location() ? 'is-virtual-event' : '').'" data-timezone="'.$this->timezone.'" data-original-date="'.e(Dates::format($start, 'datetime')).'" data-dateformat="full"';
                 } else {
                     $tzattrs = '';
                 }
                 return '<time datetime="'.$start->format('c').'" '.$tzattrs.'>'
-                        . $start->format('M j, Y').' '.$start->format('g:ia')
+                        . e(Dates::format($start, 'datetime'))
                         . ($this->has_physical_location() ? ' ('.$this->timezone.')' : '')
                         . '</time>';
             } else {
                 return '<time datetime="'.$start_date->format('Y-m-d').'">'
-                        . $start_date->format('M j, Y')
+                        . e(Dates::format($start_date, 'date'))
                         . '</time>';
             }
         }
@@ -378,15 +377,20 @@ class Event extends Model
             $end_date = new DateTime($this->end_date);
 
             if($start_date->format('Y') != $end_date->format('Y')) {
-                return $start_date->format('F j, Y') . ' - ' . $end_date->format('F j, Y');
-            } elseif($start_date->format('F') == $end_date->format('F')) {
-                return $start_date->format('F j') . ' - ' . $end_date->format('j, Y');
+                $start_format = 'date_long';
+                $end_format = 'date_long';
+            } elseif($start_date->format('m') == $end_date->format('m')) {
+                $start_format = 'month_day_long';
+                $end_format = 'day_year';
             } else {
-                return $start_date->format('F j') . ' - ' . $end_date->format('F j, Y');
+                $start_format = 'month_day_long';
+                $end_format = 'date_long';
             }
 
+            return __('dates.range', ['start' => Dates::format($start_date, $start_format), 'end' => Dates::format($end_date, $end_format)]);
+
         } else {
-            return $start_date->format('F j, Y');
+            return Dates::format($start_date, 'date_long');
         }
     }
 
@@ -398,13 +402,14 @@ class Event extends Model
 
         if($this->end_time) {
             $end_time = new DateTime($this->end_time);
+            // Leave out am/pm on the start time when it's the same as the end time's
             if($start_time->format('a') == $end_time->format('a'))
-                $start_format = 'g:i';
+                $start_format = 'time_no_meridiem';
             else
-                $start_format = 'g:ia';
-            $str = $start_time->format($start_format) . ' - ' . $end_time->format('g:ia');
+                $start_format = 'time';
+            $str = __('dates.range', ['start' => Dates::format($start_time, $start_format), 'end' => Dates::format($end_time, 'time')]);
         } else {
-            $str = $start_time->format('g:ia');
+            $str = Dates::format($start_time, 'time');
         }
 
         return $str;
@@ -420,7 +425,7 @@ class Event extends Model
 
     public function weekday() {
         $start_date = new DateTime($this->start_date);
-        return $start_date->format('D');
+        return Dates::format($start_date, 'weekday_short');
     }
 
     public function start_and_end_dates() {

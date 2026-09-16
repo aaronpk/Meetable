@@ -24,7 +24,7 @@
             <br>
 
             {{ $event->recurrence_description() }}
-            starting {{ (new DateTime($event->start_date))->format('M j, Y') }}
+            starting {{ \App\Helpers\Dates::format($event->start_date, 'date') }}
 
             @if(count($instances[$event->id]))
                 <br>

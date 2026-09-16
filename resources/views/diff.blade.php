@@ -69,9 +69,9 @@ td.diff-container td {
 		on 
 
 		<span title="{{ $current->updated_at->format('c') }}">
-			{{ $current->updated_at->format('F j, Y') }}
+			{{ \App\Helpers\Dates::format($current->updated_at, 'date_long') }}
 			at 
-			{{ $current->updated_at->format('g:ia') }} UTC
+			{{ \App\Helpers\Dates::format($current->updated_at, 'time') }} UTC
 		</span>
 	</div>
 

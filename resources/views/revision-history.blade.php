@@ -40,7 +40,7 @@
 					on 
 
 					<span title="{{ $currentRevision->updated_at->format('c') }}">
-						{{ $currentRevision->updated_at->format('F j, Y') }}
+						{{ \App\Helpers\Dates::format($currentRevision->updated_at, 'date_long') }}
 					</span>
 				</div>
 			</div>
@@ -67,7 +67,7 @@
 					<a href="{{ route('view-revision', [$event, $currentRevision]) }}">
 						created this event on
 						<span title="{{ $currentRevision->updated_at->format('c') }}">
-							{{ $currentRevision->created_at->format('F j, Y') }}
+							{{ \App\Helpers\Dates::format($currentRevision->created_at, 'date_long') }}
 						</span>
 					</a>
 				</div>

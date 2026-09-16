@@ -22,7 +22,7 @@
                     <span class="meta">
                         <a href="{{ $response->link() }}">
                             <time datetime="{{ date('c', strtotime($response->published)) }}">
-                                {{ date('M j, Y', strtotime($response->published)) }}
+                                {{ \App\Helpers\Dates::format($response->published, 'date') }}
                             </time>
                         </a>
                     </span>
@@ -31,7 +31,7 @@
                     <span class="meta">
                         Webmention Received
                         <time datetime="{{ date('c', strtotime($response->created_at)) }}">
-                            {{ date('M j, Y g:ia', strtotime($response->created_at)) }}
+                            {{ \App\Helpers\Dates::format($response->created_at, 'datetime') }}
                         </time>
                         from
                         <a href="{{ \App\Helpers\Uri::safe_href($response->source_url) }}">
@@ -42,7 +42,7 @@
                     <span class="meta">
                         Added
                         <time datetime="{{ date('c', strtotime($response->created_at)) }}">
-                            {{ date('M j, Y g:ia', strtotime($response->created_at)) }}
+                            {{ \App\Helpers\Dates::format($response->created_at, 'datetime') }}
                         </time>
                         by
                         <a href="{{ \App\Helpers\Uri::safe_href($response->creator->url) }}">

@@ -247,7 +247,7 @@ class Discord {
         if($event->start_time) {
             $when = '<t:'.$start->format('U').':F> (<t:'.$start->format('U').':R>)';
         } else {
-            $when = $start->format('l, F j, Y');
+            $when = \App\Helpers\Dates::format($start, 'date_full');
         }
         $fields[] = ['name' => 'When', 'value' => $when, 'inline' => false];
 
