@@ -24,6 +24,9 @@ return [
         'log_in' => 'Log In',
     ],
 
+    'edit' => 'Edit',
+    'save' => 'Save',
+
     // :meetable is a link to the Meetable project
     'footer' => 'powered by :meetable, an open source event listing website',
 ];

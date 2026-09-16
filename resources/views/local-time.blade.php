@@ -6,7 +6,7 @@
 @if(!$date || !$timezone)
 
     <div class="notification is-danger">
-        Invalid input
+        {{ __('events.local_time.invalid_input') }}
     </div>
 
 @else
@@ -16,7 +16,7 @@
     <div class="widget">
         <div class="original">
             <div class="header">
-                Event Time
+                {{ __('events.local_time.event_time') }}
             </div>
             <div class="time">
                 {{ $date->format('g:ia') }}
@@ -35,7 +35,7 @@
 
         <div class="local">
             <div class="header">
-                Your Local Time
+                {{ __('events.local_time.your_local_time') }}
             </div>
             <div class="time"></div>
             <div class="timezone"></div>

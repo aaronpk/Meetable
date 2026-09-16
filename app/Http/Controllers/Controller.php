@@ -195,7 +195,7 @@ class Controller extends BaseController
             'month' => false,
             'day' => false,
             'home' => (!$year && !$month && !$day),
-            'page_title' => $year . ' Events',
+            'page_title' => __('events.title.year', ['year' => $year]),
             'tags' => $tags,
             'page_type' => 'tag',
         ]);
@@ -238,11 +238,11 @@ class Controller extends BaseController
 
         if(!isset($opts['page_title'])) {
             if(!empty($opts['day'])) {
-                $opts['page_title'] = env('APP_NAME').' on '.date('F j, Y', strtotime($opts['year'].'-'.$opts['month'].'-'.$opts['day']));
+                $opts['page_title'] = __('events.title.day', ['site' => env('APP_NAME'), 'date' => date('F j, Y', strtotime($opts['year'].'-'.$opts['month'].'-'.$opts['day']))]);
             } elseif(!empty($opts['month'])) {
-                $opts['page_title'] = env('APP_NAME').' in '.date('F Y', strtotime($opts['year'].'-'.$opts['month'].'-01'));
+                $opts['page_title'] = __('events.title.month', ['site' => env('APP_NAME'), 'month' => date('F Y', strtotime($opts['year'].'-'.$opts['month'].'-01'))]);
             } elseif(!empty($opts['year'])) {
-                $opts['page_title'] = env('APP_NAME').' in '.$opts['year'];
+                $opts['page_title'] = __('events.title.year_on_site', ['site' => env('APP_NAME'), 'year' => $opts['year']]);
             } else {
                 $opts['page_title'] = env('APP_NAME');
             }

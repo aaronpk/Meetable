@@ -20,7 +20,7 @@ a.title:hover, a.subtitle:hover {
 </style>
 
 <ul class="year h-feed">
-    <data class="p-name" value="Past Events"></data>
+    <data class="p-name" value="{{ __('events.past_events') }}"></data>
 @foreach($data as $year => $months)
 
     <li>
@@ -34,7 +34,7 @@ a.title:hover, a.subtitle:hover {
                     </a>
                     {{-- only show count of events for dates older than 18 months ago --}}
                     @if( count($events) > 2 && mktime(0,0,0, $month, 1, $year) < strtotime('18 months ago') )
-                        &bull; <a href="{{ route('month', [$year, sprintf('%02d', $month)]) }}">{{ count($events) }} {{ count($events) == 1 ? 'event' : 'events' }}</a>
+                        &bull; <a href="{{ route('month', [$year, sprintf('%02d', $month)]) }}">{{ trans_choice('events.event_count', count($events), ['count' => count($events)]) }}</a>
                     @else
                         <ul>
                         @foreach($events as $event)
