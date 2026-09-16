@@ -43,7 +43,7 @@ use App\Response;
 
     <main>
 
-    <nav class="navbar" role="navigation" aria-label="main navigation">
+    <nav class="navbar" role="navigation" aria-label="{{ __('common.nav.main_navigation') }}">
         <div class="navbar-brand">
             <span class="navbar-item">
                 <a href="{{ route('index') }}" class="navbar-logo">
@@ -56,7 +56,7 @@ use App\Response;
                 </a>
             </span>
 
-            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <a role="button" class="navbar-burger burger" aria-label="{{ __('common.nav.menu') }}" aria-expanded="false" data-target="navbarBasicExample">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
@@ -66,25 +66,25 @@ use App\Response;
         <div id="navbarBasicExample" class="navbar-menu">
             <div class="navbar-start">
                 @if(Setting::value('logo_url'))
-                    <a class="navbar-item" href="{{ route('index') }}">Upcoming Events</a>
+                    <a class="navbar-item" href="{{ route('index') }}">{{ __('common.nav.upcoming_events') }}</a>
                 @endif
-                <a class="navbar-item" href="{{ route('archive') }}">Past Events</a>
-                <a class="navbar-item" href="{{ route('tags') }}">Discover</a>
+                <a class="navbar-item" href="{{ route('archive') }}">{{ __('common.nav.past_events') }}</a>
+                <a class="navbar-item" href="{{ route('tags') }}">{{ __('common.nav.discover') }}</a>
                 @can('create-event')
                     @if(Setting::value('enable_unlisted_events'))
-                        <a class="navbar-item" href="{{ route('unlisted') }}">Unlisted Events</a>
+                        <a class="navbar-item" href="{{ route('unlisted') }}">{{ __('common.nav.unlisted_events') }}</a>
                     @endif
                     @if(Setting::value('enable_webmention_responses'))
                         <a class="navbar-item" href="{{ route('moderate-all-responses') }}">
-                            Moderate Responses
+                            {{ __('common.nav.moderate_responses') }}
                             {!! ($num=Response::where('approved', 0)->count()) ? "(<span class='pending-response-count'>$num</span>)" : "" !!}
                         </a>
                     @endif
                     <div class="navbar-item has-dropdown is-hoverable">
-                        <a class="navbar-link" href="{{ route('new-event') }}">Add Event</a>
+                        <a class="navbar-link" href="{{ route('new-event') }}">{{ __('common.nav.add_event') }}</a>
                         <div class="navbar-dropdown">
-                            <a class="navbar-item" href="{{ route('new-event') }}">Create New Event</a>
-                            <a class="navbar-item" href="{{ route('import-event') }}">Import from URL</a>
+                            <a class="navbar-item" href="{{ route('new-event') }}">{{ __('common.nav.create_new_event') }}</a>
+                            <a class="navbar-item" href="{{ route('import-event') }}">{{ __('common.nav.import_from_url') }}</a>
                         </div>
                     </div>
                 @endcan
@@ -92,22 +92,22 @@ use App\Response;
             <div class="navbar-end">
                 @can('create-event')
                     @if(true || Setting::value('enable_recurring_events'))
-                        <a class="navbar-item" href="{{ route('templates') }}">Recurring Events</a>
+                        <a class="navbar-item" href="{{ route('templates') }}">{{ __('common.nav.recurring_events') }}</a>
                     @endif
                 @endcan
                 @can('manage-site')
-                    <a class="navbar-item" href="{{ route('settings') }}">Settings</a>
+                    <a class="navbar-item" href="{{ route('settings') }}">{{ __('common.nav.settings') }}</a>
                 @endcan
                 @if(Auth::user() && env('AUTH_METHOD') == 'discord')
-                    <a class="navbar-item" href="{{ route('discord-notifications') }}">Discord</a>
+                    <a class="navbar-item" href="{{ route('discord-notifications') }}">{{ __('common.nav.discord') }}</a>
                 @endif
                 @if(Auth::user())
-                    <a class="navbar-item" href="{{ route('profile') }}">Profile</a>
+                    <a class="navbar-item" href="{{ route('profile') }}">{{ __('common.nav.profile') }}</a>
                 @endif
                 @if(Auth::user() && !Setting::value('auth_hide_logout'))
-                    <a class="navbar-item" href="{{ route('logout') }}">Log Out</a>
+                    <a class="navbar-item" href="{{ route('logout') }}">{{ __('common.nav.log_out') }}</a>
                 @elseif(!Auth::user() && !Setting::value('auth_hide_login'))
-                    <a class="navbar-item" href="{{ route('login') }}">Log In</a>
+                    <a class="navbar-item" href="{{ route('login') }}">{{ __('common.nav.log_in') }}</a>
                 @endif
             </div>
         </div>
@@ -122,7 +122,7 @@ use App\Response;
 
     <footer class="site-footer">
         <div>
-            powered by <a href="https://github.com/aaronpk/Meetable">meetable</a>, an open source event listing website
+            {!! __('common.footer', ['meetable' => '<a href="https://github.com/aaronpk/Meetable">meetable</a>']) !!}
         </div>
     </footer>
 
