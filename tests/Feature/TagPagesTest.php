@@ -56,6 +56,23 @@ class TagPagesTest extends TestCase
         $this->assertEquals(1, Tag::where('tag', 'like', $this->prefix.'%')->count());
     }
 
+    public function testTagsInAnyScriptWork()
+    {
+        $moscow = 'москва-'.$this->prefix;
+        $event = $this->createEvent(['start_date' => '2031-06-01', 'tags' => 'Москва-'.$this->prefix.' '.$this->prefix.'-東京']);
+        $this->app['auth']->forgetGuards();
+
+        $this->assertEqualsCanonicalizing([$moscow, $this->prefix.'-東京'], $event->tags()->pluck('tag')->all());
+
+        $tag = Tag::where('tag', $moscow)->firstOrFail();
+        $this->assertEquals('/tag/'.rawurlencode($moscow), $tag->url());
+
+        $this->get($tag->url())->assertOk()->assertSee($event->name);
+        $this->get($event->permalink())->assertOk()->assertSee('href="'.$tag->url().'"', false);
+
+        Tag::where('tag', $moscow)->delete();
+    }
+
     public function testLookupDoesNotSaveMissingTags()
     {
         $tag = Tag::lookup(' '.strtoupper($this->prefix).'-Missing, ');

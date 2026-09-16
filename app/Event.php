@@ -77,7 +77,8 @@ class Event extends Model
     public static function slug_from_name($name) {
         $name = \Normalizer::normalize((string)$name, \Normalizer::FORM_C) ?: (string)$name;
 
-        return trim(preg_replace('/[^\p{L}\p{M}\p{N}]+/u', '-', mb_strtolower($name)), '-');
+        // preg_replace returns null for text that isn't valid UTF-8
+        return trim(preg_replace('/[^\p{L}\p{M}\p{N}]+/u', '-', mb_strtolower($name)) ?? '', '-');
     }
 
     public static function find_from_url($url) {

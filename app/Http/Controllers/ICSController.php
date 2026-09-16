@@ -10,6 +10,7 @@ use App\Event, App\Tag, App\Setting;
 use DateTime, DateTimeZone, DateInterval;
 use DB, Log;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class ICSController extends BaseController
 {
@@ -176,9 +177,17 @@ class ICSController extends BaseController
 
         $ics = $vCalendar->render();
 
+        // Tags can use any script, so the filename also has an ASCII version for older clients
+        $names = array_map(function($t){ return $t->tag; }, $tags);
+        $ascii_names = array_filter(array_map(function($name){
+            return trim(preg_replace('/[^A-Za-z0-9-]+/', '', $name), '-');
+        }, $names));
+        $filename = 'events-'.implode(',', $names).'.ics';
+        $ascii_filename = $ascii_names ? 'events-'.implode(',', $ascii_names).'.ics' : 'events.ics';
+
         return response($ics)->withHeaders([
             'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="events-'.implode(',', array_map(function($t){ return $t->tag; }, $tags)).'.ics"'
+            'Content-Disposition' => HeaderUtils::makeDisposition('attachment', $filename, $ascii_filename),
         ]);
     }
 

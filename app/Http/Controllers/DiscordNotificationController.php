@@ -228,7 +228,7 @@ class DiscordNotificationController extends BaseController
             $event->summary = __('discord.example.summary', ['tag' => $notification->tag], Locales::site());
 
             $payload = Discord::buildEventMessage($notification, $event);
-            $payload['embeds'][0]['url'] = env('APP_URL').'/tag/'.$notification->tag;
+            $payload['embeds'][0]['url'] = env('APP_URL').'/tag/'.rawurlencode($notification->tag);
             $description = __('discord.messages.test_with_example');
         }
 

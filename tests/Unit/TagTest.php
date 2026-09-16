@@ -47,4 +47,32 @@ class TagTest extends TestCase
         $tag = Tag::normalize($input);
         $this->assertEquals('çelik', $tag);
     }
+
+    public function testLettersFromAnyScript()
+    {
+        $this->assertEquals('москва', Tag::normalize('Москва'));
+        $this->assertEquals('東京', Tag::normalize('東京'));
+        $this->assertEquals('größe', Tag::normalize('Größe'));
+        $this->assertEquals('नमस्ते', Tag::normalize('नमस्ते'));
+        $this->assertEquals('open-source-東京', Tag::normalize('Open Source / 東京'));
+    }
+
+    public function testTheSameTagAlwaysNormalizesTheSameWay()
+    {
+        // "é" written as one character, and as "e" followed by a combining accent
+        $this->assertEquals(Tag::normalize("caf\u{00E9}"), Tag::normalize("cafe\u{0301}"));
+    }
+
+    public function testExistingTagsAreUnchanged()
+    {
+        // Tags saved with the previous, narrower rules normalize to themselves
+        foreach(['indieweb', 'one-two', 'düsseldorf', 'café-société', 'grö-e', 'iwc-2031'] as $tag) {
+            $this->assertEquals($tag, Tag::normalize($tag));
+        }
+    }
+
+    public function testTextThatIsNotValidUtf8()
+    {
+        $this->assertSame('', Tag::normalize("\xff\xfe"));
+    }
 }
