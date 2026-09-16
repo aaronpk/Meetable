@@ -141,7 +141,7 @@ use App\Setting;
     @endif
 
     <h1 class="event-name">
-        @if($event->meeting_url && !$event->is_past())
+        @if($event->meeting_url_is_visible())
             <a href="{{ \App\Helpers\Uri::safe_href($event->meeting_url) }}" target="_blank">
                 {!! $event->status_tag() !!}
             </a>

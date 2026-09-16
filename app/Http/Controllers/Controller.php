@@ -388,7 +388,7 @@ class Controller extends BaseController
 
         $meeting_url = false;
 
-        if($event->meeting_url && !$event->is_past() && $event->is_starting_soon()) {
+        if($event->meeting_url_is_visible()) {
             $meeting_url = $event->meeting_url;
         }
 

@@ -708,6 +708,11 @@ class Event extends Model
         $this->notification_sent = 0;
     }
 
+    // The meeting link is only shared from 15 minutes before the event starts until it's over
+    public function meeting_url_is_visible() {
+        return $this->meeting_url && !$this->is_past() && ($this->is_starting_soon() || $this->is_ongoing());
+    }
+
     public function is_starting_soon() {
         if($this->is_past() || $this->status != 'confirmed')
             return false;
