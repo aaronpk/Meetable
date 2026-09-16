@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\DiscordNotification;
 use App\Event;
+use App\Helpers\Locales;
 use App\Services\Discord;
 use Tests\CreatesEvents;
 use Tests\TestCase;
@@ -26,6 +27,7 @@ class BrowserLanguageTest extends TestCase
 
     protected function tearDown(): void
     {
+        Locales::$intl = null;
         $this->deleteTestData();
 
         parent::tearDown();
@@ -85,9 +87,10 @@ class BrowserLanguageTest extends TestCase
 
     public function testTheLanguageMenuListsTheAvailableLanguages()
     {
+        Locales::$intl = false;
         $html = $this->withHeader('Accept-Language', 'fr')->get('/')->getContent();
 
-        // French and German have no translation files in the tests, so they're shown by their code
+        // French and German have no translation files in the tests, so without intl they're shown by their code
         $this->assertStringContainsString('<b lang="fr">fr</b>', $html);
         $this->assertStringContainsString('hreflang="en">English</a>', $html);
         $this->assertStringContainsString('href="'.route('set-language', 'en').'"', $html);
@@ -95,6 +98,25 @@ class BrowserLanguageTest extends TestCase
 
         config(['app.available_locales' => ['en']]);
         $this->assertStringNotContainsString('class="languages"', $this->get('/')->getContent());
+    }
+
+    public function testLanguageNames()
+    {
+        // A translation's own name for itself comes first
+        $this->assertEquals('English', Locales::name('en'));
+
+        Locales::$intl = false;
+        $this->assertEquals('de', Locales::name('de'));
+        $this->assertEquals('pt_BR', Locales::name('pt_BR'));
+
+        if(!extension_loaded('intl'))
+            $this->markTestSkipped('The intl extension is not installed');
+
+        Locales::$intl = true;
+        $this->assertEquals('Deutsch', Locales::name('de'));
+        $this->assertEquals('Français', Locales::name('fr'));
+        $this->assertEquals('Português (Brasil)', Locales::name('pt_BR'));
+        $this->assertEquals('xx', Locales::name('xx'));
     }
 
     public function testDiscordPostsUseTheSitesLanguageWhoeverSendsThem()
