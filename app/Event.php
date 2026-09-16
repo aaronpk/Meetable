@@ -35,9 +35,6 @@ class Event extends Model
         'yearly',
     ];
 
-    // A weekday can fall in at most five different weeks of a month
-    const RECURRENCE_ORDINALS = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th'];
-
     // Fields holding links. code_of_conduct_url can hold several, separated by spaces.
     public static $URL_PROPERTIES = [
         'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url', 'notes_url', 'cover_image',
@@ -482,14 +479,23 @@ class Event extends Model
 
     // e.g. "3rd Tuesday"
     public static function day_of_week_ordinal_label(DateTime $date) {
-        return self::RECURRENCE_ORDINALS[self::week_of_month($date)].' '.$date->format('l');
+        return __('recurrence.nth_weekday', [
+            'ordinal' => __('recurrence.ordinals.'.self::week_of_month($date)),
+            'weekday' => Dates::format($date, 'weekday'),
+        ]);
     }
 
     // e.g. "last Friday" or "2nd last Friday"
     public static function day_of_week_from_end_label(DateTime $date) {
         $weeks = self::weeks_from_end_of_month($date);
 
-        return ($weeks == 1 ? 'last ' : self::RECURRENCE_ORDINALS[$weeks].' last ').$date->format('l');
+        if($weeks == 1)
+            return __('recurrence.last_weekday', ['weekday' => Dates::format($date, 'weekday')]);
+
+        return __('recurrence.nth_last_weekday', [
+            'ordinal' => __('recurrence.ordinals.'.$weeks),
+            'weekday' => Dates::format($date, 'weekday'),
+        ]);
     }
 
     public function recurrence_description() {
@@ -497,23 +503,24 @@ class Event extends Model
             return '';
 
         $start = new DateTime($this->start_date);
+        $weekdays = __('recurrence.weekdays.'.$start->format('w'));
 
         switch($this->recurrence_interval) {
             case 'weekly_dow':
-                return 'Every week on '.$start->format('l').'s';
+                return __('recurrence.description.weekly', ['weekdays' => $weekdays]);
             case 'biweekly_dow':
-                return 'Every other week on '.$start->format('l').'s';
+                return __('recurrence.description.biweekly', ['weekdays' => $weekdays]);
             case 'weekly_n':
                 $weeks = (int)$this->recurrence_interval_count ?: 1;
-                return ($weeks == 1 ? 'Every week' : 'Every '.$weeks.' weeks').' on '.$start->format('l').'s';
+                return trans_choice('recurrence.description.every_n_weeks', $weeks, ['weekdays' => $weekdays]);
             case 'monthly_date':
-                return 'Every month on the '.$start->format('dS');
+                return __('recurrence.description.monthly_date', ['day' => Dates::format($start, 'day_ordinal')]);
             case 'monthly_dow':
-                return 'Every month on the '.self::day_of_week_ordinal_label($start);
+                return __('recurrence.description.monthly_dow', ['position' => self::day_of_week_ordinal_label($start)]);
             case 'monthly_dow_last':
-                return 'Every month on the '.self::day_of_week_from_end_label($start);
+                return __('recurrence.description.monthly_dow', ['position' => self::day_of_week_from_end_label($start)]);
             case 'yearly':
-                return 'Every year on '.$start->format('M j');
+                return __('recurrence.description.yearly', ['date' => Dates::format($start, 'month_day')]);
         }
     }
 
@@ -779,7 +786,7 @@ class Event extends Model
                 $occurrence->save();
 
                 $revision = EventRevision::createFromEvent($occurrence);
-                $revision->edit_summary = 'Updated from the recurring event template';
+                $revision->edit_summary = __('recurrence.updated_from_template');
                 $revision->save();
             }
         }
