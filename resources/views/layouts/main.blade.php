@@ -16,6 +16,10 @@ use App\Response;
 
     @yield('headtags')
 
+    <script>
+    // Text used by the site's JavaScript, from resources/lang/{locale}/js.php
+    window.Meetable = {{ \Illuminate\Support\Js::from(['lang' => __('js')]) }};
+    </script>
     <script src="/jquery/jquery-1.12.0.min.js"></script>
 
     <link href="/bulma-1.0.4/bulma.css" rel="stylesheet">
@@ -128,7 +132,7 @@ use App\Response;
 
     </main>
 
-    <script src="/assets/script.js?v=2025327"></script>
+    <script src="/assets/script.js?v=20260916"></script>
     @yield('scripts')
 
 </body>

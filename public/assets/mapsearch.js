@@ -54,7 +54,7 @@ jQuery(function(){
                 fields: ["geometry", "name", "address_component", "formatted_address", "url", "utc_offset"]
             }, function(result, status) {
                 if(status != google.maps.places.PlacesServiceStatus.OK) {
-                    alert('Error looking up location');
+                    alert(lang('location_lookup_failed'));
                     return;
                 }
 

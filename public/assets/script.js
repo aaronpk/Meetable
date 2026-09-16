@@ -19,10 +19,10 @@ $(function(){
         local_time = date_to_display_datetime(date);
     }
     if($(this).hasClass("is-virtual-event")) {
-      tooltip = $(this).data("original-date").replace(/\s+/g," ").trim()+" in event timezone\n"+$(this).data("timezone");
+      tooltip = lang("in_event_timezone", {date: $(this).data("original-date").replace(/\s+/g," ").trim()})+"\n"+$(this).data("timezone");
       $(this).text(local_time);
     } else {
-      tooltip = $(this).data("timezone")+"\n("+date_to_display_datetime(date)+" in your timezone)";
+      tooltip = $(this).data("timezone")+"\n"+lang("in_your_timezone", {date: date_to_display_datetime(date)});
     }
     if($(this).data("show-tooltip") != false) {
         $(this).attr("data-tooltip", tooltip);
@@ -163,6 +163,20 @@ $(function(){
 
 });
 
+// Looks up text from resources/lang/{locale}/js.php and fills in :placeholders
+function lang(key, replacements) {
+  var text = (window.Meetable && window.Meetable.lang && window.Meetable.lang[key]) || key;
+  Object.keys(replacements || {}).forEach(function(name){
+    text = text.split(":"+name).join(replacements[name]);
+  });
+  return text;
+}
+
+// Dates are shown in the site's language, using that language's usual clock
+function page_locale() {
+  return document.documentElement.lang || [];
+}
+
 function csrf_token() {
     return $("input[name=_token]").val();
 }
@@ -182,26 +196,24 @@ function tz_minutes_to_offset(minutes) {
 }
 
 function date_to_display_datetime(date) {
-  return date.toLocaleString([], {
+  return date.toLocaleString(page_locale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour:'numeric',
-    minute: '2-digit',
-    hour12: true
+    minute: '2-digit'
   });
 }
 
 function date_to_display_time(date) {
-  return date.toLocaleString([], {
+  return date.toLocaleString(page_locale(), {
     hour:'numeric',
-    minute: '2-digit',
-    hour12: true
+    minute: '2-digit'
   });
 }
 
 function date_to_display_date(date) {
-  return date.toLocaleString([], {
+  return date.toLocaleString(page_locale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
