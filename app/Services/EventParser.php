@@ -8,6 +8,16 @@ use DateTime, DateTimeZone, DateInterval;
 class EventParser {
 
     public static function eventFromURL($url) {
+        $event = self::_eventFromURL($url);
+
+        // Imported data can contain links like javascript: that must not end up on the event
+        if($event)
+            $event->remove_unsafe_urls();
+
+        return $event;
+    }
+
+    private static function _eventFromURL($url) {
 
         $response = static::_fetch($url);
 

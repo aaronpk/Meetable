@@ -34,7 +34,7 @@
                             {{ date('M j, Y g:ia', strtotime($response->created_at)) }}
                         </time>
                         from
-                        <a href="{{ $response->source_url }}">
+                        <a href="{{ \App\Helpers\Uri::safe_href($response->source_url) }}">
                             {{ parse_url($response->source_url, PHP_URL_HOST) }}
                         </a>
                     </span>
@@ -45,7 +45,7 @@
                             {{ date('M j, Y g:ia', strtotime($response->created_at)) }}
                         </time>
                         by
-                        <a href="{{ $response->creator->url }}">
+                        <a href="{{ \App\Helpers\Uri::safe_href($response->creator->url) }}">
                             {{ $response->creator->name ?: p3k\url\display_url($response->creator->url) }}
                         </a>
                     </span>

@@ -37,6 +37,32 @@ class Event extends Model
     // A weekday can fall in at most five different weeks of a month
     const RECURRENCE_ORDINALS = [1 => '1st', 2 => '2nd', 3 => '3rd', 4 => '4th', 5 => '5th'];
 
+    // Fields holding links. code_of_conduct_url can hold several, separated by spaces.
+    public static $URL_PROPERTIES = [
+        'website', 'tickets_url', 'code_of_conduct_url', 'meeting_url', 'video_url', 'notes_url', 'cover_image',
+    ];
+
+    public static function url_validation_rules() {
+        $rules = [];
+        foreach(self::$URL_PROPERTIES as $property) {
+            $rules[$property] = ['nullable', function($attribute, $value, $fail) {
+                foreach(explode(' ', (string)$value) as $url) {
+                    if(\App\Helpers\Uri::has_unsafe_scheme($url))
+                        return $fail('The '.str_replace('_', ' ', $attribute).' must be an http or https link.');
+                }
+            }];
+        }
+        return $rules;
+    }
+
+    // Removes links that aren't http or https, for events built from imported data
+    public function remove_unsafe_urls() {
+        foreach(self::$URL_PROPERTIES as $property) {
+            if($this->{$property} && \App\Helpers\Uri::has_unsafe_scheme($this->{$property}))
+                $this->{$property} = null;
+        }
+    }
+
     public static $EDITABLE_PROPERTIES = [
         'name', 'start_date', 'end_date', 'start_time', 'end_time',
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',
@@ -799,6 +825,8 @@ class Event extends Model
               $class = 'warning';
               $text = 'Tentative';
               break;
+            default:
+              return '';
         }
 
         return '<span class="status tag is-'.$class.'">'
@@ -1015,7 +1043,8 @@ class Event extends Model
             ];
         }
 
-        return json_encode($data, JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES);
+        // This is output inside a script tag, so escape anything that could end it
+        return json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     }
 
     public function cover_image_absolute_url() {

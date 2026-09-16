@@ -61,13 +61,13 @@ class EventController extends BaseController
         Gate::authorize('create-event');
 
         // Check for required fields: name, start_date
-        $request->validate([
+        $request->validate(array_merge([
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
             'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
-        ]);
+        ], Event::url_validation_rules()));
 
         $event = new Event();
         $event->name = request('name');
@@ -248,13 +248,13 @@ class EventController extends BaseController
     public function save_event(Request $request, Event $event) {
         Gate::authorize('manage-event', $event);
 
-        $request->validate([
+        $request->validate(array_merge([
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
             'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
-        ]);
+        ], Event::url_validation_rules()));
 
         if($event->fields_from_ics) {
             // Remove edited fields from the list of fields created by an ICS invite

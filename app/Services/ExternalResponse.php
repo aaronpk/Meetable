@@ -12,6 +12,14 @@ class ExternalResponse {
             $response->published = date('Y-m-d H:i:s', strtotime($data['published']));
         }
 
+        // Links from other websites end up in href attributes, so only keep http and https ones
+        foreach(['url', 'photo'] as $prop) {
+            if(isset($data['author'][$prop]) && !self::is_http_url($data['author'][$prop]))
+                unset($data['author'][$prop]);
+        }
+        if(isset($data['url']) && !self::is_http_url($data['url']))
+            unset($data['url']);
+
         foreach(['url', 'name'] as $prop) {
             if(isset($data[$prop])) {
                 $response->{$prop} = $data[$prop];
@@ -68,6 +76,11 @@ class ExternalResponse {
             $response->post_type = $data['post-type'];
 
         $response->data = json_encode($data);
+    }
+
+    private static function is_http_url($url) {
+        return is_string($url) && in_array(strtolower((string)parse_url($url, PHP_URL_SCHEME)), ['http', 'https'])
+            && !\App\Helpers\Uri::has_unsafe_scheme($url);
     }
 
     public static function setPhotoRecords(&$response, $photos) {

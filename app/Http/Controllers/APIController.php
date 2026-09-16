@@ -39,6 +39,15 @@ class APIController extends BaseController
             }
         }
 
+        if(request('status') && !isset(Event::$STATUSES[request('status')])) {
+            return $this->error('invalid status');
+        }
+
+        $validator = \Validator::make(request()->all(), Event::url_validation_rules());
+        if($validator->fails()) {
+            return $this->error($validator->errors()->first());
+        }
+
         if(request('timezone')) {
             try {
                 $tz = new DateTimeZone(request('timezone'));
