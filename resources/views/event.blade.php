@@ -164,15 +164,16 @@ use App\Setting;
         <span class="icon">@icon(clock)</span>
         <span>
             <div>{{ $event->status == 'postponed' ? __('events.tbd_originally').' ' : '' }}
-                <time datetime="{{ $event->start_datetime()->format('c') }}"  class="event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}"  data-original-date="{{ \App\Helpers\Dates::format($event->start_datetime(), 'datetime') }}" data-dateformat="dateonly" data-show-tooltip="false">
-                    {!! $event->display_date() !!}
+                {{-- A date without a time is the same date everywhere, so it's only shown in the viewer's timezone when the event has a start time --}}
+                <time datetime="{{ $event->start_datetime()->format('c') }}" class="{{ $event->start_time && !$event->is_multiday() ? 'event-localize-date' : '' }} {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}" data-original-date="{{ \App\Helpers\Dates::format($event->start_datetime(), 'datetime') }}" @if($event->end_datetime()) data-end="{{ $event->end_datetime()->format('c') }}" @endif data-dateformat="dateonly" data-show-tooltip="false">
+                    {!! $event->display_date(true) !!}
                 </time>
             </div>
             @if(!$event->is_multiday() && $event->display_time())
                 <div class="time">
                     @if($event->timezone)
                         <a href="{{ route('local_time') }}?date={{ urlencode($event->start_datetime_local()) }}&tz={{ urlencode($event->timezone) }}">
-                            <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}" data-original-date="{{ \App\Helpers\Dates::format($event->start_datetime(), 'datetime') }}" data-dateformat="timeonly">
+                            <time datetime="{{ $event->start_datetime()->format('c') }}" class="has-tooltip-bottom event-localize-date {{ (!$event->has_physical_location() ? 'is-virtual-event' : '') }}" data-timezone="{{ $event->timezone }}" data-original-date="{{ \App\Helpers\Dates::format($event->start_datetime(), 'datetime') }}" @if($event->end_datetime()) data-end="{{ $event->end_datetime()->format('c') }}" @endif data-dateformat="timeonly">
                                 {!! $event->display_time() !!}
                             </time>
                         </a>
