@@ -2,8 +2,9 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Routing\Controller as BaseController;
-use Auth, DB;
+use Auth, Cache, DB;
 use App\User;
+use Laravel\Passkeys\Passkey;
 
 class AuthController extends BaseController
 {
@@ -13,27 +14,31 @@ class AuthController extends BaseController
             // Check if there is an admin user. If not, it's because
             // they just set up the site and haven't created the admin user yet, so
             // show the page to create the admin user.
-            $user = User::where('is_admin', 1)->first();
-            if(!$user) {
+            if(!User::where('is_admin', 1)->exists()) {
                 return view('auth/register');
             }
 
-            // If there is an admin user, check if there is a passkey registered
-            $credential = DB::table('passkeys')->where('user_id', $user->id)->count();
-            if(!$credential) {
-                if(!Auth::user()) {
-                    Auth::login($user);
+            if($user = Auth::user()) {
+                // Someone who just created the admin account, or followed a passkey link,
+                // is signed in without a passkey and needs to register one
+                if(!Passkey::where('user_id', $user->id)->exists()) {
+                    return view('auth/webauthn');
                 }
 
-                // If not, show the page to register a credential
-                return view('auth/webauthn');
-            }
-
-            if(Auth::user()) {
                 return redirect('/');
             }
 
-            return view('auth/login');
+            // Never sign anyone in from here. An admin without a passkey needs a
+            // one-time link generated on the server.
+            $admin_without_passkey = User::where('is_admin', 1)
+              ->whereNotExists(function($query){
+                  $query->select(DB::raw(1))->from('passkeys')->whereColumn('passkeys.user_id', 'users.id');
+              })
+              ->exists();
+
+            return view('auth/login', [
+                'admin_without_passkey' => $admin_without_passkey,
+            ]);
         } else {
             if(Auth::user())
                 return redirect('/');
@@ -44,27 +49,38 @@ class AuthController extends BaseController
     }
 
     public function create_user() {
-        if(env('AUTH_METHOD') == 'session' && !Auth::user()) {
-            $users = User::where('is_admin', 1)
-              ->join('passkeys', 'passkeys.user_id', '=', 'users.id')
-              ->count();
-            if($users == 0) {
-                // Create the admin user now and log them in
-                $user = User::where('is_admin', true)->first();
-                if(!$user) {
-                    $user = new User;
-                    $user->identifier = request('email');
-                    $user->email = request('email');
-                    $user->name = request('name');
-                    $user->is_admin = true;
-                    $user->save();
-                }
-                Auth::login($user);
-                return redirect('/login');
-            }
+        // The admin account can only be created from the web while there are no admins at all
+        if(env('AUTH_METHOD') == 'session' && !Auth::user() && !User::where('is_admin', 1)->exists()) {
+            $user = new User;
+            $user->identifier = request('email');
+            $user->email = request('email');
+            $user->name = request('name');
+            $user->is_admin = true;
+            $user->save();
+
+            Auth::login($user);
+            session()->regenerate();
+            return redirect('/login');
         }
 
         return redirect('/');
+    }
+
+    // Opened from the link printed by `php artisan user:passkey-link`, lets that user register a passkey
+    public function passkey_link(User $user) {
+        if(env('AUTH_METHOD') != 'session')
+            abort(404);
+
+        // The signature proves the server issued the link and that it hasn't expired.
+        // Record the nonce as used here so the link only works once.
+        $nonce = (string)request('nonce');
+        if(!$nonce || !Cache::add('passkey-link-used:'.$nonce, true, now()->addDay()))
+            abort(403, 'This link has already been used');
+
+        Auth::login($user);
+        session()->regenerate();
+
+        return view('auth/webauthn');
     }
 
     public function logout() {

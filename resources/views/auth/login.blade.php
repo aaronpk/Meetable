@@ -10,6 +10,12 @@
     </div>
 
 
+    @if(!empty($admin_without_passkey))
+    <div class="notification is-warning">
+        An admin account doesn't have a passkey yet. To set one up, run <code>php artisan user:passkey-link &lt;email&gt;</code> on the server and open the link it prints.
+    </div>
+    @endif
+
     <form id="login-form">
         <button type="submit" class="button is-primary">Log in with a passkey</button>
     </form>
