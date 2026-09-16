@@ -135,7 +135,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         }
 
@@ -313,7 +313,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         } elseif($event->zoom_meeting_id) {
             $event->update_zoom_meeting();
