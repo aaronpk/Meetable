@@ -398,7 +398,7 @@ class Controller extends BaseController
     }
 
     public function export_event_json(Event $event, $secretkey) {
-        if($event->export_secret != $secretkey) {
+        if(!$event->export_secret || !hash_equals((string)$event->export_secret, (string)$secretkey)) {
             abort(403);
         }
 
