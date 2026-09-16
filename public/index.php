@@ -24,6 +24,9 @@ if(empty($_ENV['APP_NAME'])) {
     $_ENV['APP_KEY'] = 'base64:v7ZDOfJbqzXdbbJ/3GYSAP+B4jm3rMlrWiNutsaQYEE=';
     // Use cookie driver for setup, will switch back to database when setup is complete
     $_ENV['SESSION_DRIVER'] = 'cookie';
+    // The APP_KEY above is public, so anyone can make a session cookie. Store sessions as JSON
+    // so a crafted cookie can't be unserialized into PHP objects.
+    $_ENV['SESSION_SERIALIZATION'] = 'json';
     // Setting the MEETABLE_SETUP to true will trigger `routes/web.php` to
     // define the setup routes instead of app routes
     define('MEETABLE_SETUP', true);
