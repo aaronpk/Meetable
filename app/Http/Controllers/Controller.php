@@ -414,9 +414,13 @@ class Controller extends BaseController
     }
 
     public function find_matching_events($year, $month, $partial_slug) {
+        // Match the beginning of the slug literally, so % and _ can't list every event in the month
+        $prefix = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $partial_slug);
+
         $events = Event::whereYear('start_date', $year)
           ->whereMonth('start_date', $month)
-          ->where('slug', 'like', $partial_slug.'%')
+          ->where('slug', 'like', $prefix.'%')
+          ->where('unlisted', 0)
           ->where('is_template', 0)
           ->get();
 
