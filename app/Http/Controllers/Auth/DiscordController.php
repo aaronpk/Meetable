@@ -32,15 +32,15 @@ class DiscordController extends BaseController
     public function callback() {
         if(!$this->validState('DISCORD_OAUTH_STATE')) {
             return view('auth/oauth-error', [
-                'error' => 'Invalid OAuth State',
-                'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
+                'error' => __('login.errors.invalid_state'),
+                'error_description' => __('login.errors.invalid_state_description'),
             ]);
         }
 
         if(!request('code')) {
             return view('auth/oauth-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'The Discord login process did not complete successfully. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.not_completed', ['provider' => 'Discord']),
             ]);
         }
 
@@ -62,8 +62,8 @@ class DiscordController extends BaseController
 
         if(!isset($data['access_token'])) {
             return view('auth/oauth-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'Unable to get an access token from Discord. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.no_access_token', ['provider' => 'Discord']),
             ]);
         }
 
@@ -82,8 +82,8 @@ class DiscordController extends BaseController
 
         if(!isset($userdata['user']['id'])) {
             return view('auth/oauth-error', [
-                'error' => 'OAuth Error',
-                'error_description' => 'Unable to get user info from Discord. Please try again.',
+                'error' => __('login.errors.oauth_error'),
+                'error_description' => __('login.errors.no_user_info', ['provider' => 'Discord']),
             ]);
         }
 
@@ -101,8 +101,8 @@ class DiscordController extends BaseController
 
             if(!$guilddata || empty($guilddata['user'])) {
                 return view('auth/oauth-error', [
-                    'error' => 'User Not Allowed',
-                    'error_description' => 'Sorry, you are not a member of the Discord server associated with this website.',
+                    'error' => __('login.errors.not_allowed'),
+                    'error_description' => __('login.errors.not_server_member'),
                 ]);
             }
 
@@ -112,8 +112,8 @@ class DiscordController extends BaseController
                 if(!array_intersect($role_ids, $guilddata['roles'])) {
                     Log::error('User "'.$userdata['user']['username'].'" attempted to log in but did not have the right roles. User roles: '.json_encode($guilddata['roles']));
                     return view('auth/oauth-error', [
-                        'error' => 'User Not Allowed',
-                        'error_description' => 'Sorry, you are not assigned the required role in the Discord server.',
+                        'error' => __('login.errors.not_allowed'),
+                        'error_description' => __('login.errors.missing_role'),
                     ]);
                 }
             }

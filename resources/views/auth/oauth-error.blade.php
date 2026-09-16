@@ -4,7 +4,7 @@
 <section class="section">
 
     <div class="notification is-danger">
-        <h2 class="subtitle">Error: {{ $error }}</h2>
+        <h2 class="subtitle">{{ __('login.errors.title', ['error' => $error]) }}</h2>
         <p>{{ $error_description }}</p>
     </div>
 
