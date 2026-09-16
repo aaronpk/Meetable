@@ -388,7 +388,7 @@ class Controller extends BaseController
 
         $meeting_url = false;
 
-        if($event->meeting_url && !$event->is_past() && $event->is_starting_soon()) {
+        if($event->meeting_url_is_visible()) {
             $meeting_url = $event->meeting_url;
         }
 
@@ -398,7 +398,7 @@ class Controller extends BaseController
     }
 
     public function export_event_json(Event $event, $secretkey) {
-        if($event->export_secret != $secretkey) {
+        if(!$event->export_secret || !hash_equals((string)$event->export_secret, (string)$secretkey)) {
             abort(403);
         }
 
@@ -414,9 +414,13 @@ class Controller extends BaseController
     }
 
     public function find_matching_events($year, $month, $partial_slug) {
+        // Match the beginning of the slug literally, so % and _ can't list every event in the month
+        $prefix = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $partial_slug);
+
         $events = Event::whereYear('start_date', $year)
           ->whereMonth('start_date', $month)
-          ->where('slug', 'like', $partial_slug.'%')
+          ->where('slug', 'like', $prefix.'%')
+          ->where('unlisted', 0)
           ->where('is_template', 0)
           ->get();
 

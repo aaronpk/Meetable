@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 
 class HerokuController extends BaseController
 {
+    use CompletesOAuthLogin;
 
     public static function authURL() {
         $state = bin2hex(random_bytes(16));
@@ -28,7 +29,7 @@ class HerokuController extends BaseController
     }
 
     public function callback() {
-        if(request('state') != session('HEROKU_OAUTH_STATE')) {
+        if(!$this->validState('HEROKU_OAUTH_STATE')) {
             return view('auth/oauth-error', [
                 'error' => 'Invalid OAuth State',
                 'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
@@ -116,16 +117,8 @@ class HerokuController extends BaseController
         }
 
 
-        // Now set the session data to make this user logged-in
-        session([
-            'HEROKU_USERID' => $userdata['id'],
-        ]);
-
-        if(session('AUTH_RETURN_TO')) {
-            return redirect(session('AUTH_RETURN_TO'));
-        } else {
-            return redirect('/');
-        }
+        // Now make this user logged-in
+        return $this->redirectAfterLogin('HEROKU_USERID', $userdata['id']);
     }
 
 }

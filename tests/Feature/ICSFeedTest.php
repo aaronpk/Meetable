@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Event;
+use Tests\CreatesEvents;
 use Tests\TestCase;
 
 /**
@@ -10,6 +12,36 @@ use Tests\TestCase;
  */
 class ICSFeedTest extends TestCase
 {
+    use CreatesEvents;
+
+    protected function tearDown(): void
+    {
+        $this->deleteTestData();
+
+        parent::tearDown();
+    }
+
+    public function testTemplatesAreNotInTheFeed()
+    {
+        $name = 'ICS template '.uniqid();
+        $this->createEvent(['name' => $name, 'start_date' => date('Y-m-d', strtotime('+7 days')), 'is_template' => 1, 'recurrence_interval' => 'weekly_dow']);
+
+        $instances = Event::where('name', $name)->where('is_template', 0)->count();
+        $this->assertGreaterThan(0, $instances);
+
+        $ics = $this->get('/ics/events.ics')->assertOk()->getContent();
+
+        // Only the scheduled events appear, not the template they were made from
+        $this->assertEquals($instances, substr_count($ics, 'SUMMARY:'.$name));
+    }
+
+    public function testTheTagFeedFilenameOnlyContainsTheTagName()
+    {
+        $this->get('/ics/tag/'.rawurlencode('a"b;c').'.ics')
+            ->assertOk()
+            ->assertHeader('Content-Disposition', 'attachment; filename="events-a-b-c.ics"');
+    }
+
     public function testTheFeedIsAlwaysServedAsACalendar()
     {
         // The Accept header a browser sends when following a link

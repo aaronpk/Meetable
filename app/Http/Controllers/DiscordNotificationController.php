@@ -59,12 +59,11 @@ class DiscordNotificationController extends BaseController
     public function install_callback() {
         $this->authorizeDiscord();
 
-        if(!request('state') || request('state') != session('DISCORD_INSTALL_STATE')) {
+        $expected_state = session()->pull('DISCORD_INSTALL_STATE');
+        if(!is_string($expected_state) || !is_string(request('state')) || !hash_equals($expected_state, request('state'))) {
             session()->flash('discord-error', 'The bot installation could not be verified. Please try again.');
             return redirect(route('discord-notifications'));
         }
-
-        session()->forget('DISCORD_INSTALL_STATE');
 
         if(request('error')) {
             session()->flash('discord-error', 'The bot was not installed: '.(request('error_description') ?: request('error')));
@@ -73,16 +72,21 @@ class DiscordNotificationController extends BaseController
 
         $guild_id = request('guild_id');
 
-        if($guild_id && !env('DISCORD_SERVER_ID') && preg_match('/^\d+$/', $guild_id)) {
-            Setting::set('discord_guild_id', $guild_id);
-        }
+        // Without a configured server, use the one the bot was added to, once the bot is confirmed to be in it
+        if(!env('DISCORD_SERVER_ID') && is_string($guild_id) && preg_match('/^\d+$/', $guild_id))
+            $check_guild_id = $guild_id;
+        else
+            $check_guild_id = Discord::guildId();
 
         try {
-            $guild = Discord::getGuild();
+            $guild = Discord::getGuild($check_guild_id);
         } catch(DiscordException $e) {
             session()->flash('discord-error', $e->getMessage());
             return redirect(route('discord-notifications'));
         }
+
+        if($guild && !env('DISCORD_SERVER_ID'))
+            Setting::set('discord_guild_id', $guild['id']);
 
         if($guild) {
             Discord::forgetChannels();

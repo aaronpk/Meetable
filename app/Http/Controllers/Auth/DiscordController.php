@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 
 class DiscordController extends BaseController
 {
+    use CompletesOAuthLogin;
 
     public static function discordAuthURL() {
         $state = bin2hex(random_bytes(16));
@@ -29,7 +30,7 @@ class DiscordController extends BaseController
     }
 
     public function callback() {
-        if(request('state') != session('DISCORD_OAUTH_STATE')) {
+        if(!$this->validState('DISCORD_OAUTH_STATE')) {
             return view('auth/oauth-error', [
                 'error' => 'Invalid OAuth State',
                 'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
@@ -137,16 +138,8 @@ class DiscordController extends BaseController
 
         $user->save();
 
-        // Now set the session data to make this user logged-in
-        session([
-            'DISCORD_USER' => $userdata['user']['id'],
-        ]);
-
-        if(session('AUTH_RETURN_TO')) {
-            return redirect(session('AUTH_RETURN_TO'));
-        } else {
-            return redirect('/');
-        }
+        // Now make this user logged-in
+        return $this->redirectAfterLogin('DISCORD_USER', $userdata['user']['id']);
     }
 
 }

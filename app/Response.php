@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Helpers\Uri;
 
 class Response extends Model
 {
@@ -37,9 +38,9 @@ class Response extends Model
     public function author_photo() {
         if($this->rsvp_user_id) {
             $user = User::where('id', $this->rsvp_user_id)->first();
-            return $user->photo ?: $this->author_photo;
+            return Uri::safe_href($user->photo ?: $this->author_photo);
         } else {
-            return $this->author_photo;
+            return Uri::safe_href($this->author_photo);
         }
     }
 
@@ -76,17 +77,17 @@ class Response extends Model
         else
             $url = $this->link();
 
-        return $url;
+        return Uri::safe_href($url);
     }
 
     public function link() {
-        return $this->url ?: $this->source_url;
+        return Uri::safe_href($this->url ?: $this->source_url);
     }
 
     public function rsvp_link() {
         if($this->rsvp_user_id) {
             $user = User::where('id', $this->rsvp_user_id)->first();
-            return $user->url;
+            return Uri::safe_href($user->url);
         }
         return $this->link();
     }
@@ -100,7 +101,7 @@ class Response extends Model
     }
 
     public function photo_original_url() {
-        return $this->link() ?: ($this->creator ? $this->creator->url : '');
+        return $this->link() ?: ($this->creator ? Uri::safe_href($this->creator->url) : '');
     }
 
     public function photo_author_name() {

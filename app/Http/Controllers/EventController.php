@@ -61,13 +61,13 @@ class EventController extends BaseController
         Gate::authorize('create-event');
 
         // Check for required fields: name, start_date
-        $request->validate([
+        $request->validate(array_merge([
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
             'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
-        ]);
+        ], Event::url_validation_rules()));
 
         $event = new Event();
         $event->name = request('name');
@@ -135,7 +135,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         }
 
@@ -248,13 +248,13 @@ class EventController extends BaseController
     public function save_event(Request $request, Event $event) {
         Gate::authorize('manage-event', $event);
 
-        $request->validate([
+        $request->validate(array_merge([
             'name' => 'required',
             'start_date' => 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
             'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
-        ]);
+        ], Event::url_validation_rules()));
 
         if($event->fields_from_ics) {
             // Remove edited fields from the list of fields created by an ICS invite
@@ -313,7 +313,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
             }
         } elseif($event->zoom_meeting_id) {
             $event->update_zoom_meeting();
@@ -373,7 +373,8 @@ class EventController extends BaseController
     }
 
     public function view_revision(Event $event, EventRevision $revision) {
-        Gate::authorize('manage-event', $revision);
+        Gate::authorize('manage-event', $event);
+        abort_if($revision->event_id != $event->id, 404);
 
         $date = new DateTime($revision->start_date);
 
@@ -389,7 +390,8 @@ class EventController extends BaseController
     }
 
     public function view_revision_diff(Event $event, EventRevision $revision) {
-        Gate::authorize('manage-event', $revision);
+        Gate::authorize('manage-event', $event);
+        abort_if($revision->event_id != $event->id, 404);
 
         $previous = EventRevision::where('event_id', $revision->event_id)
           ->where('id', '!=', $revision->id)
@@ -558,7 +560,7 @@ class EventController extends BaseController
     }
 
     public function edit_registration(Event $event) {
-        Gate::authorize('create-event');
+        Gate::authorize('manage-event', $event);
 
 
 

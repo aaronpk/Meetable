@@ -67,12 +67,14 @@ class ResponseController extends BaseController
 
     public function get_response_details(Event $event, Response $response) {
         Gate::authorize('manage-event', $event);
+        abort_if($response->event_id != $event->id, 404);
         $response->photos; // load photos so they are part of the response
         return response()->json($response);
     }
 
     public function delete_response(Event $event, Response $response) {
         Gate::authorize('manage-event', $event);
+        abort_if($response->event_id != $event->id, 404);
 
         $id = $response->id;
         $response->delete();
@@ -88,6 +90,7 @@ class ResponseController extends BaseController
 
     public function approve_response(Event $event, Response $response) {
         Gate::authorize('manage-event', $event);
+        abort_if($response->event_id != $event->id, 404);
 
         $response->approved = true;
         $response->approved_by = Auth::user()->id;

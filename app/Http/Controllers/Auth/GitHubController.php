@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 
 class GitHubController extends BaseController
 {
+    use CompletesOAuthLogin;
 
     public static function githubAuthURL() {
         $state = bin2hex(random_bytes(16));
@@ -28,7 +29,7 @@ class GitHubController extends BaseController
     }
 
     public function callback() {
-        if(request('state') != session('GITHUB_OAUTH_STATE')) {
+        if(!$this->validState('GITHUB_OAUTH_STATE')) {
             return view('auth/oauth-error', [
                 'error' => 'Invalid OAuth State',
                 'error_description' => 'There was a problem with the login process. Double check you are allowing cookies from this domain and try again.',
@@ -117,16 +118,8 @@ class GitHubController extends BaseController
 
         $user->save();
 
-        // Now set the session data to make this user logged-in
-        session([
-            'GITHUB_USER' => $userdata['html_url'],
-        ]);
-
-        if(session('AUTH_RETURN_TO')) {
-            return redirect(session('AUTH_RETURN_TO'));
-        } else {
-            return redirect('/');
-        }
+        // Now make this user logged-in
+        return $this->redirectAfterLogin('GITHUB_USER', $userdata['html_url']);
     }
 
 }

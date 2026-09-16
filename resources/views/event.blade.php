@@ -136,13 +136,13 @@ use App\Setting;
 
     @if($event->cover_image)
         <div class="cover-image">
-            <img src="{{ $event->cover_image }}" class="u-featured" style="max-width: 720px; width: 100%;">
+            <img src="{{ \App\Helpers\Uri::safe_href($event->cover_image) }}" class="u-featured" style="max-width: 720px; width: 100%;">
         </div>
     @endif
 
     <h1 class="event-name">
-        @if($event->meeting_url && !$event->is_past())
-            <a href="{{ $event->meeting_url }}" target="_blank">
+        @if($event->meeting_url_is_visible())
+            <a href="{{ \App\Helpers\Uri::safe_href($event->meeting_url) }}" target="_blank">
                 {!! $event->status_tag() !!}
             </a>
         @else
@@ -236,7 +236,7 @@ use App\Setting;
         <div class="website segment with-icon with-url">
             <span class="icon">@icon(link)</span>
             <span>
-                <a href="{{ $event->website }}" class="u-url" rel="canonical" title="{{ $event->website }}">
+                <a href="{{ \App\Helpers\Uri::safe_href($event->website) }}" class="u-url" rel="canonical" title="{{ $event->website }}">
                     {{ strlen($event->website) > 40 ?  parse_url($event->website, PHP_URL_HOST) : \p3k\url\display_url($event->website) }}
                 </a>
             </span>
@@ -247,7 +247,7 @@ use App\Setting;
         <div class="website segment with-icon with-url">
             <span class="icon">@icon(ticket-alt)</span>
             <span>
-                <a href="{{ $event->tickets_url }}" title="{{ $event->tickets_url }}">
+                <a href="{{ \App\Helpers\Uri::safe_href($event->tickets_url) }}" title="{{ $event->tickets_url }}">
                     {{ strlen($event->tickets_url) > 40 ?  parse_url($event->tickets_url, PHP_URL_HOST) : \p3k\url\display_url($event->tickets_url) }}
                 </a>
             </span>
@@ -260,7 +260,7 @@ use App\Setting;
             <span class="text">
                 <span class="segment-title">Code of Conduct</span>
                 @foreach($event->code_of_conduct_urls() as $url)
-                    <a href="{{ $url }}" title="{{ $url }}" class="segment-url">
+                    <a href="{{ \App\Helpers\Uri::safe_href($url) }}" title="{{ $url }}" class="segment-url">
                         {{ strlen($url) > 80 ?  parse_url($url, PHP_URL_HOST) : \p3k\url\display_url($url) }}
                     </a>
                 @endforeach
@@ -273,7 +273,7 @@ use App\Setting;
             <div class="website segment with-icon">
                 <span class="icon">@icon(video)</span>
                 <span>
-                    <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" target="_blank">
+                    <a href="{{ \App\Helpers\Uri::safe_href($event->meeting_url) }}" title="{{ $event->meeting_url }}" target="_blank">
                         {{ strlen($event->meeting_url) > 80 ?  parse_url($event->meeting_url, PHP_URL_HOST) : \p3k\url\display_url($event->meeting_url) }}
                     </a>
                 </span>
@@ -285,7 +285,7 @@ use App\Setting;
                 <span class="icon">@icon(video)</span>
                 <span>
                     @if($event->is_starting_soon() || $event->is_ongoing())
-                        <a href="{{ $event->meeting_url }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
+                        <a href="{{ \App\Helpers\Uri::safe_href($event->meeting_url) }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
                             Join the Online Meeting
                         </a>
                     @else
@@ -301,7 +301,7 @@ use App\Setting;
         <div class="website segment with-icon with-url">
             <span class="icon">@brand_icon(youtube)</span>
             <span>
-                <a href="{{ $event->video_url }}" title="{{ $event->video_url }}">
+                <a href="{{ \App\Helpers\Uri::safe_href($event->video_url) }}" title="{{ $event->video_url }}">
                     {{ \p3k\url\display_url(strlen($event->video_url) > 40 ? 'http://'.parse_url($event->video_url, PHP_URL_HOST) : $event->video_url) }}
                 </a>
             </span>
@@ -319,7 +319,7 @@ use App\Setting;
             <span class="icon">@icon(pen)</span>
             <span class="text">
                 <span class="segment-title">Notes</span>
-                <a href="{{ $event->notes_url }}" title="{{ $event->notes_url }}" class="segment-url">
+                <a href="{{ \App\Helpers\Uri::safe_href($event->notes_url) }}" title="{{ $event->notes_url }}" class="segment-url">
                     {{ \p3k\url\display_url(strlen($event->notes_url) > 40 ? 'http://'.parse_url($event->notes_url, PHP_URL_HOST) : $event->notes_url) }}
                 </a>
             </span>

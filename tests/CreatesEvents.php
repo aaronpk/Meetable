@@ -59,7 +59,6 @@ trait CreatesEvents
             $ids = Event::whereIn('name', $this->test_event_names)->pluck('id');
 
             EventRevision::whereIn('event_id', $ids)->forceDelete();
-            DB::table('inbound_email_log')->whereIn('event_id', $ids)->delete();
             DB::table('event_tag')->whereIn('event_id', $ids)->delete();
             Event::whereIn('id', $ids)->forceDelete();
         }

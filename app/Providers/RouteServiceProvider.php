@@ -44,8 +44,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutes();
 
         $this->mapICSRoutes();
-
-        $this->mapEmailRoutes();
     }
 
     /**
@@ -82,12 +80,5 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('ics')
              ->namespace($this->namespace)
              ->group(base_path('routes/ics.php'));
-    }
-
-    protected function mapEmailRoutes()
-    {
-        Route::middleware('email')
-             ->namespace($this->namespace)
-             ->group(base_path('routes/email.php'));
     }
 }

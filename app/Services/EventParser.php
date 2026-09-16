@@ -2,13 +2,22 @@
 namespace App\Services;
 
 use App\Event, App\Tag;
-use p3k\XRay;
 use ICal\ICal;
 use DateTime, DateTimeZone, DateInterval;
 
 class EventParser {
 
     public static function eventFromURL($url) {
+        $event = self::_eventFromURL($url);
+
+        // Imported data can contain links like javascript: that must not end up on the event
+        if($event)
+            $event->remove_unsafe_urls();
+
+        return $event;
+    }
+
+    private static function _eventFromURL($url) {
 
         $response = static::_fetch($url);
 
@@ -37,7 +46,7 @@ class EventParser {
         } else {
             // Parse using XRay to find Microformats event markup
 
-            $xray = new XRay;
+            $xray = \App\Helpers\SafeHTTP::xray();
             $data = $xray->parse($url, $response);
 
             if(isset($data['data']['type']) && $data['data']['type'] == 'event') {
@@ -277,16 +286,7 @@ class EventParser {
     }
 
     protected static function _fetch($url) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 4,
-            CURLOPT_TIMEOUT => 10,
-        ]);
-        $response = curl_exec($ch);
-        curl_close($ch);
-
-        return $response;
+        return \App\Helpers\SafeHTTP::fetch($url);
     }
 
     private static function _isIETFCalendar(ICal $ical) {

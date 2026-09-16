@@ -20,12 +20,19 @@ class VouchGuard extends CustomGuard {
     }
 
     public function login_url() {
-        $url = session('AUTH_RETURN_TO') ?: route('index');
+        $url = session('AUTH_RETURN_TO') ? \App\Helpers\Uri::same_origin_path(session('AUTH_RETURN_TO')) : route('index');
         return 'https://'.env('VOUCH_HOSTNAME').'/login?url='.urlencode($url);
     }
 
     public function logout() {
         return 'https://'.env('VOUCH_HOSTNAME').'/logout?url='.urlencode(route('index'));
+    }
+
+    // The web server sets REMOTE_USER once Vouch has authenticated the visitor. Request
+    // headers reach PHP with an HTTP_ prefix, so unlike HTTP_REMOTE_USER a visitor can't
+    // set this by sending a Remote-User header.
+    protected function remoteUser() {
+        return $this->request->server->get('REMOTE_USER');
     }
 
     public function __construct(UserProvider $provider, Request $request) {
@@ -35,7 +42,7 @@ class VouchGuard extends CustomGuard {
     }
 
     public function check() {
-        $url = $this->request->server->get('HTTP_REMOTE_USER');
+        $url = $this->remoteUser();
         return $url == true;
     }
 
@@ -44,14 +51,14 @@ class VouchGuard extends CustomGuard {
     }
 
     public function guest() {
-        $url = $this->request->server->get('HTTP_REMOTE_USER');
+        $url = $this->remoteUser();
         return $url != true;
     }
 
     public function user() {
         static $cached = false;
 
-        $username = $this->request->server->get('HTTP_REMOTE_USER');
+        $username = $this->remoteUser();
 
         if(!$username)
           return null;

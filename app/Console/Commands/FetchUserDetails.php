@@ -3,7 +3,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Log;
 use App\User;
-use p3k\XRay;
 
 class FetchUserDetails extends Command {
 
@@ -21,7 +20,7 @@ class FetchUserDetails extends Command {
     foreach($users as $user) {
       $this->info('Fetching user info for '.$user->url);
 
-      $xray = new XRay();
+      $xray = \App\Helpers\SafeHTTP::xray();
       $data = $xray->parse($user->url);
 
       if(isset($data['data']['type']) && $data['data']['type'] == 'card') {

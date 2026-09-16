@@ -13,12 +13,30 @@ use Illuminate\Http\Request;
 
 class ZoomController extends BaseController
 {
+    // How old a signed webhook can be before it's rejected, so captured requests can't be replayed
+    const MAX_AGE_SECONDS = 300;
+
     public function webhook(Request $request) {
 
-        Log::info(request());
+        Log::info('Zoom webhook: '.request('event'));
+
+        if(!Setting::value('zoom_webhook_secret')) {
+            return response()->json([
+                'error' => 'not_configured',
+            ], 404);
+        }
 
         if(request('event') == 'endpoint.url_validation') {
             $plain_token = request('payload.plainToken');
+
+            // Only sign tokens shaped like the ones Zoom sends. Otherwise this would sign any
+            // text, including the "v0:timestamp:body" string used to verify webhooks.
+            if(!is_string($plain_token) || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $plain_token)) {
+                return response()->json([
+                    'error' => 'invalid_request',
+                ], 400);
+            }
+
             $encrypted_token = hash_hmac('sha256', $plain_token, Setting::value('zoom_webhook_secret'));
 
             return response()->json([
@@ -31,8 +49,15 @@ class ZoomController extends BaseController
             Log::debug('Received invalid payload to webhook URL');
             return response()->json([
                 'error' => 'unauthorized',
+            ], 401);
+        }
+
+        if(!request('payload.object.id')) {
+            return response()->json([
+                'result' => 'ok',
             ]);
         }
+
         $event = Event::where('zoom_meeting_id', request('payload.object.id'))->first();
 
         if(!$event) {
@@ -86,10 +111,18 @@ class ZoomController extends BaseController
     }
 
     private function verify_webhook(Request $request) {
-        $base = 'v0:'.$request->header('x-zm-request-timestamp').':'.$request->getContent();
+        $timestamp = $request->header('x-zm-request-timestamp');
+        $signature = $request->header('x-zm-signature');
+
+        if(!is_numeric($timestamp) || !is_string($signature))
+            return false;
+
+        if(abs(time() - (int)$timestamp) > self::MAX_AGE_SECONDS)
+            return false;
+
+        $base = 'v0:'.$timestamp.':'.$request->getContent();
         $hash = hash_hmac('sha256', $base, Setting::value('zoom_webhook_secret'));
-        $sig = 'v0='.$hash;
-        return $sig == $request->header('x-zm-signature');
+        return hash_equals('v0='.$hash, $signature);
     }
 }
 

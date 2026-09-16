@@ -23,8 +23,8 @@ use Laravel\Passkeys\Support\WebAuthn;
  * original webauthn_credentials table is left in place so this can be re-run.
  *
  * A credential that can't be converted is skipped rather than written half-formed:
- * a missing passkey lands the admin on the "register a passkey" screen, whereas a
- * broken one would lock them out.
+ * the admin can register a new passkey with a link from `php artisan user:passkey-link`,
+ * whereas a broken one would lock them out.
  */
 return new class extends Migration
 {

@@ -27,13 +27,9 @@ class WebmentionReceivedListener implements ShouldQueue {
 
         $filename = 'public/responses/'.$response->event->id.'/'.md5($url).'.jpg';
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, \App\Helpers\HTTP::user_agent());
-        $original_image = curl_exec($ch);
+        $original_image = \App\Helpers\SafeHTTP::fetch_image($url);
 
-        if($original_image && curl_errno($ch) == 0) {
+        if($original_image) {
             try {
                 $image = Image::make($original_image);
                 $image->fit($w, $h);
@@ -49,7 +45,7 @@ class WebmentionReceivedListener implements ShouldQueue {
                 Log::error('  reading image at '.$url.' failed: '.$e->getMessage());
             }
         } else {
-            Log::error('  download failed: '.curl_error($ch));
+            Log::error('  download failed');
             return $url;
         }
     }

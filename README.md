@@ -281,9 +281,9 @@ OIDC_ADMIN_USERS=sub1 sub2
 
 In this configuration, this project provides no authentication mechanism itself. Instead, it relies on the web server being able to authenticate users somehow, and setting an environment variable when users are logged in.
 
-When the `Remote-User` header is present, this app considers users logged-in with the value of that header as their unique user ID, which is expected to be a URL. As long as the app sees a `Remote-User` header, users will be considered logged in.
+When the web server sets the `REMOTE_USER` variable, this app considers users logged-in with its value as their unique user ID, which is expected to be a URL. As long as the app sees `REMOTE_USER`, users will be considered logged in.
 
-[Vouch Proxy](https://github.com/vouch/vouch-proxy) can offload authentication to an external OAuth service, and can be configured to set the HTTP `Remote-User` header that this project looks for.
+[Vouch Proxy](https://github.com/vouch/vouch-proxy) can offload authentication to an external OAuth service, and the web server can pass the user it returns to PHP as `REMOTE_USER`. A `Remote-User` request header is ignored, since anyone could send one.
 
 Configure the application to use Vouch and tell it the hostname of your Vouch server.
 
@@ -342,8 +342,9 @@ In the `location ~* \.php` block which proxies requests to the PHP handler, add 
 
 ```
     fastcgi_param   REMOTE_USER $auth_user;
-    fastcgi_param   HTTP_REMOTE_USER $auth_user;
 ```
+
+Older versions of these instructions also set `HTTP_REMOTE_USER`. The app no longer reads it, so make sure `REMOTE_USER` is set.
 
 If you want your website to be visible even to logged-out users, make sure Vouch is configured with `publicAccess: true` to avoid sending back an error page when users are not logged in.
 

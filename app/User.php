@@ -9,7 +9,6 @@ use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\PasskeyAuthenticatable;
 use Storage, Log;
 use Image;
-use p3k\XRay;
 
 class User extends Authenticatable implements PasskeyUser
 {
@@ -67,15 +66,9 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     public function downloadProfilePhoto($url) {
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, \App\Helpers\HTTP::user_agent());
-        $original_image = curl_exec($ch);
-        $err = curl_errno($ch);
-        curl_close($ch);
+        $original_image = \App\Helpers\SafeHTTP::fetch_image($url);
 
-        if($original_image && $err == 0) {
+        if($original_image) {
             // Resize to 150px square
             try {
                 $image = Image::make($original_image);
@@ -90,7 +83,7 @@ class User extends Authenticatable implements PasskeyUser
                 Log::error('Reading image at '.$url.' failed: '.$e->getMessage());
             }
         } else {
-            Log::error('Downloading profile photo at '.$url.' failed: '.curl_error($ch));
+            Log::error('Downloading profile photo at '.$url.' failed');
         }
     }
 
@@ -99,7 +92,7 @@ class User extends Authenticatable implements PasskeyUser
             return null;
         }
 
-        $xray = new XRay();
+        $xray = \App\Helpers\SafeHTTP::xray();
         $data = $xray->parse($this->url);
 
         if(isset($data['data']['type']) && $data['data']['type'] == 'card') {

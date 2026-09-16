@@ -138,6 +138,7 @@ class ICSController extends BaseController
     public function index(Request $request) {
         $events = Event::orderBy('start_date', 'desc')
             ->where('unlisted', 0)
+            ->where('is_template', 0)
             ->get();
 
         $vCalendar = new \Eluceo\iCal\Component\Calendar(parse_url(env('APP_URL'), PHP_URL_HOST));
@@ -177,7 +178,7 @@ class ICSController extends BaseController
 
         return response($ics)->withHeaders([
             'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="events-'.$tag.'.ics"'
+            'Content-Disposition' => 'attachment; filename="events-'.implode(',', array_map(function($t){ return $t->tag; }, $tags)).'.ics"'
         ]);
     }
 

@@ -319,14 +319,32 @@ class Controller extends BaseController
     }
 
     private static function write_config_value(&$config, $key, $value) {
-        if(strpos($value, ' '))
-            $value = '"'.$value.'"';
+        $line = $key.'='.self::quote_config_value($value);
 
-        $config = preg_replace('/^'.$key.'=.*/m', $key.'='.$value, $config, 1, $count);
+        // Use a callback so "$1" or "\\1" in a value isn't treated as a backreference
+        $replace = function() use($line) {
+            return $line;
+        };
+
+        $config = preg_replace_callback('/^'.preg_quote($key, '/').'=.*/m', $replace, $config, 1, $count);
         // If nothing matched, then find commented out lines and uncomment them
         if($count == 0) {
-            $config = preg_replace('/^# '.$key.'=.*/m', $key.'='.$value, $config, 1, $count);
+            $config = preg_replace_callback('/^# '.preg_quote($key, '/').'=.*/m', $replace, $config, 1, $count);
         }
+    }
+
+    // Quotes a value so it's read back exactly and can't add lines to the .env file
+    public static function quote_config_value($value) {
+        $value = str_replace(["\r", "\n"], '', (string)$value);
+
+        if(preg_match('/^[A-Za-z0-9_.\/:@+,-]*$/', $value))
+            return $value;
+
+        // Single quoted values are read literally
+        if(strpos($value, "'") === false)
+            return "'".$value."'";
+
+        return '"'.str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value).'"';
     }
 
     private static function comment_config_value(&$config, $key) {
