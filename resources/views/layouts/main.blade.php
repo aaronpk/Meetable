@@ -98,6 +98,9 @@ use App\Response;
                 @can('manage-site')
                     <a class="navbar-item" href="{{ route('settings') }}">Settings</a>
                 @endcan
+                @if(Auth::user() && env('AUTH_METHOD') == 'discord')
+                    <a class="navbar-item" href="{{ route('discord-notifications') }}">Discord</a>
+                @endif
                 @if(Auth::user())
                     <a class="navbar-item" href="{{ route('profile') }}">Profile</a>
                 @endif

@@ -25,6 +25,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('event:notify')->everyMinute();
+        $schedule->command('discord:notify')->everyMinute()->withoutOverlapping();
     }
 
     /**
