@@ -138,19 +138,36 @@ class RecurringEventTest extends TestCase
         $this->assertEquals(0, Event::where('created_from_template_event_id', $template->id)->where('start_date', $scheduled_date)->count());
     }
 
-    private function createTemplate(DateTime $start, string $interval): Event
+    public function testMultiDayOccurrencesKeepTheTemplatesLength()
+    {
+        $start = new DateTime('+1 day');
+        $template = $this->createTemplate($start, 'weekly_dow', [
+            'end_date' => (clone $start)->modify('+1 day')->format('Y-m-d'),
+            'description' => 'Agenda: https://example.com/agenda/'.$start->format('Y-m-d'),
+        ]);
+
+        $occurrences = $this->instancesOf($template);
+        $this->assertGreaterThan(1, count($occurrences));
+
+        foreach($occurrences as $occurrence) {
+            $this->assertEquals((new DateTime($occurrence->start_date))->modify('+1 day')->format('Y-m-d'), $occurrence->end_date);
+            $this->assertEquals('Agenda: https://example.com/agenda/'.$occurrence->start_date, $occurrence->description);
+        }
+    }
+
+    private function createTemplate(DateTime $start, string $interval, array $fields = []): Event
     {
         $name = 'Test Recurring '.uniqid();
         $this->forgetEvent($name);
 
         $this->actingAs($this->testUser())
-            ->post('/create', [
+            ->post('/create', array_merge([
                 'name' => $name,
                 'start_date' => $start->format('Y-m-d'),
                 'status' => 'confirmed',
                 'is_template' => 1,
                 'recurrence_interval' => $interval,
-            ])
+            ], $fields))
             ->assertRedirect(route('templates'));
 
         return Event::where('name', $name)->where('is_template', 1)->firstOrFail();

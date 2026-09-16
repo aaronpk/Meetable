@@ -678,10 +678,11 @@ class Event extends Model
                     $copy->sort_date = $copy->sort_date();
                     $copy->reset_live_event_stats();
 
-                    // Replace any YYYY-mm-dd dates in the description or URL properties
-                    $copy->replace_date($this, 'description');
-                    $copy->replace_date($this, 'notes_url');
-                    $copy->replace_date($this, 'website');
+                    // Move the end date along with the start date, and replace the template's
+                    // YYYY-mm-dd date in the description and URL properties
+                    foreach(['end_date', 'description', 'notes_url', 'website'] as $property) {
+                        $copy->{$property} = self::occurrence_value($this->getAttributes(), $property, $date);
+                    }
 
                     $copy->save();
 
@@ -702,8 +703,32 @@ class Event extends Model
             ->delete();
     }
 
-    private function replace_date($template_event, $property) {
-        $this->{$property} = str_replace($template_event->start_datetime()->format('Y-m-d'), $this->start_datetime()->format('Y-m-d'), $template_event->{$property});
+    /**
+     * The value an occurrence scheduled on $date gets for a property, given a template's
+     * attributes. Multi-day occurrences keep the template's length, and the template's
+     * date is replaced with the occurrence's date in the description and links.
+     */
+    public static function occurrence_value(array $template, $property, DateTime $date) {
+        $value = $template[$property] ?? null;
+
+        if($value === null || $value === '' || empty($template['start_date']))
+            return $value;
+
+        $template_date = (new DateTime($template['start_date']))->format('Y-m-d');
+        $occurrence_date = $date->format('Y-m-d');
+
+        switch($property) {
+            case 'end_date':
+                $days = (int)(new DateTime($template_date))->diff(new DateTime($value))->format('%r%a');
+                return (new DateTime($occurrence_date))->modify(sprintf('%+d days', $days))->format('Y-m-d');
+
+            case 'description':
+            case 'notes_url':
+            case 'website':
+                return str_replace($template_date, $occurrence_date, $value);
+        }
+
+        return $value;
     }
 
     public function reset_live_event_stats() {
