@@ -140,6 +140,7 @@ class ICSController extends BaseController
         $events = Event::orderBy('start_date', 'desc')
             ->where('unlisted', 0)
             ->where('is_template', 0)
+            ->where('is_proposed', 0)
             ->get();
 
         $vCalendar = new \Eluceo\iCal\Component\Calendar(parse_url(env('APP_URL'), PHP_URL_HOST));
@@ -163,7 +164,8 @@ class ICSController extends BaseController
         }
 
         $events = Event::where('unlisted', 0)
-          ->where('is_template', 0);
+          ->where('is_template', 0)
+          ->where('is_proposed', 0);
 
         $events = Event::tagged($events, $tags);
 
@@ -211,7 +213,8 @@ class ICSController extends BaseController
 
         $event = Event::where('key', $key)->first();
 
-        if(!$event) {
+        // A proposed event has no date to put in a calendar yet
+        if(!$event || $event->is_proposed || !$event->start_date) {
             abort(404);
         }
 

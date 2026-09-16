@@ -68,6 +68,21 @@ return [
     'timezone' => 'Timezone',
     'timezone_help' => 'provide a timezone for online events and to help sort events on the same day',
 
+    // Proposing several dates for people to vote on, instead of setting the date
+    'propose_dates' => 'Propose several dates and let people vote, instead of setting a date',
+    'propose_dates_help' => 'The event is listed under Proposed Events until a date is chosen.',
+    'proposed_dates_help' => 'Add at least two dates to vote on. Times are optional and use the timezone below. Give a date an end date to propose a multi-day event.',
+    'proposed_edit_notice' => 'The date is set by choosing one of the proposed dates on the event page. Votes are kept for dates that stay in this list. Removing or changing a date removes its votes.',
+    'add_another_date' => 'Add another date',
+    'remove_date' => 'Remove this date',
+    'option_votes' => ':count vote|:count votes',
+    'proposed_needs_two_dates' => 'Add at least two dates to vote on.',
+    'proposed' => [
+        'choose_an_option' => 'Choose one of the proposed dates to schedule the event.',
+        // The edit summary written when a date is chosen. :date is the chosen date
+        'finalized' => 'Scheduled for :date',
+    ],
+
     'repeat_question' => 'How often do you want to repeat this event?',
 
     'details' => 'Details',

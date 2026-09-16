@@ -33,10 +33,40 @@ return [
         'postponed' => 'Postponed',
         'cancelled' => 'Cancelled',
         'live_now' => 'Live Now',
+        'proposed' => 'Proposed',
     ],
 
     // Shown before the original date of a postponed event
     'tbd_originally' => 'TBD, originally',
+
+    // A proposed event: several possible dates that people vote on
+    'proposed' => [
+        'title' => 'Proposed Events',
+        'page_title' => 'Proposed Event',
+        'heading' => 'Proposed event: vote on a date',
+        'explanation' => 'This event does not have a date yet. Mark the dates that work for you.',
+        // :timezone is the event's timezone, shown when the proposed dates have times
+        'times_in_timezone' => 'Times are in :timezone',
+        'date_tbd' => 'Date to be decided',
+        'date_column' => 'Date',
+        'yes' => 'Yes',
+        'ifneedbe' => 'If need be',
+        'no' => 'No',
+        'leading' => 'Leading',
+        'chosen' => 'Chosen',
+        'log_in_to_vote' => 'Log in to vote on a date',
+        'voting_closed' => 'Voting is closed',
+        'schedule_this_date' => 'Schedule this date',
+        // :date is the date about to be chosen
+        'schedule_confirm' => 'Schedule this event for :date? Voting will close and the event will get its permanent date.',
+        'chosen_from' => 'The date was chosen from :count proposed date|The date was chosen from :count proposed dates',
+        'none' => 'There are no proposed events right now.',
+        'option_count' => ':count possible date|:count possible dates',
+        'voter_count' => ':count voter|:count voters',
+        // The home page banner. :link is a link with the text banner_link
+        'banner' => ':count proposed event is looking for a date. :link|:count proposed events are looking for a date. :link',
+        'banner_link' => 'Vote on dates',
+    ],
 
     'calendar' => [
         'add_to_calendar' => 'Add to Calendar',

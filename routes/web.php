@@ -42,6 +42,10 @@ Route::middleware('slashes:remove')->group(function(){
 
     Route::get('/archive', 'Controller@archive')->name('archive');
 
+    Route::get('/proposed', 'Controller@proposed')->name('proposed');
+    Route::get('/proposed/{slug}-{key}', 'Controller@proposed_event')->name('proposed-event');
+    Route::get('/proposed/{key}', 'Controller@proposed_event')->name('proposed-event-short');
+
     Route::get('/{year}/{month}/{slug}-{key}', 'Controller@event')->name('event');
     Route::get('/{year}/{month}/{key}', 'Controller@event')->name('event-short');
 
@@ -123,6 +127,9 @@ Route::middleware(['auth', 'slashes:remove'])->group(function(){
 
     Route::post('/event/{event}/rsvp', 'EventResponseController@save_rsvp')->name('event-rsvp');
     Route::post('/event/{event}/rsvp_delete', 'EventResponseController@delete_rsvp')->name('event-rsvp-delete');
+
+    Route::post('/event/{event}/vote', 'EventDateVoteController@vote')->name('event-date-vote');
+    Route::post('/event/{event}/finalize', 'EventController@finalize_event')->name('finalize-event');
 
     Route::middleware('can:manage-site')->group(function(){
         Route::get('/settings', 'SettingsController@get')->name('settings');

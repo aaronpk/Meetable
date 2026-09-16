@@ -34,6 +34,11 @@ class EventController extends BaseController
             $event = new Event;
         }
 
+        // The "Propose an Event" link starts the form with the candidate dates shown
+        if(request('propose') && Gate::allows('propose-event')) {
+            $event->is_proposed = true;
+        }
+
         $parent = null;
         if(request('parent')) {
             $event->parent = Event::where('id', request('parent'))->first();
@@ -61,14 +66,20 @@ class EventController extends BaseController
     public function create_event(Request $request) {
         Gate::authorize('create-event');
 
-        // Check for required fields: name, start_date
+        // A proposed event offers several candidate dates to vote on instead of a start date
+        $is_proposed = request('is_proposed') && !request('is_template');
+        if($is_proposed) {
+            Gate::authorize('propose-event');
+        }
+
+        // Check for required fields: name, start_date (or the candidate dates)
         $request->validate(array_merge([
             'name' => 'required',
-            'start_date' => 'required|date_format:Y-m-d',
+            'start_date' => $is_proposed ? 'nullable' : 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
             'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
-        ], Event::url_validation_rules()));
+        ], Event::url_validation_rules(), self::date_option_validation_rules($is_proposed)), self::date_option_validation_messages());
 
         $event = new Event();
         $event->name = request('name');
@@ -98,17 +109,22 @@ class EventController extends BaseController
         $event->longitude = request('longitude') ?: null;
         $event->timezone = request('timezone') ?: '';
 
-        $event->start_date = date('Y-m-d', strtotime(request('start_date')));
-        if(request('end_date'))
-            $event->end_date = date('Y-m-d', strtotime(request('end_date')));
-        if(request('start_time'))
-            $event->start_time = date('H:i:00', strtotime(request('start_time')));
-        if(request('end_time'))
-            $event->end_time = date('H:i:00', strtotime(request('end_time')));
+        if($is_proposed) {
+            // The date is filled in when one of the candidate dates is chosen
+            $event->is_proposed = true;
+        } else {
+            $event->start_date = date('Y-m-d', strtotime(request('start_date')));
+            if(request('end_date'))
+                $event->end_date = date('Y-m-d', strtotime(request('end_date')));
+            if(request('start_time'))
+                $event->start_time = date('H:i:00', strtotime(request('start_time')));
+            if(request('end_time'))
+                $event->end_time = date('H:i:00', strtotime(request('end_time')));
+        }
 
         $event->sort_date = $event->sort_date();
 
-        $event->status = request('status');
+        $event->status = $is_proposed ? 'confirmed' : request('status');
 
         $event->summary = request('summary');
         $event->description = request('description');
@@ -132,8 +148,8 @@ class EventController extends BaseController
         $event->cloned_from_id = request('cloned_from_id') ?: null;
         $event->previous_instance_date = request('previous_instance_date') ?: null;
 
-        // Schedule a zoom meeting if requested
-        if(request('create_zoom_meeting')) {
+        // Schedule a zoom meeting if requested. A proposed event has no time to schedule it at yet.
+        if(request('create_zoom_meeting') && !$is_proposed) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
                 return back()->withInput()->withErrors([__('event_form.zoom_failed')]);
@@ -145,6 +161,10 @@ class EventController extends BaseController
         foreach(explode(' ', request('tags')) as $t) {
             if(trim($t))
                 $event->tags()->attach(Tag::get($t));
+        }
+
+        if($event->is_proposed) {
+            $event->sync_date_options(request('options'));
         }
 
         // Store a snapshot in the revision table
@@ -170,6 +190,63 @@ class EventController extends BaseController
 
         $event->delete();
         return redirect('/');
+    }
+
+    /**
+     * Turns a proposed event into a scheduled one by giving it the date and times of
+     * one of its candidate dates. The candidate dates and votes are kept so the event
+     * page can still show how the date was chosen.
+     */
+    public function finalize_event(Request $request, Event $event) {
+        Gate::authorize('manage-event', $event);
+        abort_unless($event->is_proposed, 404);
+
+        $option = $event->date_options()->where('id', request('option_id'))->first();
+        if(!$option) {
+            return back()->withErrors([__('event_form.proposed.choose_an_option')]);
+        }
+
+        $event->start_date = $option->date;
+        $event->end_date = $option->end_date;
+        $event->start_time = $option->start_time;
+        $event->end_time = $option->end_time;
+        $event->is_proposed = false;
+        $event->chosen_date_option_id = $option->id;
+        $event->sort_date = $event->sort_date();
+        $event->slug = Event::slug_from_name($event->name);
+        $event->last_modified_by = Auth::user()->id;
+        $event->save();
+
+        $revision = EventRevision::createFromEvent($event);
+        // Stored and shown to everyone, so it is written in the site's language
+        $revision->edit_summary = __('event_form.proposed.finalized', ['date' => $event->display_date()], \App\Helpers\Locales::site());
+        $revision->save();
+
+        event(new EventUpdated($event, $revision));
+
+        return redirect($event->permalink());
+    }
+
+    // The candidate dates of a proposed event come in as options[N][date|start_time|end_time|id]
+    private static function date_option_validation_rules($is_proposed) {
+        if(!$is_proposed) {
+            return ['options' => 'nullable|array'];
+        }
+
+        return [
+            'options' => 'required|array|min:2',
+            'options.*.date' => 'required|date_format:Y-m-d',
+            'options.*.end_date' => 'nullable|date_format:Y-m-d|after_or_equal:options.*.date',
+            'options.*.start_time' => 'nullable|date_format:H:i,H:i:s',
+            'options.*.end_time' => 'nullable|date_format:H:i,H:i:s',
+        ];
+    }
+
+    private static function date_option_validation_messages() {
+        return [
+            'options.required' => __('event_form.proposed_needs_two_dates'),
+            'options.min' => __('event_form.proposed_needs_two_dates'),
+        ];
     }
 
     public function edit_event(Event $event) {
@@ -209,6 +286,8 @@ class EventController extends BaseController
 
     public function recurring_event(Event $event) {
         Gate::authorize('create-event');
+        // A repeating schedule needs a date to count from
+        abort_if($event->is_proposed, 404);
 
         // Predict the next recurrence of the event based on the past occurrence
         if($event->previous_instance_date) {
@@ -229,6 +308,7 @@ class EventController extends BaseController
 
     public function recurring_event_details(Request $request, Event $event) {
         Gate::authorize('manage-event', $event);
+        abort_if($event->is_proposed, 404);
 
         $date = new DateTime(request('date'));
 
@@ -249,13 +329,15 @@ class EventController extends BaseController
     public function save_event(Request $request, Event $event) {
         Gate::authorize('manage-event', $event);
 
+        // Whether the event is proposed comes from the event itself: the form can't turn
+        // a scheduled event into a proposal, and choosing a date is done on the event page
         $request->validate(array_merge([
             'name' => 'required',
-            'start_date' => 'required|date_format:Y-m-d',
+            'start_date' => $event->is_proposed ? 'nullable' : 'required|date_format:Y-m-d',
             'status' => 'in:'.implode(',', array_keys(Event::$STATUSES)),
             'recurrence_interval' => 'nullable|in:'.implode(',', Event::$RECURRENCE_INTERVALS),
             'recurrence_interval_count' => 'required_if:recurrence_interval,weekly_n|nullable|integer|min:1|max:52',
-        ], Event::url_validation_rules()));
+        ], Event::url_validation_rules(), self::date_option_validation_rules($event->is_proposed)), self::date_option_validation_messages());
 
         if($event->fields_from_ics) {
             // Remove edited fields from the list of fields created by an ICS invite
@@ -306,6 +388,15 @@ class EventController extends BaseController
             $event->end_time = null;
         }
 
+        // A proposed event's date comes from the candidate date that gets chosen, not the form
+        if($event->is_proposed) {
+            $event->start_date = null;
+            $event->end_date = null;
+            $event->start_time = null;
+            $event->end_time = null;
+            $event->status = 'confirmed';
+        }
+
         if(!$event->unlisted)
             $event->unlisted = 0; // override null from above
 
@@ -318,7 +409,7 @@ class EventController extends BaseController
         $event->slug = Event::slug_from_name($event->name);
 
         // Schedule a zoom meeting if requested
-        if(request('create_zoom_meeting')) {
+        if(request('create_zoom_meeting') && !$event->is_proposed) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
                 return back()->withInput()->withErrors([__('event_form.zoom_failed')]);
@@ -354,6 +445,10 @@ class EventController extends BaseController
             $event->tags()->attach($tag);
         }
 
+        if($event->is_proposed) {
+            $event->sync_date_options(request('options'));
+        }
+
         $revision = EventRevision::createFromEvent($event);
         $revision->edit_summary = request('edit_summary');
         $revision->save();
@@ -383,12 +478,13 @@ class EventController extends BaseController
         Gate::authorize('manage-event', $event);
         abort_if($revision->event_id != $event->id, 404);
 
-        $date = new DateTime($revision->start_date);
+        // A revision from before the date was chosen doesn't have one
+        $date = $revision->start_date ? new DateTime($revision->start_date) : null;
 
         return view('event', [
             'event' => $revision,
-            'year' => $date->format('Y'),
-            'month' => $date->format('m'),
+            'year' => $date ? $date->format('Y') : null,
+            'month' => $date ? $date->format('m') : null,
             'key' => $revision->key,
             'slug' => $revision->slug,
             'mode' => 'archive',
@@ -520,6 +616,7 @@ class EventController extends BaseController
             'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status')
           ->where('unlisted', 1)
           ->where('is_template', 0)
+          ->where('is_proposed', 0)
           ->orderBy('sort_date', 'desc')
           ->get();
 

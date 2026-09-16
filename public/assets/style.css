@@ -384,3 +384,87 @@ ul.photo-album li {
 }
 
 
+
+/* proposed events: the table of candidate dates and votes */
+.date-poll td.count, .date-poll th.count {
+    text-align: center;
+    white-space: nowrap;
+    width: 5em;
+}
+.date-poll td.count .number {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.date-poll .voters {
+    margin-top: 2px;
+    line-height: 0;
+}
+.date-poll .vote-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    margin: 1px;
+    object-fit: cover;
+}
+.date-poll .leading-tag {
+    display: none;
+    margin-left: .5em;
+}
+.date-poll tr.is-leading .leading-tag {
+    display: inline-flex;
+}
+.date-poll tr.is-leading td {
+    background-color: #fffbeb;
+}
+.date-poll tr.is-chosen td {
+    background-color: #effaf3;
+}
+.date-poll .option-date .time {
+    font-weight: 300;
+}
+.date-poll .finalize-form {
+    margin-top: .4em;
+}
+.date-poll .my-vote .buttons {
+    flex-wrap: nowrap;
+}
+.date-poll .vote-button.is-pressed.is-yes {
+    background-color: #48c78e;
+    color: #fff;
+}
+.date-poll .vote-button.is-pressed.is-ifneedbe {
+    background-color: #ffe08a;
+    color: #000;
+}
+.date-poll .vote-button.is-pressed.is-no {
+    background-color: #f14668;
+    color: #fff;
+}
+details.poll-results summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+/* each candidate date in the event form is its own box, with its remove button in the corner */
+.proposed-option {
+    position: relative;
+    border: 1px solid var(--bulma-border, #dbdbdb);
+    border-radius: 6px;
+    padding: 1em 1em 0.5em;
+    padding-right: 3.5em;
+    margin-bottom: 1em;
+}
+.proposed-option .remove-proposed-option {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+}
+.proposed-option .field:last-child {
+    margin-bottom: 0.5em;
+}
+.proposed-option .option-votes {
+    margin-top: 0;
+    margin-bottom: 0.5em;
+}
+.proposed-list .event {
+    margin-left: 2em;
+}

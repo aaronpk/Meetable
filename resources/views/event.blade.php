@@ -12,7 +12,7 @@ use App\Setting;
 
 <link rel="stylesheet" href="/jquery/jquery-ui-1.12.1/jquery-ui.min.css">
 <script type="application/ld+json">
-@if($mode != 'archive')
+@if($mode != 'archive' && !$event->is_proposed)
 {!! $event->toGoogleJSON() !!}
 @endif
 </script>
@@ -66,18 +66,22 @@ use App\Setting;
                         <span class="icon">@icon(copy)</span>
                         <span>{{ __('events.actions.clone') }}</span>
                     </a>
+                    @if(!$event->is_proposed)
                     <a class="dropdown-item" href="{{ route('recurring-event', $event) }}">
                         <span class="icon">@icon(redo)</span>
                         <span>{{ __('events.actions.create_recurring') }}</span>
                     </a>
+                    @endif
                     <a class="dropdown-item" href="{{ route('add-event-photo', $event) }}">
                         <span class="icon">@icon(camera)</span>
                         <span>{{ __('events.actions.add_photo') }}</span>
                     </a>
+                    @if(!$event->is_proposed)
                     <a class="dropdown-item" href="{{ route('new-event', ['parent'=>$event]) }}">
                         <span class="icon">@icon(calendar)</span>
                         <span>{{ __('events.actions.add_sub_event') }}</span>
                     </a>
+                    @endif
                     @if(Setting::value('enable_webmention_responses'))
                     <a class="dropdown-item" href="{{ route('edit-responses', $event) }}">
                         <span class="icon">@icon(comment)</span>
@@ -160,6 +164,15 @@ use App\Setting;
         </div>
     @endif
 
+    @if($event->is_proposed)
+    <div class="date segment with-icon proposed">
+        <span class="icon">@icon(vote-yea)</span>
+        <span>
+            <div>{{ __('events.proposed.heading') }}</div>
+            <div class="time">{{ __('events.proposed.explanation') }}</div>
+        </span>
+    </div>
+    @else
     <div class="date segment with-icon">
         <span class="icon">@icon(clock)</span>
         <span>
@@ -216,6 +229,7 @@ use App\Setting;
             @endif
         </span>
     </div>
+    @endif
 
     @if( $event->location_name || $event->location_summary() )
     <div class="location segment with-icon">
@@ -229,6 +243,21 @@ use App\Setting;
             @endif
         </div>
     </div>
+    @endif
+
+    @if($event->is_proposed && $mode != 'archive')
+        <div class="segment">
+            @if($event->timezone && $date_options->contains(function($option){ return $option->start_time; }))
+                <p class="help">{{ __('events.proposed.times_in_timezone', ['timezone' => $event->timezone]) }}</p>
+            @endif
+            @include('components/date-poll', [
+                'options' => $date_options,
+                'readonly' => false,
+                'leading_id' => $leading_option_id,
+                'chosen_id' => null,
+                'user_votes' => $user_votes,
+            ])
+        </div>
     @endif
 
     <a href="{{ $event->absolute_permalink() }}" class="u-url"></a>
@@ -281,7 +310,7 @@ use App\Setting;
             </div>
         @endif
     @else
-        @if($event->status == 'confirmed' && $event->meeting_url && !$event->is_past())
+        @if($event->status == 'confirmed' && $event->meeting_url && !$event->is_proposed && !$event->is_past())
             <div class="website segment with-icon">
                 <span class="icon">@icon(video)</span>
                 <span>
@@ -380,7 +409,22 @@ use App\Setting;
         </div>
     @endif
 
-    @if(Setting::value('enable_rsvps') && $event->rsvps_enabled && ($event->has_rsvps() || Auth::user()))
+    @if(!$event->is_proposed && $event->date_options->count())
+        {{-- The event got its date from a vote, so show how the vote went --}}
+        @php $poll_options = $event->date_options_with_tallies(); @endphp
+        <details class="responses poll-results" id="poll-results">
+            <summary>{{ trans_choice('events.proposed.chosen_from', $poll_options->count(), ['count' => $poll_options->count()]) }}</summary>
+            @include('components/date-poll', [
+                'options' => $poll_options,
+                'readonly' => true,
+                'leading_id' => null,
+                'chosen_id' => $event->chosen_date_option_id,
+                'user_votes' => [],
+            ])
+        </details>
+    @endif
+
+    @if(!$event->is_proposed && Setting::value('enable_rsvps') && $event->rsvps_enabled && ($event->has_rsvps() || Auth::user()))
         <div class="responses rsvps" id="rsvps">
             <div class="level">
                 <div class="level-left">
@@ -563,7 +607,7 @@ use App\Setting;
     </script>
     @endcan
 
-    @if($event->meeting_url && !$event->is_past())
+    @if($event->meeting_url && !$event->is_proposed && !$event->is_past())
     <script>
         var meetingURLTimer;
         $(function(){

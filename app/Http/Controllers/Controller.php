@@ -9,7 +9,7 @@ use Illuminate\Routing\Controller as BaseController;
 use App\Event, App\Tag, App\Setting;
 use App\Helpers\Dates;
 use DateTime, DateTimeZone, DateInterval, Exception;
-use DB;
+use DB, Auth;
 
 class Controller extends BaseController
 {
@@ -38,7 +38,7 @@ class Controller extends BaseController
             $events = new Event();
         }
 
-        $events = $events->where('unlisted', 0)->where('hide_from_main_feed', 0)->where('is_template', 0);
+        $events = $events->where('unlisted', 0)->where('hide_from_main_feed', 0)->where('is_template', 0)->where('is_proposed', 0);
 
         if($only_future)
             $events = $events->orderBy('sort_date');
@@ -75,12 +75,79 @@ class Controller extends BaseController
             }
         }
 
+        $home = (!$year && !$month && !$day);
+
         return $this->show_events_from_query($events, [
             'year' => $year,
             'month' => $month,
             'day' => $day,
             'tags' => $tags,
-            'home' => (!$year && !$month && !$day)
+            'home' => $home,
+            'proposed_count' => ($home && Setting::value('enable_proposed_events')) ? $this->proposed_query()->count() : 0,
+        ]);
+    }
+
+    // The proposed events that are still looking for a date
+    private function proposed_query() {
+        return Event::where('is_proposed', 1)
+            ->where('unlisted', 0)
+            ->where('is_template', 0);
+    }
+
+    public function proposed() {
+        if(!Setting::value('enable_proposed_events'))
+            abort(404);
+
+        $events = $this->proposed_query()
+            ->withMin('date_options', 'date')
+            ->with('date_options', 'tags')
+            ->orderBy('date_options_min_date')
+            ->orderBy('created_at')
+            ->get();
+
+        return view('proposed', [
+            'events' => $events,
+            'page_title' => __('events.proposed.title'),
+        ]);
+    }
+
+    public function proposed_event($key_or_slug, $key2=false) {
+        if($key2) {
+            $key = $key2;
+            $slug = $key_or_slug;
+        } else {
+            $key = $key_or_slug;
+            $slug = false;
+        }
+
+        $event = Event::where('key', $key)->first();
+
+        if(!$event || $event->is_template) {
+            abort(404);
+        }
+
+        // Once a date is chosen the event lives at its dated URL for good
+        if(!$event->is_proposed) {
+            return redirect($event->permalink(), 301);
+        }
+
+        if($event->slug && $event->slug != $slug) {
+            return redirect($event->permalink(), 301);
+        }
+
+        $leading = $event->leading_date_option();
+
+        return view('event', [
+            'event' => $event,
+            'year' => null,
+            'month' => null,
+            'key' => $key,
+            'slug' => $slug,
+            'mode' => 'event',
+            'page_title' => $event->name . ' | ' . __('events.proposed.page_title'),
+            'date_options' => $event->date_options_with_tallies(),
+            'leading_option_id' => $leading ? $leading->id : null,
+            'user_votes' => Auth::user() ? $event->date_votes_for_user(Auth::user()) : [],
         ]);
     }
 
@@ -264,6 +331,7 @@ class Controller extends BaseController
             ->where('start_date', '<', $now->format('Y-m-d'))
             ->where('unlisted', 0)
             ->where('is_template', 0)
+            ->where('is_proposed', 0)
             ->orderBy('sort_date', 'desc')
             ->get();
 
@@ -301,7 +369,7 @@ class Controller extends BaseController
             FROM events
             JOIN event_tag ON event_tag.event_id = events.id
             JOIN tags ON event_tag.tag_id = tags.id
-            WHERE unlisted = 0 AND is_template = 0
+            WHERE unlisted = 0 AND is_template = 0 AND is_proposed = 0
             GROUP BY tag, locality
             ORDER BY tag) AS data
             GROUP BY tag
@@ -362,6 +430,11 @@ class Controller extends BaseController
             abort(404);
         }
 
+        // A proposed event has its own URL until a date is chosen, so this is temporary
+        if($event->is_proposed || !$event->start_date) {
+            return redirect($event->permalink(), 302);
+        }
+
         // Redirect to the canonical URL
         $date = new DateTime($event->start_date);
         if($event->slug && $event->slug != $slug
@@ -382,7 +455,7 @@ class Controller extends BaseController
     }
 
     public function event_json($key) {
-        $event = Event::where('key', $key)->where('is_template', 0)->first();
+        $event = Event::where('key', $key)->where('is_template', 0)->where('is_proposed', 0)->first();
         if(!$event) {
             abort(404);
         }
@@ -403,11 +476,27 @@ class Controller extends BaseController
             abort(403);
         }
 
-        return response()->json([
+        $data = [
             'generator' => 'Meetable',
             'version' => '1.0',
             'event' => $event,
-        ]);
+        ];
+
+        // The candidate dates and how the voting stands, without naming the voters
+        if($event->date_options->count()) {
+            $data['date_options'] = $event->date_options_with_tallies()->map(function($option){
+                return [
+                    'id' => $option->id,
+                    'date' => $option->date,
+                    'end_date' => $option->end_date,
+                    'start_time' => $option->start_time,
+                    'end_time' => $option->end_time,
+                    'votes' => $option->vote_counts(),
+                ];
+            })->values();
+        }
+
+        return response()->json($data);
     }
 
     public function event_shorturl($key) {
@@ -423,6 +512,7 @@ class Controller extends BaseController
           ->where('slug', 'like', $prefix.'%')
           ->where('unlisted', 0)
           ->where('is_template', 0)
+          ->where('is_proposed', 0)
           ->get();
 
         if($events->count() == 0) {
@@ -442,7 +532,7 @@ class Controller extends BaseController
     }
 
     public function add_to_google($key) {
-        $event = Event::where('key', $key)->where('is_template', 0)->first();
+        $event = Event::where('key', $key)->where('is_template', 0)->where('is_proposed', 0)->first();
 
         if(!$event) {
             abort(404);

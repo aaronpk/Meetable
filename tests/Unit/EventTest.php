@@ -302,4 +302,32 @@ class EventTest extends TestCase
         $this->assertContains('2026-01-30', $dates);
         $this->assertNotContains('2026-02-27', $dates); // February 2026 has only four Fridays
     }
+    public function testAProposedEventHasNoDateYet()
+    {
+        $event = new Event;
+        $event->is_proposed = true;
+        $event->key = 'abcdefghijkl';
+        $event->slug = 'game-night';
+        $event->status = 'confirmed';
+        $event->meeting_url = 'https://example.com/meet';
+
+        $this->assertEquals('/proposed/game-night-abcdefghijkl', $event->permalink());
+        $this->assertNull($event->ics_permalink());
+        $this->assertNull($event->sort_date());
+        $this->assertNull($event->start_datetime());
+        $this->assertNull($event->end_datetime());
+        $this->assertEquals('', $event->start_datetime_local());
+        $this->assertFalse($event->is_past());
+        $this->assertFalse($event->is_starting_soon());
+        $this->assertFalse($event->is_ongoing());
+        $this->assertFalse($event->meeting_url_is_visible());
+        $this->assertEquals('Date to be decided', $event->date_summary_text());
+        $this->assertEquals('Date to be decided', $event->display_date());
+        $this->assertEquals('', $event->weekday());
+        $this->assertEquals('', $event->mf2_date_html());
+        $this->assertNull($event->duration_minutes());
+        $this->assertStringContainsString('vote-yea', $event->status_tag());
+        $this->assertStringContainsString('P<span class="lower">ROPOSED</span>', $event->status_tag());
+        $this->assertArrayNotHasKey('startDate', json_decode($event->toGoogleJSON(), true));
+    }
 }

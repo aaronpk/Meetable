@@ -87,6 +87,8 @@ class Event extends Model
             return Event::where('key', $match[2] ?? $match[1])->first();
         } elseif(preg_match('~^/([0-9a-zA-Z]{12})$~', $url, $match)) {
             return Event::where('key', $match[1])->first();
+        } elseif(preg_match('~^/proposed/(.+-)?([0-9a-zA-Z]{12})$~', $url, $match)) {
+            return Event::where('key', $match[2])->first();
         } else {
             return null;
         }
@@ -236,17 +238,141 @@ class Event extends Model
         return $this->responses()->where('is_like', 1)->orderBy('created_at', 'asc');
     }
 
+    // The candidate dates of a proposed event, in the order they were proposed
+    public function date_options() {
+        return $this->hasMany('\App\EventDateOption', 'event_id', $this->eventKeyName())
+            ->orderBy('sort_order')->orderBy('date')->orderBy('start_time');
+    }
+
+    public function chosen_date_option() {
+        return $this->belongsTo('\App\EventDateOption', 'chosen_date_option_id');
+    }
+
+    /**
+     * The candidate dates with their yes, if need be and no counts and their voters
+     * loaded, so a page can show the whole poll without a query per option.
+     */
+    public function date_options_with_tallies() {
+        $options = $this->date_options()
+            ->withCount([
+                'votes as yes_count' => function($q){ $q->where('vote', 'yes'); },
+                'votes as ifneedbe_count' => function($q){ $q->where('vote', 'ifneedbe'); },
+                'votes as no_count' => function($q){ $q->where('vote', 'no'); },
+            ])
+            ->with('votes.user')
+            ->get();
+
+        foreach($options as $option)
+            $option->setRelation('event', $this);
+
+        return $options;
+    }
+
+    /**
+     * The candidate date most people can make: the most yes answers, then the most
+     * if need be, then the fewest no. Null when nobody has voted yet.
+     */
+    public function leading_date_option() {
+        $options = $this->date_options_with_tallies()->filter(function($option){
+            return array_sum($option->vote_counts()) > 0;
+        });
+
+        if($options->isEmpty())
+            return null;
+
+        return $options->sortBy([
+            ['yes_count', 'desc'],
+            ['ifneedbe_count', 'desc'],
+            ['no_count', 'asc'],
+            ['sort_order', 'asc'],
+        ])->first();
+    }
+
+    // The user's answers as [option id => vote]
+    public function date_votes_for_user(User $user) {
+        return EventDateVote::whereIn('event_date_option_id', $this->date_options()->pluck('id'))
+            ->where('user_id', $user->id)
+            ->pluck('vote', 'event_date_option_id')
+            ->all();
+    }
+
+    // How many different people have voted on any of the candidate dates
+    public function voter_count() {
+        return EventDateVote::whereIn('event_date_option_id', $this->date_options()->pluck('id'))
+            ->distinct()
+            ->count('user_id');
+    }
+
+    /**
+     * Saves the candidate dates submitted by the event form, in the order given.
+     * Rows with an id update that option, keeping its votes unless its date or time
+     * changed, since those votes were for a different date. Options left out of the
+     * form are deleted along with their votes.
+     */
+    public function sync_date_options($rows) {
+        $keep = [];
+        $order = 0;
+
+        foreach((array)$rows as $row) {
+            if(empty($row['date']))
+                continue;
+
+            $option = null;
+            if(!empty($row['id']))
+                $option = $this->date_options()->where('id', $row['id'])->first();
+
+            if(!$option) {
+                $option = new EventDateOption;
+                $option->event_id = $this->id;
+            }
+
+            $option->date = date('Y-m-d', strtotime($row['date']));
+            $option->end_date = !empty($row['end_date']) ? date('Y-m-d', strtotime($row['end_date'])) : null;
+
+            // Like a scheduled event, a multi-day candidate has no start or end time
+            if($option->end_date) {
+                $option->start_time = null;
+                $option->end_time = null;
+            } else {
+                $option->start_time = !empty($row['start_time']) ? date('H:i:00', strtotime($row['start_time'])) : null;
+                $option->end_time = !empty($row['end_time']) ? date('H:i:00', strtotime($row['end_time'])) : null;
+            }
+            $option->sort_order = $order++;
+
+            if($option->exists && $option->isDirty(['date', 'end_date', 'start_time', 'end_time']))
+                $option->votes()->delete();
+
+            $option->save();
+            $keep[] = $option->id;
+        }
+
+        $removed = $this->date_options()->whereNotIn('id', $keep)->pluck('id');
+        EventDateVote::whereIn('event_date_option_id', $removed)->delete();
+        EventDateOption::whereIn('id', $removed)->delete();
+
+        $this->unsetRelation('date_options');
+    }
+
     public function generate_random_values() {
         $this->key = Str::random(12);
         $this->export_secret = Str::random(20);
     }
 
     public function permalink() {
+        $slug = $this->slug ? rawurlencode($this->slug).'-' : '';
+
+        // A proposed event has no date to build the usual URL from
+        if($this->is_proposed || !$this->start_date)
+            return '/proposed/' . $slug . $this->key;
+
         $date = new DateTime($this->start_date);
-        return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? rawurlencode($this->slug).'-' : '') . $this->key;
+        return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . $slug . $this->key;
     }
 
     public function ics_permalink() {
+        if($this->is_proposed || !$this->start_date)
+            return null;
+
         return '/ics' . $this->permalink() . '.ics';
     }
 
@@ -273,6 +399,9 @@ class Event extends Model
     }
 
     public function sort_date() {
+        if(!$this->start_date)
+            return null;
+
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
         } else {
@@ -293,6 +422,9 @@ class Event extends Model
     }
 
     public function date_summary() {
+        if(!$this->start_date)
+            return e(__('events.proposed.date_tbd'));
+
         $start_date = new DateTime($this->start_date);
 
         if($this->is_multiday()) {
@@ -339,11 +471,17 @@ class Event extends Model
     }
 
     public function start_datetime_local($format='Ymd\THi') {
+        if(!$this->start_date)
+            return '';
+
         $start_date = new DateTime($this->start_date.' '.$this->start_time);
         return $start_date->format($format);
     }
 
     public function start_datetime() {
+        if(!$this->start_date)
+            return null;
+
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
             $start = new DateTime($this->start_date.' '.$this->start_time, $tz);
@@ -354,7 +492,7 @@ class Event extends Model
     }
 
     public function end_datetime() {
-        if(!$this->end_time)
+        if(!$this->end_time || !$this->start_date)
             return null;
 
         $date = $this->start_datetime();
@@ -376,6 +514,9 @@ class Event extends Model
 
     // e.g. "June 17, 2031", or "Tuesday, June 17, 2031" with the weekday
     public function display_date($with_weekday = false) {
+        if(!$this->start_date)
+            return __('events.proposed.date_tbd');
+
         $start_date = new DateTime($this->start_date);
 
         if($this->is_multiday()) {
@@ -433,6 +574,9 @@ class Event extends Model
     }
 
     public function weekday() {
+        if(!$this->start_date)
+            return '';
+
         $start_date = new DateTime($this->start_date);
         return Dates::format($start_date, 'weekday_short');
     }
@@ -464,6 +608,9 @@ class Event extends Model
 
     public function mf2_date_html() {
         list($start, $end) = $this->start_and_end_dates();
+
+        if(!$start)
+            return '';
 
         $start_html = '<data class="dt-start" value="' . $start . '"></data>';
         $end_html = $end ? '<data class="dt-end" value="' . $end . '"></data>' : '';
@@ -854,7 +1001,7 @@ class Event extends Model
     }
 
     public function is_starting_soon() {
-        if($this->is_past() || $this->status != 'confirmed')
+        if(!$this->start_date || $this->is_past() || $this->status != 'confirmed')
             return false;
 
         // Return true if the event is starting in 15 minutes or less
@@ -875,7 +1022,7 @@ class Event extends Model
     }
 
     public function is_ongoing() {
-        if($this->is_past() || $this->status != 'confirmed')
+        if(!$this->start_date || $this->is_past() || $this->status != 'confirmed')
             return false;
 
         // If Zoom has sent the meeting started notification early, return true now
@@ -903,6 +1050,10 @@ class Event extends Model
         // Always report the event is over if Zoom has sent the meeting ended notification
         if($this->zoom_meeting_status == 'ended')
             return true;
+
+        // A proposed event hasn't happened yet, since it doesn't have a date
+        if(!$this->start_date)
+            return false;
 
         if($this->timezone) {
             $tz = new DateTimeZone($this->timezone);
@@ -945,33 +1096,34 @@ class Event extends Model
     }
 
     public function status_tag() {
-        // Live now
         if($this->meeting_url && $this->is_ongoing()) {
             $icon = 'play-circle';
             $class = 'success';
             $text = __('events.status.live_now');
-        } else if($this->status == 'confirmed') {
-            return '';
-        }
-
-        switch($this->status) {
-            case 'cancelled':
-              $icon = 'exclamation-triangle';
-              $class = 'danger';
-              $text = self::status_label('cancelled');
-              break;
-            case 'postponed':
-              $icon = 'question-circle';
-              $class = 'warning';
-              $text = self::status_label('postponed');
-              break;
-            case 'tentative':
-              $icon = 'question-circle';
-              $class = 'warning';
-              $text = self::status_label('tentative');
-              break;
-            default:
-              return '';
+        } elseif($this->is_proposed) {
+            $icon = 'vote-yea';
+            $class = 'info';
+            $text = __('events.status.proposed');
+        } else {
+            switch($this->status) {
+                case 'cancelled':
+                  $icon = 'exclamation-triangle';
+                  $class = 'danger';
+                  $text = self::status_label('cancelled');
+                  break;
+                case 'postponed':
+                  $icon = 'question-circle';
+                  $class = 'warning';
+                  $text = self::status_label('postponed');
+                  break;
+                case 'tentative':
+                  $icon = 'question-circle';
+                  $class = 'warning';
+                  $text = self::status_label('tentative');
+                  break;
+                default:
+                  return '';
+            }
         }
 
         return '<span class="status tag is-'.$class.'">'
@@ -1175,7 +1327,8 @@ class Event extends Model
 
         list($start, $end) = $this->start_and_end_dates();
 
-        $data['startDate'] = $start;
+        if($start)
+            $data['startDate'] = $start;
         if($end)
             $data['endDate'] = $end;
 
