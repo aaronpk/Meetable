@@ -41,10 +41,6 @@ class Kernel extends HttpKernel
 
         ],
 
-        'email' => [
-
-        ],
-
         'api' => [
             'throttle:60,1',
             'bindings',
