@@ -70,8 +70,14 @@ class Event extends Model
         'recurrence_interval', 'recurrence_interval_count',
     ];
 
+    // Keeps letters and numbers from any script, so names that aren't written in the Latin
+    // alphabet still get a readable slug, e.g. "Москва встреча" becomes "москва-встреча".
+    // Normalizer comes from symfony/polyfill-intl-normalizer when intl isn't installed,
+    // so a name gets the same slug on every server.
     public static function slug_from_name($name) {
-        return preg_replace('/--+/', '-', mb_ereg_replace('[^a-z0-9à-öø-ÿāăąćĉċčŏœ]+', '-', mb_strtolower($name)));
+        $name = \Normalizer::normalize((string)$name, \Normalizer::FORM_C) ?: (string)$name;
+
+        return trim(preg_replace('/[^\p{L}\p{M}\p{N}]+/u', '-', mb_strtolower($name)), '-');
     }
 
     public static function find_from_url($url) {
@@ -236,7 +242,7 @@ class Event extends Model
 
     public function permalink() {
         $date = new DateTime($this->start_date);
-        return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? $this->slug.'-' : '') . $this->key;
+        return '/' . $date->format('Y') . '/' . $date->format('m') . '/' . ($this->slug ? rawurlencode($this->slug).'-' : '') . $this->key;
     }
 
     public function ics_permalink() {
