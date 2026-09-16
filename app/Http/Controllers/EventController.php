@@ -373,7 +373,8 @@ class EventController extends BaseController
     }
 
     public function view_revision(Event $event, EventRevision $revision) {
-        Gate::authorize('manage-event', $revision);
+        Gate::authorize('manage-event', $event);
+        abort_if($revision->event_id != $event->id, 404);
 
         $date = new DateTime($revision->start_date);
 
@@ -389,7 +390,8 @@ class EventController extends BaseController
     }
 
     public function view_revision_diff(Event $event, EventRevision $revision) {
-        Gate::authorize('manage-event', $revision);
+        Gate::authorize('manage-event', $event);
+        abort_if($revision->event_id != $event->id, 404);
 
         $previous = EventRevision::where('event_id', $revision->event_id)
           ->where('id', '!=', $revision->id)
