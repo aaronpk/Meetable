@@ -19,10 +19,10 @@ use App\Setting;
 
     <div class="tabs is-boxed">
         <ul>
-            <li class="is-active" data-tab="messages"><a>Messages</a></li>
-            <li data-tab="design"><a>Design</a></li>
-            <li data-tab="features"><a>Site Features</a></li>
-            <li data-tab="services"><a>Services</a></li>
+            <li class="is-active" data-tab="messages"><a>{{ __('settings.tabs.messages') }}</a></li>
+            <li data-tab="design"><a>{{ __('settings.tabs.design') }}</a></li>
+            <li data-tab="features"><a>{{ __('settings.tabs.features') }}</a></li>
+            <li data-tab="services"><a>{{ __('settings.tabs.services') }}</a></li>
         </ul>
     </div>
 
@@ -30,9 +30,9 @@ use App\Setting;
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="enable_ticket_url" value="1" {{ Setting::value('enable_ticket_url') ? 'checked="checked"' : ''}}>
-                Enable Registration URL
+                {{ __('settings.enable_ticket_url') }}
             </label>
-            <p class="help">Show or hide the "Registration URL" field on events.</p>
+            <p class="help">{{ __('settings.enable_ticket_url_help') }}</p>
         </div>
 
         <!--
@@ -48,62 +48,62 @@ use App\Setting;
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="enable_unlisted_events" value="1" {{ Setting::value('enable_unlisted_events') ? 'checked="checked"' : ''}}>
-                Enable Unlisted Events
+                {{ __('settings.enable_unlisted_events') }}
             </label>
-            <p class="help">When checked, events can be marked as "unlisted", preventing them from showing up on the home page and all feeds.</p>
+            <p class="help">{{ __('settings.enable_unlisted_events_help') }}</p>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="enable_rsvps" value="1" {{ Setting::value('enable_rsvps') ? 'checked="checked"' : ''}}>
-                Enable RSVPs
+                {{ __('settings.enable_rsvps') }}
             </label>
-            <p class="help">When checked, events will have an "RSVP" button for logged-in users and will show who has RSVPd. When unchecked, RSVP webmentions will not be shown either.</p>
+            <p class="help">{{ __('settings.enable_rsvps_help') }}</p>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="show_rsvps_in_ics" value="1" {{ Setting::value('show_rsvps_in_ics') ? 'checked="checked"' : ''}}>
-                Show RSVPs in ICS Feeds
+                {{ __('settings.show_rsvps_in_ics') }}
             </label>
-            <p class="help">When checked, event names in the ics feeds will include the names of people who have RSVP'd to the event.</p>
+            <p class="help">{{ __('settings.show_rsvps_in_ics_help') }}</p>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="show_meeting_url_in_ics" value="1" {{ Setting::value('show_meeting_url_in_ics') ? 'checked="checked"' : ''}}>
-                Show meeting URL in ICS Feeds
+                {{ __('settings.show_meeting_url_in_ics') }}
             </label>
-            <p class="help">When checked, the meeting URL will always be included in ics feeds.</p>
+            <p class="help">{{ __('settings.show_meeting_url_in_ics_help') }}</p>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="clone_meeting_url" value="1" {{ Setting::value('clone_meeting_url') ? 'checked="checked"' : ''}}>
-                Clone meeting URL when cloning events
+                {{ __('settings.clone_meeting_url') }}
             </label>
-            <p class="help">When checked, cloning an event will also clone the meeting URL.</p>
+            <p class="help">{{ __('settings.clone_meeting_url_help') }}</p>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="enable_webmention_responses" value="1" {{ Setting::value('enable_webmention_responses') ? 'checked="checked"' : ''}}>
-                Enable Webmention Responses
+                {{ __('settings.enable_webmention_responses') }}
             </label>
-            <p class="help">Check this option to let people post comments and photos on events via <a href="https://webmention.net">Webmention</a>.</p>
+            <p class="help">{!! __('settings.enable_webmention_responses_help', ['webmention' => '<a href="https://webmention.net">Webmention</a>']) !!}</p>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="auth_hide_login" value="1" {{ Setting::value('auth_hide_login') ? 'checked="checked"' : ''}}>
-                Hide Log In Button
+                {{ __('settings.auth_hide_login') }}
             </label>
         </div>
 
         <div class="field">
             <label class="label">
                 <input type="checkbox" name="auth_hide_logout" value="1" {{ Setting::value('auth_hide_logout') ? 'checked="checked"' : ''}}>
-                Hide Log Out Button
+                {{ __('settings.auth_hide_logout') }}
             </label>
         </div>
 
@@ -112,23 +112,23 @@ use App\Setting;
 
     <div class="tab-content" id="tab-messages">
         <div class="field">
-            <label class="label">Add an Event</label>
+            <label class="label">{{ __('settings.add_an_event') }}</label>
             <textarea class="input" name="add_an_event" style="max-height: none; height: 25vh">{{ Setting::value('add_an_event') }}</textarea>
-            <div class="help">You can edit the text that appears on the "Add an Event" page for users. Use this to describe what kinds of events should be added to the website. Markdown and HTML are supported.</div>
+            <div class="help">{{ __('settings.add_an_event_help') }}</div>
         </div>
 
         <div class="field">
-            <label class="label">Photo Upload License</label>
+            <label class="label">{{ __('settings.photo_license') }}</label>
             <textarea class="input" name="photo_license" style="max-height: none; height: 25vh">{{ Setting::value('photo_license') }}</textarea>
-            <div class="help">This message will be displayed on the photo upload form. You can use it to indicate the license users grant when uploading photos. Markdown and HTML are supported.</div>
+            <div class="help">{{ __('settings.photo_license_help') }}</div>
         </div>
 
         <div class="field">
           <div class="control">
-            <label class="label">Default Code of Conduct URL</label>
+            <label class="label">{{ __('settings.default_coc_url') }}</label>
             <input class="input" type="url" value="{{ Setting::value('default_coc_url') }}" name="default_coc_url">
           </div>
-          <p class="help">Provide the URL to the community Code of Conduct. This will pre-fill when creating an event, but can be overridden per event if needed.</p>
+          <p class="help">{{ __('settings.default_coc_url_help') }}</p>
         </div>
     </div>
 
@@ -137,63 +137,63 @@ use App\Setting;
     <div class="tab-content" id="tab-design">
         <div class="field">
           <div class="control">
-            <label class="label">Logo URL</label>
+            <label class="label">{{ __('settings.logo_url') }}</label>
             <input class="input" type="url" value="{{ Setting::value('logo_url') }}" name="logo_url">
           </div>
-          <p class="help">Provide the URL to a logo to show in the top left corner of the website. If blank, just the website name will be displayed.</p>
+          <p class="help">{{ __('settings.logo_url_help') }}</p>
         </div>
 
         <div class="field is-grouped is-grouped-multiline">
             <div class="control is-expanded">
-                <label class="label">Logo Width (optional)</label>
+                <label class="label">{{ __('settings.logo_width') }}</label>
                 <input class="input" type="text" name="logo_width" autocomplete="off" value="{{ Setting::value('logo_width') }}">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Logo Height (optional)</label>
+                <label class="label">{{ __('settings.logo_height') }}</label>
                 <input class="input" type="text" name="logo_height" autocomplete="off" value="{{ Setting::value('logo_height') }}">
             </div>
-            <p class="help">Depending on your image, you may need to define the width and/or height. Make sure to include CSS units such as "80px"</p>
+            <p class="help">{{ __('settings.logo_size_help') }}</p>
         </div>
 
         <div class="field">
             <div class="control">
-                <label class="label">Favicon URL</label>
+                <label class="label">{{ __('settings.favicon_url') }}</label>
                 <input class="input" type="url" value="{{ Setting::value('favicon_url') }}" name="favicon_url">
             </div>
-            <p class="help">Provide the URL to a favicon to use on the website.</p>
+            <p class="help">{{ __('settings.favicon_url_help') }}</p>
         </div>
 
         <div class="field">
             <div class="control">
-                <label class="label">Manifest Logo URL</label>
+                <label class="label">{{ __('settings.manifest_logo_url') }}</label>
                 <input class="input" type="url" value="{{ Setting::value('manifest_logo_url') }}" name="manifest_logo_url">
             </div>
-            <p class="help">Provide the URL to a 192px square png logo for use in the <code>manifest.json</code> file, used when bookmarking the site to a phone's home screen.</p>
+            <p class="help">{!! __('settings.manifest_logo_url_help', ['manifest' => '<code>manifest.json</code>']) !!}</p>
         </div>
 
         <div class="field">
           <div class="control">
-            <label class="label">Home Page Social Image</label>
+            <label class="label">{{ __('settings.home_social_image_url') }}</label>
             <input class="input" type="url" value="{{ Setting::value('home_social_image_url') }}" name="home_social_image_url">
           </div>
-          <p class="help">Provide the URL to an image to use for the home page social sharing card. This will not be displayed on the website, it will only appear in Slack/Facebook/etc previews of the home page.</p>
+          <p class="help">{{ __('settings.home_social_image_url_help') }}</p>
         </div>
 
         <div class="field">
           <div class="control">
-            <label class="label">Home Page Meta Description</label>
+            <label class="label">{{ __('settings.home_meta_description') }}</label>
             <input class="input" type="text" value="{{ Setting::value('home_meta_description') }}" name="home_meta_description">
           </div>
-          <p class="help">This text will be used as the meta description of the home page, as well as the description for Slack/Facebook/etc cards.</p>
+          <p class="help">{{ __('settings.home_meta_description_help') }}</p>
         </div>
 
         <div class="field">
           <div class="control">
-            <label class="label">Custom CSS</label>
+            <label class="label">{{ __('settings.custom_global_css') }}</label>
             <textarea class="textarea" name="custom_global_css" rows="8">{{ Setting::value('custom_global_css') }}</textarea>
           </div>
-          <p class="help">Write custom CSS that will be included on every page. This can be used to, for example, add a site banner.</p>
+          <p class="help">{{ __('settings.custom_global_css_help') }}</p>
         </div>
 
 
@@ -203,29 +203,29 @@ use App\Setting;
     <div class="tab-content" id="tab-services">
         <div class="field">
           <div class="control">
-            <label class="label">Google Maps API Key</label>
+            <label class="label">{{ __('settings.googlemaps_api_key') }}</label>
             <input class="input" type="password" value="{{ Setting::value('googlemaps_api_key') ? '********' : '' }}" name="googlemaps_api_key" autocomplete="off">
           </div>
-          <p class="help">In order to search for locations and show maps, you'll need to get a <a href="https://developers.google.com/maps/documentation/javascript/get-api-key">Google Maps API key</a></p>
+          <p class="help">{!! __('settings.googlemaps_api_key_help', ['link' => '<a href="https://developers.google.com/maps/documentation/javascript/get-api-key">'.e(__('settings.googlemaps_api_key_link')).'</a>']) !!}</p>
         </div>
 
         <br>
 
         <div class="field">
           <div class="control">
-            <label class="label">Analytics</label>
+            <label class="label">{{ __('settings.analytics') }}</label>
             <textarea class="input" name="analytics" style="height:8em; font-family:courier; font-size: 0.8em;">{{ Setting::value('analytics') }}</textarea>
           </div>
-          <p class="help">Provide your website analytics tracking code here</p>
+          <p class="help">{{ __('settings.analytics_help') }}</p>
         </div>
 
         <br>
 
         <div class="field">
           <div class="control">
-            <label class="label">Event Page Embed</label>
+            <label class="label">{{ __('settings.event_page_embed') }}</label>
             <textarea class="input" name="event_page_embed" style="height:8em; font-family:courier; font-size: 0.8em;">{{ Setting::value('event_page_embed') }}</textarea>
-            <p class="help">Provide some HTML or JS that will be embedded on the event permalinks. You can use this to add external comments to event pages for example, such as using the <a href="https://meta.discourse.org/t/embedding-discourse-comments-via-javascript/31963">Discourse embed</a> code. The magic string <code>%EVENT_URL%</code> will be replaced with the full URL to the event page.</p>
+            <p class="help">{!! __('settings.event_page_embed_help', ['link' => '<a href="https://meta.discourse.org/t/embedding-discourse-comments-via-javascript/31963">'.e(__('settings.event_page_embed_link')).'</a>', 'magic_string' => '<code>%EVENT_URL%</code>']) !!}</p>
           </div>
         </div>
 
@@ -233,83 +233,83 @@ use App\Setting;
 
         <div class="field is-grouped is-grouped-multiline">
             <div class="control is-expanded">
-                <label class="label">Notification Endpoint</label>
+                <label class="label">{{ __('settings.notification_endpoint') }}</label>
                 <input class="input" type="url" value="{{ Setting::value('notification_endpoint') }}" name="notification_endpoint" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Notification Token</label>
+                <label class="label">{{ __('settings.notification_token') }}</label>
                 <input class="input" type="password" value="{{ Setting::value('notification_token') ? '********' : '' }}" name="notification_token" autocomplete="off">
             </div>
         </div>
         <div class="field is-grouped is-grouped-multiline">
             <div class="control is-expanded">
-                <label class="label">Primary Notification Channel</label>
+                <label class="label">{{ __('settings.notification_channel_primary') }}</label>
                 <input class="input" type="text" value="{{ Setting::value('notification_channel_primary') }}" name="notification_channel_primary" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Meta Notification Channel</label>
+                <label class="label">{{ __('settings.notification_channel_meta') }}</label>
                 <input class="input" type="text" value="{{ Setting::value('notification_channel_meta') }}" name="notification_channel_meta" autocomplete="off">
             </div>
         </div>
-        <p class="help">Notifications will be sent to this URL with the token in the Authorization header and the notification text in a form post parameter named "content". The primary channel will receive notifications before an event with a meeting URL starts. The meta channel will receive notifications about new and updated events.</p>
+        <p class="help">{{ __('settings.notifications_help') }}</p>
 
         <br>
 
         <div class="field is-grouped is-grouped-multiline">
             <div class="control is-expanded">
-                <label class="label">Mail From Address</label>
+                <label class="label">{{ __('settings.mail_from_address') }}</label>
                 <input class="input" type="email" value="{{ Setting::value('mail_from_address') }}" name="mail_from_address" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Mailgun Domain</label>
+                <label class="label">{{ __('settings.mailgun_domain') }}</label>
                 <input class="input" type="text" value="{{ Setting::value('mailgun_domain') }}" name="mailgun_domain" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Mailgun Secret</label>
+                <label class="label">{{ __('settings.mailgun_secret') }}</label>
                 <input class="input" type="password" value="{{ Setting::value('mailgun_secret') ? '********' : '' }}" name="mailgun_secret" autocomplete="off">
             </div>
         </div>
-        <p class="help">Configuring Mailgun enables this website to send email notifications for events that require registration.</p>
+        <p class="help">{{ __('settings.mailgun_help') }}</p>
 
         <br>
 
         <div class="field is-grouped is-grouped-multiline">
             <div class="control is-expanded">
-                <label class="label">Zoom Email</label>
+                <label class="label">{{ __('settings.zoom_email') }}</label>
                 <input class="input" type="email" value="{{ Setting::value('zoom_email') }}" name="zoom_email" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Zoom Account ID</label>
+                <label class="label">{{ __('settings.zoom_account_id') }}</label>
                 <input class="input" type="text" value="{{ Setting::value('zoom_account_id') }}" name="zoom_account_id" autocomplete="off">
             </div>
         </div>
         <div class="field is-grouped is-grouped-multiline">
             <div class="control is-expanded">
-                <label class="label">Zoom Client ID</label>
+                <label class="label">{{ __('settings.zoom_client_id') }}</label>
                 <input class="input" type="text" value="{{ Setting::value('zoom_client_id') }}" name="zoom_client_id" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Zoom Client Secret</label>
+                <label class="label">{{ __('settings.zoom_client_secret') }}</label>
                 <input class="input" type="password" value="{{ Setting::value('zoom_client_secret') ? '********' : '' }}" name="zoom_client_secret" autocomplete="off">
             </div>
 
             <div class="control is-expanded">
-                <label class="label">Zoom Webhook Secret</label>
+                <label class="label">{{ __('settings.zoom_webhook_secret') }}</label>
                 <input class="input" type="password" value="{{ Setting::value('zoom_webhook_secret') ? '********' : '' }}" name="zoom_webhook_secret" autocomplete="off">
             </div>
         </div>
-        <p class="help">Create a <a href="https://developers.zoom.us/docs/internal-apps/s2s-oauth/">Server-to-Server Zoom Application</a> and enter the details above to give people the option of scheduling a Zoom meeting when creating an event. Enter the email address of the Zoom account you want to use to schedule the meetings.</p>
+        <p class="help">{!! __('settings.zoom_help', ['link' => '<a href="https://developers.zoom.us/docs/internal-apps/s2s-oauth/">'.e(__('settings.zoom_link')).'</a>']) !!}</p>
 
     </div>
 
     <br><br>
-    <button class="button is-primary" type="submit">Save All Settings</button>
+    <button class="button is-primary" type="submit">{{ __('settings.save') }}</button>
 
 
 
