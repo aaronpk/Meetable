@@ -157,7 +157,7 @@ class ICSController extends BaseController
     public function tag(Request $request, $tag) {
         $tags = [];
         foreach(explode(',', $tag) as $t) {
-            $tags[] = Tag::get($t);
+            $tags[] = Tag::lookup($t);
         }
 
         $events = Event::where('unlisted', 0)

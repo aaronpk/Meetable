@@ -86,7 +86,7 @@ class Controller extends BaseController
     public function tag($tag) {
         $tags = [];
         foreach(explode(',', $tag) as $t) {
-            $tags[] = Tag::get($t);
+            $tags[] = Tag::lookup($t);
         }
 
         $year = $month = false;
@@ -132,7 +132,7 @@ class Controller extends BaseController
     public function tag_archive($tag) {
         $tags = [];
         foreach(explode(',', $tag) as $t) {
-            $tags[] = Tag::get($t);
+            $tags[] = Tag::lookup($t);
         }
 
         $events = $this->events_query(false, false, false, false);
@@ -157,7 +157,7 @@ class Controller extends BaseController
     public function year_tag($year, $tag) {
         $tags = [];
         foreach(explode(',', $tag) as $t) {
-            $tags[] = Tag::get($t);
+            $tags[] = Tag::lookup($t);
         }
 
         $now = new DateTime('now', new DateTimeZone('-12:00'));
