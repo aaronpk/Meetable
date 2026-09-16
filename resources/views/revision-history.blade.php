@@ -4,7 +4,7 @@
 <section class="section narrow">
 
 <div class="content">
-    <h1>Revision History for "{{ $event->name }}"</h1>
+    <h1>{{ __('revisions.history_for', ['name' => $event->name]) }}</h1>
 
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
 </div>
@@ -20,7 +20,7 @@
 			<div class="left">
 				<div class="change">
 					<a href="{{ route('view-revision-diff', [$event, $currentRevision]) }}">
-						{{ $currentRevision->edit_summary ?: '(no comment)' }}
+						{{ $currentRevision->edit_summary ?: __('revisions.no_comment') }}
 					</a>
 				</div>
 
@@ -29,24 +29,15 @@
 				</div>
 
 				<div class="meta">
-					<a href="{{ $currentRevision->lastModifiedBy->url }}" class="author">
-						{{ $currentRevision->lastModifiedBy->display_name() }}
-					</a>
-
-					made
-
-					{{ $currentRevision->num_changed_fields($previousRevision) }} changes
-
-					on 
-
-					<span title="{{ $currentRevision->updated_at->format('c') }}">
-						{{ \App\Helpers\Dates::format($currentRevision->updated_at, 'date_long') }}
-					</span>
+					{!! trans_choice('revisions.made_changes', $currentRevision->num_changed_fields($previousRevision), [
+						'author' => '<a href="'.e($currentRevision->lastModifiedBy->url).'" class="author">'.e($currentRevision->lastModifiedBy->display_name()).'</a>',
+						'date' => '<span title="'.e($currentRevision->updated_at->format('c')).'">'.e(\App\Helpers\Dates::format($currentRevision->updated_at, 'date_long')).'</span>',
+					]) !!}
 				</div>
 			</div>
 			<div class="right">
 				<a href="{{ route('view-revision-diff', [$event, $currentRevision]) }}" class="ui button is-small is-light">
-					diff
+					{{ __('revisions.diff') }}
 				</a>
 				<a href="{{ route('view-revision', [$event, $currentRevision]) }}" class="ui button is-small is-light">
 					<span class="icon">@icon(eye)</span>
@@ -65,10 +56,9 @@
 						{{ $currentRevision->lastModifiedBy->display_name() }}
 					</a>
 					<a href="{{ route('view-revision', [$event, $currentRevision]) }}">
-						created this event on
-						<span title="{{ $currentRevision->updated_at->format('c') }}">
-							{{ \App\Helpers\Dates::format($currentRevision->created_at, 'date_long') }}
-						</span>
+						{!! __('revisions.created_event', [
+							'date' => '<span title="'.e($currentRevision->updated_at->format('c')).'">'.e(\App\Helpers\Dates::format($currentRevision->created_at, 'date_long')).'</span>',
+						]) !!}
 					</a>
 				</div>
 

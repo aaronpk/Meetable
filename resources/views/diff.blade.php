@@ -55,31 +55,23 @@ td.diff-container td {
 </style>
 
 <div class="content">
-	<h1>Differences between revisions of "{{ $current->name }}"</h1>
+	<h1>{{ __('revisions.differences', ['name' => $current->name]) }}</h1>
 
 	<div class="meta">
-		<a href="{{ $current->lastModifiedBy->url }}" class="author">
-			{{ $current->lastModifiedBy->display_name() }}
-		</a>
-
-		made
-
-		{{ $current->num_changed_fields($previous) }} changes
-
-		on 
-
-		<span title="{{ $current->updated_at->format('c') }}">
-			{{ \App\Helpers\Dates::format($current->updated_at, 'date_long') }}
-			at 
-			{{ \App\Helpers\Dates::format($current->updated_at, 'time') }} UTC
-		</span>
+		{!! trans_choice('revisions.made_changes', $current->num_changed_fields($previous), [
+			'author' => '<a href="'.e($current->lastModifiedBy->url).'" class="author">'.e($current->lastModifiedBy->display_name()).'</a>',
+			'date' => '<span title="'.e($current->updated_at->format('c')).'">'.e(__('revisions.date_at_time_utc', [
+				'date' => \App\Helpers\Dates::format($current->updated_at, 'date_long'),
+				'time' => \App\Helpers\Dates::format($current->updated_at, 'time'),
+			])).'</span>',
+		]) !!}
 	</div>
 
 	<div class="narrow">
 
 		<div style="margin-top: 1em;" class="nav-links">
-			<a href="{{ route('revision-history', $event_id) }}">@icon(arrow-circle-left) back</a>
-			<a href="{{ route('view-revision', [$event_id, $current]) }}">@icon(eye) view</a>
+			<a href="{{ route('revision-history', $event_id) }}">@icon(arrow-circle-left) {{ __('revisions.back') }}</a>
+			<a href="{{ route('view-revision', [$event_id, $current]) }}">@icon(eye) {{ __('revisions.view') }}</a>
 		</div>
 
 		<table class="diffs">
