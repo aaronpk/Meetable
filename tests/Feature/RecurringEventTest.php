@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Event;
+use App\Response;
+use App\Tag;
 use DateTime;
 use Tests\CreatesEvents;
 use Tests\TestCase;
@@ -11,9 +13,23 @@ class RecurringEventTest extends TestCase
 {
     use CreatesEvents;
 
+    private $tag_prefix;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->tag_prefix = 'rt'.uniqid();
+    }
+
     protected function tearDown(): void
     {
+        $ids = Event::withTrashed()->whereIn('name', $this->test_event_names)->pluck('id');
+        Response::withTrashed()->whereIn('event_id', $ids)->forceDelete();
+
         $this->deleteTestData();
+
+        Tag::where('tag', 'like', $this->tag_prefix.'%')->delete();
 
         parent::tearDown();
     }
@@ -153,6 +169,142 @@ class RecurringEventTest extends TestCase
             $this->assertEquals((new DateTime($occurrence->start_date))->modify('+1 day')->format('Y-m-d'), $occurrence->end_date);
             $this->assertEquals('Agenda: https://example.com/agenda/'.$occurrence->start_date, $occurrence->description);
         }
+    }
+
+    private function weeklyTemplate(array $fields = []): Event
+    {
+        return $this->createTemplate(new DateTime('+1 day'), 'weekly_dow', array_merge([
+            'start_time' => '18:00',
+            'timezone' => 'UTC',
+            'description' => 'Weekly meetup',
+            'tags' => $this->tag_prefix.'-a',
+        ], $fields));
+    }
+
+    // Saves the template through the edit form, keeping the fields that aren't given
+    private function saveTemplate(Event $template, array $fields): Event
+    {
+        $this->actingAs($this->testUser())
+            ->post('/event/'.$template->id.'/save', array_merge([
+                'name' => $template->name,
+                'start_date' => $template->start_date,
+                'start_time' => $template->start_time ? substr($template->start_time, 0, 5) : null,
+                'timezone' => $template->timezone,
+                'status' => $template->status,
+                'description' => $template->description,
+                'recurrence_interval' => $template->recurrence_interval,
+                'tags' => implode(' ', $template->tags()->pluck('tag')->all()),
+            ], $fields))
+            ->assertRedirect(route('templates'));
+
+        return $template->fresh();
+    }
+
+    private function rsvp(Event $event): Response
+    {
+        $response = new Response;
+        $response->event_id = $event->id;
+        $response->url = 'https://example.com/rsvp/'.uniqid();
+        $response->rsvp = 'yes';
+        $response->approved = true;
+        $response->save();
+        return $response;
+    }
+
+    public function testEditingATemplateUpdatesItsOccurrencesInPlace()
+    {
+        $template = $this->weeklyTemplate();
+        $before = $this->instancesOf($template);
+        $this->assertGreaterThan(1, count($before));
+
+        $rsvp = $this->rsvp($before[0]);
+
+        $this->saveTemplate($template, ['description' => 'Weekly meetup, now with snacks', 'start_time' => '19:30']);
+
+        $after = $this->instancesOf($template);
+        $this->assertEquals($before->pluck('id')->all(), $after->pluck('id')->all());
+        $this->assertEquals($before->pluck('key')->all(), $after->pluck('key')->all());
+
+        foreach($after as $occurrence) {
+            $this->assertEquals('Weekly meetup, now with snacks', $occurrence->description);
+            $this->assertEquals('19:30:00', $occurrence->start_time);
+            $this->assertEquals($occurrence->start_date.' 19:30:00', $occurrence->sort_date);
+        }
+
+        $this->assertEquals($before[0]->id, $rsvp->fresh()->event_id);
+        $this->assertEquals(1, $after[0]->rsvps()->count());
+    }
+
+    public function testPropertiesEditedOnAnOccurrenceAreKept()
+    {
+        $template = $this->weeklyTemplate();
+        $customized = $this->instancesOf($template)[1];
+        $customized->description = 'Special guest speaker this week';
+        $customized->save();
+
+        $this->saveTemplate($template, ['description' => 'Weekly meetup, now with snacks', 'start_time' => '19:30']);
+
+        $occurrences = $this->instancesOf($template);
+        $this->assertEquals('Weekly meetup, now with snacks', $occurrences[0]->description);
+        $this->assertEquals('Special guest speaker this week', $occurrences[1]->description);
+        $this->assertEquals('19:30:00', $occurrences[1]->start_time);
+    }
+
+    public function testTagChangesSkipOccurrencesWithTheirOwnTags()
+    {
+        $template = $this->weeklyTemplate();
+        $customized = $this->instancesOf($template)[1];
+        $customized->tags()->sync([Tag::get($this->tag_prefix.'-custom')->id]);
+
+        $this->saveTemplate($template, ['tags' => $this->tag_prefix.'-a '.$this->tag_prefix.'-b']);
+
+        $occurrences = $this->instancesOf($template);
+        $this->assertEquals([$this->tag_prefix.'-a', $this->tag_prefix.'-b'], $occurrences[0]->tags()->pluck('tag')->sort()->values()->all());
+        $this->assertEquals([$this->tag_prefix.'-custom'], $occurrences[1]->tags()->pluck('tag')->all());
+    }
+
+    public function testChangingTheScheduleReplacesOccurrencesThatAreNoLongerOnIt()
+    {
+        $template = $this->weeklyTemplate();
+        $original = $this->instancesOf($template);
+        $original_dates = $original->pluck('start_date')->all();
+        $this->rsvp($original[0]);
+
+        // Move the series one day later in the week
+        $next_day = (new DateTime($template->start_date))->modify('+1 day')->format('Y-m-d');
+        $template = $this->saveTemplate($template, ['start_date' => $next_day]);
+
+        $moved = $this->instancesOf($template);
+        $this->assertGreaterThan(0, count($moved));
+        $this->assertEmpty(array_intersect($original_dates, $moved->pluck('start_date')->all()));
+        foreach($moved as $occurrence) {
+            $this->assertEquals((new DateTime($next_day))->format('l'), (new DateTime($occurrence->start_date))->format('l'));
+        }
+        $this->assertTrue(Event::withTrashed()->find($original[0]->id)->trashed());
+
+        // And back again, which schedules fresh occurrences on the original dates
+        $template = $this->saveTemplate($template, ['start_date' => $original_dates[0]]);
+
+        $back = $this->instancesOf($template);
+        $this->assertEquals($original_dates, $back->pluck('start_date')->all());
+        $this->assertEmpty(array_intersect($original->pluck('id')->all(), $back->pluck('id')->all()));
+    }
+
+    public function testAnOccurrenceDeletedByHandStaysDeletedWhenTheTemplateIsSaved()
+    {
+        $template = $this->weeklyTemplate();
+        $occurrences = $this->instancesOf($template);
+
+        $this->actingAs($this->testUser())
+            ->post('/event/'.$occurrences[1]->id.'/delete')
+            ->assertRedirect();
+
+        $this->saveTemplate($template, ['description' => 'Weekly meetup, now with snacks']);
+
+        $this->assertEquals(
+            $occurrences->pluck('id')->forget(1)->values()->all(),
+            $this->instancesOf($template)->pluck('id')->all()
+        );
     }
 
     private function createTemplate(DateTime $start, string $interval, array $fields = []): Event

@@ -565,12 +565,16 @@ class Event extends Model
      * Every date this event recurs on between its start and the end of the window
      * we schedule ahead.
      */
-    public function recurrence_dates() {
+    public function recurrence_dates(?DateTime $until = null) {
         $start = $this->start_datetime();
         $end = $this->recurrence_end_datetime();
 
         if(!$end)
             return [];
+
+        // Allow looking further ahead than the window occurrences are created in
+        if($until && $until > $end)
+            $end = $until;
 
         if($interval = $this->recurrence_date_interval())
             return iterator_to_array(new DatePeriod($start, $interval, $end));
@@ -694,6 +698,88 @@ class Event extends Model
                 }
             }
         }
+    }
+
+    /**
+     * Applies a template's changes to its upcoming occurrences after the template is saved.
+     *
+     * Occurrences that are no longer on the schedule are deleted. The rest keep their
+     * URL, RSVPs and responses, and pick up each changed property unless it was edited
+     * on the occurrence itself, meaning it no longer matches what the template's previous
+     * values gave it. Then any newly scheduled dates get occurrences.
+     */
+    public function sync_upcoming_recurrences(array $previous, array $previous_tags) {
+        $today = date('Y-m-d');
+
+        $occurrences = Event::where('created_from_template_event_id', $this->id)
+            ->where('start_date', '>', $today)
+            ->with('tags')
+            ->get();
+
+        $latest = $occurrences->map(function($o){ return $o->created_from_template_date ?: $o->start_date; })->max();
+        $scheduled = array_map(function($date){
+            return $date->format('Y-m-d');
+        }, $this->recurrence_dates($latest ? new DateTime($latest.' 23:59:59') : null));
+
+        $current = $this->fresh()->getAttributes();
+        $current_tags = $this->tags()->get();
+        $properties = array_diff(self::$EDITABLE_PROPERTIES, ['start_date', 'recurrence_interval', 'recurrence_interval_count']);
+
+        $normalize = function($value) {
+            return $value === null ? '' : (string)$value;
+        };
+
+        foreach($occurrences as $occurrence) {
+            $scheduled_date = $occurrence->created_from_template_date ?: $occurrence->start_date;
+
+            if(!in_array($scheduled_date, $scheduled)) {
+                Log::info('  Removing occurrence on '.$scheduled_date.' that is no longer on the schedule');
+                // Forget the date so the occurrence is created again if the schedule changes back
+                $occurrence->created_from_template_date = null;
+                $occurrence->save();
+                $occurrence->delete();
+                continue;
+            }
+
+            $date = new DateTime($scheduled_date);
+            $moved = $occurrence->start_date != $scheduled_date;
+            $changed = [];
+
+            foreach($properties as $property) {
+                // A moved occurrence keeps the dates it was moved to
+                if($property == 'end_date' && $moved)
+                    continue;
+
+                $old_value = self::occurrence_value($previous, $property, $date);
+                $new_value = self::occurrence_value($current, $property, $date);
+
+                if($normalize($old_value) !== $normalize($new_value)
+                    && $normalize($occurrence->{$property}) === $normalize($old_value)) {
+                    $occurrence->{$property} = $new_value;
+                    $changed[] = $property;
+                }
+            }
+
+            $occurrence_tags = $occurrence->tags->pluck('tag')->sort()->values()->all();
+            $new_tags = $current_tags->pluck('tag')->sort()->values()->all();
+            $old_tags = collect($previous_tags)->sort()->values()->all();
+
+            if($old_tags != $new_tags && $occurrence_tags == $old_tags) {
+                $occurrence->tags()->sync($current_tags->pluck('id')->all());
+                $changed[] = 'tags';
+            }
+
+            if($changed) {
+                $occurrence->sort_date = $occurrence->sort_date();
+                $occurrence->save();
+
+                $revision = EventRevision::createFromEvent($occurrence);
+                $revision->edit_summary = 'Updated from the recurring event template';
+                $revision->save();
+            }
+        }
+
+        $this->create_upcoming_recurrences();
     }
 
     public function delete_upcoming_recurrences() {

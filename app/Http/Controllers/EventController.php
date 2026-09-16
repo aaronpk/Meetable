@@ -287,6 +287,13 @@ class EventController extends BaseController
         }
 
 
+        // What the template gave its occurrences before this edit, to tell which of
+        // their properties were changed on the occurrence itself
+        if($event->is_template) {
+            $previous_template = $event->getAttributes();
+            $previous_template_tags = $event->tags()->pluck('tag')->all();
+        }
+
         // Update the properties on the event
         foreach(Event::$EDITABLE_PROPERTIES as $p) {
             $event->{$p} = (request($p) ?: null);
@@ -353,8 +360,7 @@ class EventController extends BaseController
         event(new EventUpdated($event, $revision));
 
         if($event->is_template) {
-            $event->delete_upcoming_recurrences();
-            $event->create_upcoming_recurrences();
+            $event->sync_upcoming_recurrences($previous_template, $previous_template_tags);
             return redirect(route('templates'));
         } else {
             return redirect($event->permalink());
