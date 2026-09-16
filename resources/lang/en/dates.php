@@ -19,6 +19,8 @@ return [
     'month_day' => 'MMM D',
     // June 3
     'month_day_long' => 'MMMM D',
+    // Tuesday, June 3
+    'weekday_month_day_long' => 'dddd, MMMM D',
     // 3, 2031 (the end of a range within one month, like "Jun 3 - 5, 2031")
     'day_year' => 'D, YYYY',
     // June

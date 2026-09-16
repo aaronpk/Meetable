@@ -374,13 +374,18 @@ class Event extends Model
         return $end;
     }
 
-    public function display_date() {
+    // e.g. "June 17, 2031", or "Tuesday, June 17, 2031" with the weekday
+    public function display_date($with_weekday = false) {
         $start_date = new DateTime($this->start_date);
 
         if($this->is_multiday()) {
             $end_date = new DateTime($this->end_date);
 
-            if($start_date->format('Y') != $end_date->format('Y')) {
+            if($with_weekday) {
+                // Each end of the range names its own weekday, so the month is repeated too
+                $start_format = $start_date->format('Y') != $end_date->format('Y') ? 'date_full' : 'weekday_month_day_long';
+                $end_format = 'date_full';
+            } elseif($start_date->format('Y') != $end_date->format('Y')) {
                 $start_format = 'date_long';
                 $end_format = 'date_long';
             } elseif($start_date->format('m') == $end_date->format('m')) {
@@ -394,7 +399,7 @@ class Event extends Model
             return __('dates.range', ['start' => Dates::format($start_date, $start_format), 'end' => Dates::format($end_date, $end_format)]);
 
         } else {
-            return Dates::format($start_date, 'date_long');
+            return Dates::format($start_date, $with_weekday ? 'date_full' : 'date_long');
         }
     }
 

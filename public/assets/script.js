@@ -8,13 +8,14 @@ $(function(){
   // Add local time info into the tooltip in the event lists
   $(".event-localize-date").each(function(){
     var date = new Date($(this).attr("datetime"));
+    var end = $(this).data("end") ? new Date($(this).data("end")) : null;
     var event_time = $(this).data("event-time");
     var local_time;
     var tooltip="";
     if($(this).data("dateformat") == "dateonly") {
-        local_time = date_to_display_date(date);
+        local_time = date_to_display_date(date, end);
     } else if($(this).data("dateformat") == "timeonly") {
-        local_time = date_to_display_time(date);
+        local_time = date_to_display_time(date, end);
     } else {
         local_time = date_to_display_datetime(date);
     }
@@ -205,17 +206,32 @@ function date_to_display_datetime(date) {
   });
 }
 
-function date_to_display_time(date) {
-  return date.toLocaleString(page_locale(), {
+// Formats a start time, or a range like "6:30 – 8:00 PM" when there is an end
+function date_to_display_time(date, end) {
+  var format = new Intl.DateTimeFormat(page_locale(), {
     hour:'numeric',
     minute: '2-digit'
   });
+  if(!end) {
+    return format.format(date);
+  }
+  if(format.formatRange) {
+    return format.formatRange(date, end);
+  }
+  return format.format(date) + " – " + format.format(end);
 }
 
-function date_to_display_date(date) {
-  return date.toLocaleString(page_locale(), {
+// Formats a date with its weekday. With an end, this is one date when the event starts
+// and ends on the same day where the viewer is, or a range when it crosses midnight.
+function date_to_display_date(date, end) {
+  var format = new Intl.DateTimeFormat(page_locale(), {
+    weekday: 'long',
     year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
+  if(end && format.formatRange) {
+    return format.formatRange(date, end);
+  }
+  return format.format(date);
 }
