@@ -560,7 +560,7 @@ class EventController extends BaseController
     }
 
     public function edit_registration(Event $event) {
-        Gate::authorize('create-event');
+        Gate::authorize('manage-event', $event);
 
 
 
