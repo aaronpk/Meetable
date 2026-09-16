@@ -47,9 +47,11 @@ return [
 
     'all_queries' => [
         /*
-         * Whether all SQL queries should be logged
+         * Whether all SQL queries should be logged. Queries are written with their
+         * values filled in, including settings secrets and API tokens, so this is
+         * off unless SQL_LOGGER_ALL_QUERIES_ENABLED=true is set for debugging.
          */
-        'enabled' => env('SQL_LOGGER_ALL_QUERIES_ENABLED', true),
+        'enabled' => env('SQL_LOGGER_ALL_QUERIES_ENABLED', false),
 
         /*
          * Whether log (for all queries, not for slow queries) should be overridden.
