@@ -75,7 +75,7 @@ class AuthController extends BaseController
         // Record the nonce as used here so the link only works once.
         $nonce = (string)request('nonce');
         if(!$nonce || !Cache::add('passkey-link-used:'.$nonce, true, now()->addDay()))
-            abort(403, 'This link has already been used');
+            abort(403, __('login.passkey.link_used'));
 
         Auth::login($user);
         session()->regenerate();

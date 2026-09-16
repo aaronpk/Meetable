@@ -26,6 +26,7 @@ return [
         'default_name' => 'Passkey',
         'register' => 'Register passkey',
         'register_failed' => 'Something went wrong, try again!',
+        'link_used' => 'This link has already been used',
     ],
 
     'errors' => [
