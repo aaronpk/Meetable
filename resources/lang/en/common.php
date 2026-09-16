@@ -27,6 +27,7 @@ return [
     'edit' => 'Edit',
     'save' => 'Save',
     'delete' => 'Delete',
+    'cancel' => 'Cancel',
     'close' => 'close',
 
     // :meetable is a link to the Meetable project

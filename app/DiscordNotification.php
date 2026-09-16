@@ -87,8 +87,6 @@ class DiscordNotification extends Model
 
     public function timeBeforeText() {
         list($number, $unit) = $this->timeBeforeParts();
-        if($number == 1)
-            $unit = rtrim($unit, 's');
-        return $number.' '.$unit;
+        return trans_choice('discord.durations.'.$unit, $number);
     }
 }

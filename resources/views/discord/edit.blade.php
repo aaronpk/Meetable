@@ -10,7 +10,7 @@ $channel_id = old('channel_id', $notification->channel_id);
 @section('content')
 <section class="section">
 
-<h2 class="title">{{ $notification->id ? 'Edit' : 'Add' }} Discord Notification</h2>
+<h2 class="title">{{ $notification->id ? __('discord.form.edit_title') : __('discord.form.add_title') }}</h2>
 
 @if($form_errors = session('discord-errors'))
     <div class="notification is-danger">
@@ -20,13 +20,13 @@ $channel_id = old('channel_id', $notification->channel_id);
     </div>
 @endif
 @if($error)
-    <div class="notification is-danger">Could not load the list of channels from Discord. {{ $error }}</div>
+    <div class="notification is-danger">{{ __('discord.form.channels_failed') }} {{ $error }}</div>
 @endif
 
 <form action="{{ route('save-discord-notification') }}" method="post">
 
     <div class="field">
-        <label class="label" for="tag">Event Tag</label>
+        <label class="label" for="tag">{{ __('discord.form.tag') }}</label>
         <div class="control">
             <input class="input" type="text" name="tag" id="tag" list="tag-list" required autocomplete="off" value="{{ old('tag', $notification->tag) }}">
             <datalist id="tag-list">
@@ -35,74 +35,74 @@ $channel_id = old('channel_id', $notification->channel_id);
                 @endforeach
             </datalist>
         </div>
-        <p class="help">A message will be posted for upcoming events that have this tag.</p>
+        <p class="help">{{ __('discord.form.tag_help') }}</p>
     </div>
 
     <div class="field">
-        <label class="label" for="channel_id">Discord Channel</label>
+        <label class="label" for="channel_id">{{ __('discord.form.channel') }}</label>
         <div class="control">
             <div class="select">
                 <select name="channel_id" id="channel_id" required>
-                    <option value="">Choose a channel</option>
+                    <option value="">{{ __('discord.form.choose_channel') }}</option>
                     @php $current_category = null; @endphp
                     @foreach($channels as $channel)
                         @if($channel['category'] !== $current_category)
                             @if($current_category !== null)</optgroup>@endif
-                            <optgroup label="{{ $channel['category'] ?: 'No category' }}">
+                            <optgroup label="{{ $channel['category'] ?: __('discord.form.no_category') }}">
                             @php $current_category = $channel['category']; @endphp
                         @endif
-                        <option value="{{ $channel['id'] }}" {{ $channel['id'] === $channel_id ? 'selected' : '' }}>#{{ $channel['name'] }}{{ $channel['can_post'] ? '' : ' (bot needs access)' }}</option>
+                        <option value="{{ $channel['id'] }}" {{ $channel['id'] === $channel_id ? 'selected' : '' }}>#{{ $channel['name'] }}{{ $channel['can_post'] ? '' : ' '.__('discord.form.bot_needs_access_option') }}</option>
                     @endforeach
                     @if($current_category !== null)</optgroup>@endif
                 </select>
             </div>
         </div>
         @if(collect($channels)->contains('can_post', false))
-            <p class="help">Channels marked "bot needs access" are private to the bot. {{ App\Services\Discord::channelAccessHelp() }}</p>
+            <p class="help">{{ __('discord.form.private_channels_help') }} {{ App\Services\Discord::channelAccessHelp() }}</p>
         @endif
     </div>
 
     <div class="field">
-        <label class="label" for="time_before">Time Before the Event</label>
+        <label class="label" for="time_before">{{ __('discord.form.time_before') }}</label>
         <div class="field has-addons">
             <div class="control">
                 <input class="input" type="number" name="time_before" id="time_before" min="1" step="1" required value="{{ $time_before }}" style="width: 8em;">
             </div>
             <div class="control">
                 <div class="select">
-                    <select name="time_unit" aria-label="Unit">
+                    <select name="time_unit" aria-label="{{ __('discord.form.unit') }}">
                         @foreach(App\DiscordNotification::$TIME_UNITS as $unit => $minutes)
-                            <option value="{{ $unit }}" {{ $unit == $time_unit ? 'selected' : '' }}>{{ $unit }}</option>
+                            <option value="{{ $unit }}" {{ $unit == $time_unit ? 'selected' : '' }}>{{ __('discord.units.'.$unit) }}</option>
                         @endforeach
                     </select>
                 </div>
             </div>
         </div>
-        <p class="help">How long before the event starts to post the message, up to 30 days. Events without a start time are treated as starting at midnight.</p>
+        <p class="help">{{ __('discord.form.time_before_help') }}</p>
     </div>
 
     <div class="field">
-        <label class="label" for="message">Message</label>
+        <label class="label" for="message">{{ __('discord.form.message') }}</label>
         <div class="control">
             <textarea class="textarea" name="message" id="message" rows="4" maxlength="2000">{{ old('message', $notification->message) }}</textarea>
         </div>
-        <p class="help">This text is posted along with the event's name, link, time, location and meeting link.
-            You can use Discord formatting, and mention a role with <code>&lt;@&amp;role-id&gt;</code>. Mentioning @everyone or @here is disabled.</p>
+        <p class="help">{{ __('discord.form.message_help') }}
+            {!! __('discord.form.mentions_help', ['role_mention' => '<code>&lt;@&amp;role-id&gt;</code>']) !!}</p>
     </div>
 
     <div class="field">
         <label class="checkbox">
             <input type="checkbox" name="enabled" value="1" {{ (old() ? old('enabled') : $notification->enabled) ? 'checked' : '' }}>
-            Enabled
+            {{ __('discord.form.enabled') }}
         </label>
     </div>
 
     <div class="field is-grouped">
         <div class="control">
-            <button type="submit" class="button is-primary">Save</button>
+            <button type="submit" class="button is-primary">{{ __('common.save') }}</button>
         </div>
         <div class="control">
-            <a href="{{ route('discord-notifications') }}" class="button is-light">Cancel</a>
+            <a href="{{ route('discord-notifications') }}" class="button is-light">{{ __('common.cancel') }}</a>
         </div>
     </div>
 

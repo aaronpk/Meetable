@@ -68,7 +68,7 @@ class Discord {
 
     private static function errorMessage($response) {
         $message = $response->json('message') ?: $response->body();
-        return 'Discord API error ('.$response->status().'): '.$message;
+        return __('discord.api_error', ['status' => $response->status(), 'message' => $message]);
     }
 
     // Returns the guild if the bot is a member of it, or null if not
@@ -206,9 +206,9 @@ class Discord {
         try {
             $name = self::botUser()['username'];
         } catch(DiscordException $e) {
-            $name = 'the bot';
+            $name = __('discord.the_bot');
         }
-        return 'In Discord, edit the channel\'s permissions and allow the "'.$name.'" role or member to View Channel, Send Messages and Embed Links.';
+        return __('discord.access_help', ['bot' => $name]);
     }
 
     public static function forgetChannels() {
@@ -218,7 +218,7 @@ class Discord {
     // Posts a message and returns the Discord message ID
     public static function sendMessage($channel_id, array $payload) {
         if(!self::botConfigured())
-            throw new DiscordException('The Discord bot token is not configured');
+            throw new DiscordException(__('discord.token_not_configured'));
 
         $url = self::API.'/channels/'.$channel_id.'/messages';
 
@@ -249,7 +249,7 @@ class Discord {
         } else {
             $when = \App\Helpers\Dates::format($start, 'date_full');
         }
-        $fields[] = ['name' => 'When', 'value' => $when, 'inline' => false];
+        $fields[] = ['name' => __('discord.embed.when'), 'value' => $when, 'inline' => false];
 
         if($event->has_physical_location()) {
             $where = implode(', ', array_filter([
@@ -258,15 +258,15 @@ class Discord {
                 $event->location_region,
             ]));
             if($where)
-                $fields[] = ['name' => 'Where', 'value' => Str::limit($where, 1000), 'inline' => false];
+                $fields[] = ['name' => __('discord.embed.where'), 'value' => Str::limit($where, 1000), 'inline' => false];
         }
 
         if($event->meeting_url) {
-            $fields[] = ['name' => 'Join', 'value' => Str::limit($event->meeting_url, 1000), 'inline' => false];
+            $fields[] = ['name' => __('discord.embed.join'), 'value' => Str::limit($event->meeting_url, 1000), 'inline' => false];
         }
 
         if($event->status && $event->status != 'confirmed') {
-            $fields[] = ['name' => 'Status', 'value' => Event::status_label($event->status), 'inline' => false];
+            $fields[] = ['name' => __('discord.embed.status'), 'value' => Event::status_label($event->status), 'inline' => false];
         }
 
         $embed = [
