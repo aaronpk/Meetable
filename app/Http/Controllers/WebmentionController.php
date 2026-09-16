@@ -116,10 +116,12 @@ class WebmentionController extends BaseController
         // Reset approval on updates, requiring moderation again
         $response->approved = false;
 
-        // If the webmention is from a user who has logged in, approve it immediately
+        // If the webmention is from a user who has logged in, approve it immediately.
+        // The source has to be within the user's URL, not just on the same host, so a
+        // user whose URL is https://github.com/someone doesn't approve every GitHub page.
         $users = User::where('url', 'like', '%'.parse_url($sourceURL, PHP_URL_HOST).'%')->get();
         foreach($users as $user) {
-            if(\p3k\url\host_matches($sourceURL, $user->url)) {
+            if(\App\Helpers\Uri::url_is_under($sourceURL, $user->url)) {
                 $response->approved = true;
                 $response->approved_at = date('Y-m-d H:i:s');
             }

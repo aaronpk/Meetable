@@ -402,6 +402,37 @@ class DiscordNotificationTest extends TestCase
             ->assertSee('Discord API error (403): internal network error');
     }
 
+    public function testTheInstallCallbackOnlySavesAServerTheBotIsIn()
+    {
+        $this->setEnv('DISCORD_SERVER_ID', null);
+        \App\Setting::$cached = [];
+        $previous = \App\Setting::value('discord_guild_id');
+
+        Http::fake([
+            'discord.com/api/v10/guilds/2000' => Http::response(['message' => 'Missing Access', 'code' => 50001], 403),
+            'discord.com/api/v10/guilds/3000' => Http::response(['id' => '3000', 'name' => 'Real Server']),
+        ]);
+
+        $this->actingAs($this->testUser())
+            ->withSession(['DISCORD_INSTALL_STATE' => 'expected'])
+            ->get('/discord/install?state=expected&guild_id=2000')
+            ->assertSessionHas('discord-error');
+
+        \App\Setting::$cached = [];
+        $this->assertEquals($previous, \App\Setting::value('discord_guild_id'));
+
+        $this->actingAs($this->testUser())
+            ->withSession(['DISCORD_INSTALL_STATE' => 'expected'])
+            ->get('/discord/install?state=expected&guild_id=3000')
+            ->assertSessionHas('discord-success', 'The bot was installed in Real Server');
+
+        \App\Setting::$cached = [];
+        $this->assertEquals('3000', \App\Setting::value('discord_guild_id'));
+
+        \App\Setting::set('discord_guild_id', $previous);
+        \App\Setting::$cached = [];
+    }
+
     public function testThePagesAreOnlyAvailableOnSitesUsingDiscordLogin()
     {
         $this->get('/discord')->assertRedirect();

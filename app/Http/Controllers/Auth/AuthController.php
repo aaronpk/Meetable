@@ -43,7 +43,7 @@ class AuthController extends BaseController
             if(Auth::user())
                 return redirect('/');
 
-            session(['AUTH_RETURN_TO' => request()->headers->get('referer')]);
+            session(['AUTH_RETURN_TO' => \App\Helpers\Uri::same_origin_path(request()->headers->get('referer'))]);
             return redirect(Auth::guard()->login_url());
         }
     }
