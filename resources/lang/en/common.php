@@ -26,6 +26,8 @@ return [
 
     'edit' => 'Edit',
     'save' => 'Save',
+    'delete' => 'Delete',
+    'close' => 'close',
 
     // :meetable is a link to the Meetable project
     'footer' => 'powered by :meetable, an open source event listing website',

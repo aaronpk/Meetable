@@ -478,7 +478,7 @@ use App\Setting;
                     <p class="original-source">{!! __('responses.photo_via', ['source' => '<a href=""></a>']) !!}</p>
                 </div>
             </div>
-            <button class="modal-close is-large" aria-label="close"></button>
+            <button class="modal-close is-large" aria-label="{{ __('common.close') }}"></button>
         </div>
     @endif
 

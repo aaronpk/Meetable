@@ -1,6 +1,6 @@
                 @if($response->is_like)
                     <div class="like-of" style="display: flex;">
-                        <span class="icon">@icon(star)</span> {{ $response->author_display_name() }} likes this
+                        <span class="icon">@icon(star)</span> {{ __('responses.likes_this', ['name' => $response->author_display_name()]) }}
                     </div>
                 @else
                     @if($response->name)
@@ -29,24 +29,16 @@
                 @endif
                 @if($response->source_url)
                     <span class="meta">
-                        Webmention Received
-                        <time datetime="{{ date('c', strtotime($response->created_at)) }}">
-                            {{ \App\Helpers\Dates::format($response->created_at, 'datetime') }}
-                        </time>
-                        from
-                        <a href="{{ \App\Helpers\Uri::safe_href($response->source_url) }}">
-                            {{ parse_url($response->source_url, PHP_URL_HOST) }}
-                        </a>
+                        {!! __('responses.webmention_received', [
+                            'date' => '<time datetime="'.e(date('c', strtotime($response->created_at))).'">'.e(\App\Helpers\Dates::format($response->created_at, 'datetime')).'</time>',
+                            'source' => '<a href="'.e(\App\Helpers\Uri::safe_href($response->source_url)).'">'.e(parse_url($response->source_url, PHP_URL_HOST)).'</a>',
+                        ]) !!}
                     </span>
                 @elseif($response->created_by)
                     <span class="meta">
-                        Added
-                        <time datetime="{{ date('c', strtotime($response->created_at)) }}">
-                            {{ \App\Helpers\Dates::format($response->created_at, 'datetime') }}
-                        </time>
-                        by
-                        <a href="{{ \App\Helpers\Uri::safe_href($response->creator->url) }}">
-                            {{ $response->creator->name ?: p3k\url\display_url($response->creator->url) }}
-                        </a>
+                        {!! __('responses.added_by', [
+                            'date' => '<time datetime="'.e(date('c', strtotime($response->created_at))).'">'.e(\App\Helpers\Dates::format($response->created_at, 'datetime')).'</time>',
+                            'author' => '<a href="'.e(\App\Helpers\Uri::safe_href($response->creator->url)).'">'.e($response->creator->name ?: p3k\url\display_url($response->creator->url)).'</a>',
+                        ]) !!}
                     </span>
                 @endif
