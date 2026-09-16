@@ -11,7 +11,6 @@ use App\Events\EventCreated, App\Events\EventUpdated;
 use App\Events\WebmentionReceived;
 use Auth, Gate;
 use DateTime, DateTimeZone, Exception;
-use p3k\XRay;
 
 class APIController extends BaseController
 {
@@ -131,14 +130,14 @@ class APIController extends BaseController
             return $this->error('That URL was already sent via Webmention');
         }
 
-        $xray = new XRay();
+        $xray = \App\Helpers\SafeHTTP::xray();
 
         $opts = [];
 
         $data = $xray->parse($url, $opts);
 
         if(isset($data['error'])) {
-            return $this->error($data['error_description']);
+            return $this->error(\App\Helpers\SafeHTTP::xray_error_description($data));
         }
 
         $sourceData = $data['data'];

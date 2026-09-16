@@ -5,7 +5,6 @@ use Illuminate\Support\Str;
 use Log, Storage;
 use App\User, App\Event, App\Response;
 use Image;
-use p3k\XRay;
 
 class RefreshAllWebmentions extends Command {
 
@@ -23,7 +22,7 @@ class RefreshAllWebmentions extends Command {
 
             $targetURL = $event->absolute_permalink();
 
-            $xray = new XRay();
+            $xray = \App\Helpers\SafeHTTP::xray();
             $data = $xray->parse($webmention->source_url, [
                 'target' => $targetURL,
             ]);

@@ -9,7 +9,6 @@ use App\Event, App\Response, App\User, App\Setting;
 use App\Events\WebmentionReceived;
 use Illuminate\Support\Str;
 use Auth;
-use p3k\XRay;
 
 
 class WebmentionController extends BaseController
@@ -40,14 +39,14 @@ class WebmentionController extends BaseController
 
         $sourceURL = request('source');
 
-        $xray = new XRay();
+        $xray = \App\Helpers\SafeHTTP::xray();
         $data = $xray->parse($sourceURL, [
             'target' => $targetURL,
         ]);
 
         // XRay tells us if the URL didn't link to the target
         if(isset($data['error'])) {
-            return $this->error($data['error_description']);
+            return $this->error(\App\Helpers\SafeHTTP::xray_error_description($data));
         }
 
         // Handle redirects from source URLs

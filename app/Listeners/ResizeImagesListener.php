@@ -19,6 +19,9 @@ class ResizeImagesListener implements ShouldQueue {
             // Download the original photo from the source URL
             $original_image = $this->download($photo);
 
+            if(!$original_image)
+                return;
+
             try {
                 $image = Image::make($original_image);
                 // Create resized versions
@@ -32,31 +35,27 @@ class ResizeImagesListener implements ShouldQueue {
     private function download($photo) {
         Log::info('Downloading image '.$photo->source_url);
 
-        $filename = 'public/responses/'.$photo->response->event_id.'/'.md5($photo->source_url).'.jpg';
+        // Only store the file once it's known to be an image
+        $original_image = \App\Helpers\SafeHTTP::fetch_image($photo->source_url);
 
-        $ch = curl_init($photo->source_url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, \App\Helpers\HTTP::user_agent());
-        $original_image = curl_exec($ch);
-
-        if($original_image && curl_errno($ch) == 0) {
-            Storage::put($filename, $original_image);
-            Storage::setVisibility($filename, 'public');
-
-            $photo_url = Storage::url($filename);
-            Log::info('  saved as '.$photo_url);
-
-            $photo->original_url = $photo_url;
-            $photo->original_filename = $filename;
-            $photo->save();
-
-            return $original_image;
-        } else {
-            Log::error('  download failed: '.curl_error($ch));
+        if(!$original_image) {
+            Log::error('  download failed');
+            return null;
         }
 
-        return [null, null, null];
+        $filename = 'public/responses/'.$photo->response->event_id.'/'.md5($photo->source_url).'.jpg';
+
+        Storage::put($filename, $original_image);
+        Storage::setVisibility($filename, 'public');
+
+        $photo_url = Storage::url($filename);
+        Log::info('  saved as '.$photo_url);
+
+        $photo->original_url = $photo_url;
+        $photo->original_filename = $filename;
+        $photo->save();
+
+        return $original_image;
     }
 
 }
