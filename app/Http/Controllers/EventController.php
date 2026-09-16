@@ -136,7 +136,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors([__('event_form.zoom_failed')]);
             }
         }
 
@@ -178,7 +178,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'edit',
-            'action_heading' => ($event->recurrence_interval ? 'Edit Recurring' : 'Editing'),
+            'action_heading' => __($event->recurrence_interval ? 'event_form.heading.edit_recurring' : 'event_form.heading.editing', ['name' => $event->name]),
             'form_action' => route('save-event', $event),
         ]);
     }
@@ -202,7 +202,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'clone',
-            'action_heading' => 'Cloning',
+            'action_heading' => __('event_form.heading.cloning', ['name' => $event->name]),
             'form_action' => route('create-event'),
         ]);
     }
@@ -222,7 +222,7 @@ class EventController extends BaseController
         return view('edit-event', [
             'event' => $event,
             'mode' => 'recurring',
-            'action_heading' => 'Create Recurring',
+            'action_heading' => __('event_form.heading.create_recurring', ['name' => $event->name]),
             'form_action' => route('create-event'),
         ]);
     }
@@ -321,7 +321,7 @@ class EventController extends BaseController
         if(request('create_zoom_meeting')) {
             $meeting_result = $event->schedule_zoom_meeting();
             if(!$meeting_result) {
-                return back()->withInput()->withErrors(['Failed to create the Zoom meeting. The changes were not saved.']);
+                return back()->withInput()->withErrors([__('event_form.zoom_failed')]);
             }
         } elseif($event->zoom_meeting_id) {
             $event->update_zoom_meeting();

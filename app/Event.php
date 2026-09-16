@@ -49,7 +49,7 @@ class Event extends Model
             $rules[$property] = ['nullable', function($attribute, $value, $fail) {
                 foreach(explode(' ', (string)$value) as $url) {
                     if(\App\Helpers\Uri::has_unsafe_scheme($url))
-                        return $fail('The '.str_replace('_', ' ', $attribute).' must be an http or https link.');
+                        return $fail(__('event_form.url_must_be_http', ['field' => __('event_form.url_field_names.'.$attribute)]));
                 }
             }];
         }
@@ -929,7 +929,7 @@ class Event extends Model
         if($this->meeting_url && $this->is_ongoing()) {
             $icon = 'play-circle';
             $class = 'success';
-            $text = 'Live Now';
+            $text = __('events.status.live_now');
         } else if($this->status == 'confirmed') {
             return '';
         }
@@ -938,17 +938,17 @@ class Event extends Model
             case 'cancelled':
               $icon = 'exclamation-triangle';
               $class = 'danger';
-              $text = 'Cancelled';
+              $text = self::status_label('cancelled');
               break;
             case 'postponed':
               $icon = 'question-circle';
               $class = 'warning';
-              $text = 'Postponed';
+              $text = self::status_label('postponed');
               break;
             case 'tentative':
               $icon = 'question-circle';
               $class = 'warning';
-              $text = 'Tentative';
+              $text = self::status_label('tentative');
               break;
             default:
               return '';
@@ -956,17 +956,22 @@ class Event extends Model
 
         return '<span class="status tag is-'.$class.'">'
             .'<svg class="svg-icon" style="margin-right:5px;"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#'.$icon.'"></use></svg>'
-            .substr(strtoupper($text), 0, 1)
-            .'<span class="lower">'.substr(strtoupper($text), 1).'</span>'
+            .e(mb_substr(mb_strtoupper($text), 0, 1))
+            .'<span class="lower">'.e(mb_substr(mb_strtoupper($text), 1)).'</span>'
             .'<span class="hidden">:</span>'
             .'</span> ';
+    }
+
+    // The name of a status, like "Cancelled", or the status itself if it isn't one of $STATUSES
+    public static function status_label($status) {
+        return isset(self::$STATUSES[$status]) ? __('events.status.'.$status) : $status;
     }
 
     public function status_text() {
         if($this->status == 'confirmed')
             return '';
 
-        return strtoupper($this->status).': ';
+        return mb_strtoupper(self::status_label($this->status)).': ';
     }
 
     public function location_summary() {

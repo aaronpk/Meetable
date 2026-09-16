@@ -266,7 +266,7 @@ class Discord {
         }
 
         if($event->status && $event->status != 'confirmed') {
-            $fields[] = ['name' => 'Status', 'value' => Event::$STATUSES[$event->status] ?? $event->status, 'inline' => false];
+            $fields[] = ['name' => 'Status', 'value' => Event::status_label($event->status), 'inline' => false];
         }
 
         $embed = [

@@ -4,7 +4,7 @@
 <section class="section event">
 
 <div class="content">
-    <h1>Configure Event Registration</h1>
+    <h1>{{ __('event_form.registration.title') }}</h1>
 
     <p><a href="{{ $event->permalink() }}">@icon(arrow-circle-left) {{ $event->name }}</a></p>
 </div>

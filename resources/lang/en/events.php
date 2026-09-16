@@ -27,6 +27,14 @@ return [
 
     'meeting_url_needs_timezone' => 'The meeting URL for this event will not be shown because there is no timezone set for this event. Please edit this event to include a timezone.',
 
+    'status' => [
+        'confirmed' => 'Confirmed',
+        'tentative' => 'Tentative',
+        'postponed' => 'Postponed',
+        'cancelled' => 'Cancelled',
+        'live_now' => 'Live Now',
+    ],
+
     // Shown before the original date of a postponed event
     'tbd_originally' => 'TBD, originally',
 
