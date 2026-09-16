@@ -15,7 +15,6 @@ class LocaleTest extends TestCase
 
     protected function tearDown(): void
     {
-        app()->setLocale('en');
         $this->deleteTestData();
 
         parent::tearDown();
@@ -46,7 +45,7 @@ class LocaleTest extends TestCase
             'tags' => 'locale-test-'.uniqid(),
         ]);
 
-        app()->setLocale('fr');
+        config(['app.available_locales' => ['en', 'fr']]);
 
         $user = $this->testUser();
         $pages = [
@@ -61,13 +60,14 @@ class LocaleTest extends TestCase
 
         foreach($pages as $url => $as) {
             $this->app['auth']->forgetGuards();
-            $response = $as ? $this->actingAs($as)->get($url) : $this->get($url);
+            $request = $this->withHeader('Accept-Language', 'fr');
+            $response = $as ? $request->actingAs($as)->get($url) : $request->get($url);
             $response->assertOk();
             $this->assertNoKeys($response->getContent(), $url);
         }
 
         $this->app['auth']->forgetGuards();
-        $html = $this->get($event->permalink())->getContent();
+        $html = $this->withHeader('Accept-Language', 'fr')->get($event->permalink())->getContent();
 
         $this->assertStringContainsString('<html lang="fr">', $html);
         $this->assertStringContainsString('juin', $html);

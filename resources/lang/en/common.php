@@ -5,6 +5,9 @@
  */
 
 return [
+    // This language's name, written in the language itself, for the language menu
+    'language_name' => 'English',
+
     'nav' => [
         'main_navigation' => 'main navigation',
         'menu' => 'menu',

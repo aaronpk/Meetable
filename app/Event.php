@@ -786,7 +786,8 @@ class Event extends Model
                 $occurrence->save();
 
                 $revision = EventRevision::createFromEvent($occurrence);
-                $revision->edit_summary = __('recurrence.updated_from_template');
+                // Stored and shown to everyone, so in the site's language rather than the editor's
+                $revision->edit_summary = __('recurrence.updated_from_template', [], \App\Helpers\Locales::site());
                 $revision->save();
             }
         }

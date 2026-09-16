@@ -512,6 +512,15 @@ class Controller extends BaseController
         return $parts[2] + ($parts[1]*60) + ($parts[0]*60*60);
     }
 
+    // Remembers the language a visitor picked, instead of the one their browser asks for
+    public function set_language($locale) {
+        if(!in_array($locale, \App\Helpers\Locales::available()))
+            abort(404);
+
+        return redirect(\App\Helpers\Uri::same_origin_path(request()->headers->get('referer')))
+            ->withCookie(cookie()->forever(\App\Http\Middleware\SetLocale::COOKIE, $locale));
+    }
+
     public function local_time() {
 
         try {

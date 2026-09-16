@@ -6,6 +6,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use App\DiscordNotification, App\Event, App\Tag, App\Setting;
 use App\Services\Discord, App\Services\DiscordException;
+use App\Helpers\Locales;
 use DateTime, DateInterval;
 use Auth, Gate, Log;
 
@@ -219,12 +220,12 @@ class DiscordNotificationController extends BaseController
             $start->add(new DateInterval('PT'.$notification->minutes_before.'M'));
 
             $event = new Event;
-            $event->name = __('discord.example.name');
+            $event->name = __('discord.example.name', [], Locales::site());
             $event->start_date = $start->format('Y-m-d');
             $event->start_time = $start->format('H:i:s');
             $event->timezone = 'UTC';
             $event->status = 'confirmed';
-            $event->summary = __('discord.example.summary', ['tag' => $notification->tag]);
+            $event->summary = __('discord.example.summary', ['tag' => $notification->tag], Locales::site());
 
             $payload = Discord::buildEventMessage($notification, $event);
             $payload['embeds'][0]['url'] = env('APP_URL').'/tag/'.$notification->tag;

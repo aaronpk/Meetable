@@ -240,7 +240,14 @@ class Discord {
         return $response->json('id');
     }
 
+    // Posts are written in the site's language, whoever triggered them
     public static function buildEventMessage(DiscordNotification $notification, Event $event) {
+        return \App\Helpers\Locales::inSiteLocale(function() use($notification, $event) {
+            return self::eventMessage($notification, $event);
+        });
+    }
+
+    private static function eventMessage(DiscordNotification $notification, Event $event) {
         $fields = [];
 
         $start = $event->start_datetime();

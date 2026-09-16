@@ -25,7 +25,7 @@ use App\Response;
     <link href="/bulma-1.0.4/bulma.css" rel="stylesheet">
     <link href="/assets/bulma-tooltip-1.2.0.min.css" rel="stylesheet">
 
-    <link href="/assets/style.css" rel="stylesheet">
+    <link href="/assets/style.css?v=20260916" rel="stylesheet">
 
     <link rel="manifest" href="/manifest.json">
 
@@ -128,6 +128,17 @@ use App\Response;
         <div>
             {!! __('common.footer', ['meetable' => '<a href="https://github.com/aaronpk/Meetable">meetable</a>']) !!}
         </div>
+        @if(count($locales = \App\Helpers\Locales::available()) > 1)
+        <div class="languages">
+            @foreach($locales as $locale)
+                @if($locale == app()->getLocale())
+                    <b lang="{{ str_replace('_', '-', $locale) }}">{{ \App\Helpers\Locales::name($locale) }}</b>
+                @else
+                    <a href="{{ route('set-language', $locale) }}" lang="{{ str_replace('_', '-', $locale) }}" hreflang="{{ str_replace('_', '-', $locale) }}">{{ \App\Helpers\Locales::name($locale) }}</a>
+                @endif
+            @endforeach
+        </div>
+        @endif
     </footer>
 
     </main>
