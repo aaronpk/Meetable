@@ -440,6 +440,51 @@ ul.photo-album li {
     background-color: #f14668;
     color: #fff;
 }
+/* on phones each candidate date becomes a card: the date, the three counts in a row, then the vote buttons */
+@media screen and (max-width: 768px) {
+    .date-poll table, .date-poll tbody, .date-poll tr, .date-poll td {
+        display: block;
+        width: auto;
+    }
+    .date-poll thead {
+        display: none;
+    }
+    .date-poll tr.poll-option {
+        border: 1px solid var(--bulma-border, #dbdbdb);
+        border-radius: 6px;
+        padding: 0.75em;
+        margin-bottom: 0.75em;
+    }
+    .date-poll tr.is-leading, .date-poll tr.is-leading td {
+        background-color: #fffbeb;
+    }
+    .date-poll tr.is-chosen, .date-poll tr.is-chosen td {
+        background-color: #effaf3;
+    }
+    .date-poll td {
+        border: none;
+        padding: 0.25em 0;
+    }
+    .date-poll td.count {
+        display: inline-block;
+        width: 32%;
+        white-space: normal;
+    }
+    .date-poll td.count::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.8em;
+        color: #7a7a7a;
+    }
+    .date-poll td.my-vote .buttons {
+        flex-wrap: wrap;
+        margin-top: 0.5em;
+    }
+    .date-poll td.my-vote .buttons .button {
+        flex-grow: 1;
+    }
+}
+
 details.poll-results summary {
     cursor: pointer;
     font-weight: bold;

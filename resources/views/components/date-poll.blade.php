@@ -52,7 +52,7 @@ $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
                 @endif
             </td>
             @foreach($vote_labels as $vote => $label)
-                <td class="count count-{{ $vote }}">
+                <td class="count count-{{ $vote }}" data-label="{{ $label }}">
                     <span class="number">{{ $option->vote_counts()[$vote] }}</span>
                     <div class="voters">
                         @foreach($option->voters($vote) as $voter)
@@ -68,6 +68,7 @@ $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
                         @foreach($vote_labels as $vote => $label)
                             <button class="button is-small vote-button is-{{ $vote }} {{ ($user_votes[$option->id] ?? null) == $vote ? 'is-pressed' : '' }}" data-vote="{{ $vote }}" title="{{ $label }}" aria-label="{{ $label }}">
                                 <span class="icon"><svg class="svg-icon"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#{{ $vote_icons[$vote] }}"></use></svg></span>
+                                <span class="is-hidden-tablet">{{ $label }}</span>
                             </button>
                         @endforeach
                     </div>
