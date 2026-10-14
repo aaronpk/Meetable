@@ -37,13 +37,31 @@ $(function(){
     $(".navbar-menu").toggleClass("is-active");
   });
 
+  // Deleting an event asks first in a dialog. The menu item carries the URL to post to.
+  var pendingDeleteURL = null;
+
   $(".delete-event").click(function(evt){
     evt.preventDefault();
-    $.post($(this).attr('href'), {
-        _token: $("input[name=_token]").val()
+    pendingDeleteURL = $(this).attr("href");
+    $("#delete-modal .delete-confirm").prop("disabled", false);
+    $("#delete-modal").addClass("is-active");
+  });
+
+  $("#delete-modal .delete-confirm").click(function(){
+    if(!pendingDeleteURL) {
+      return;
+    }
+    $(this).prop("disabled", true);
+    $.post(pendingDeleteURL, {
+        _token: csrf_token()
     }, function(response){
         window.location = '/';
     });
+  });
+
+  $("#delete-modal .delete-cancel").click(function(){
+    pendingDeleteURL = null;
+    $("#delete-modal").removeClass("is-active");
   });
 
   $("#rsvp-button").click(function(evt){

@@ -110,6 +110,11 @@ use App\Setting;
                         <span>{{ __('events.actions.copy_export_url') }}</span>
                     </a>
                     @endif
+                    <hr class="dropdown-divider">
+                    <a class="dropdown-item delete-event has-text-danger" href="{{ route('delete-event', $event) }}">
+                        <span class="icon">@icon(trash)</span>
+                        <span>{{ __('events.actions.delete') }}</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -117,6 +122,29 @@ use App\Setting;
     </div>
 
   </div>
+</div>
+
+{{-- Asks before deleting. Opened by the delete item in the menu above. --}}
+<div class="modal" id="delete-modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ __('events.delete.title') }}</p>
+            <button class="delete delete-cancel" aria-label="{{ __('common.close') }}"></button>
+        </header>
+        <section class="modal-card-body">
+            <p>{!! __('events.delete.confirm', ['name' => '<b>'.e($event->name).'</b>']) !!}</p>
+        </section>
+        <footer class="modal-card-foot">
+            <div class="buttons">
+                <button class="button is-danger delete-confirm">
+                    <span class="icon">@icon(trash)</span>
+                    <span>{{ __('events.actions.delete') }}</span>
+                </button>
+                <button class="button delete-cancel">{{ __('common.cancel') }}</button>
+            </div>
+        </footer>
+    </div>
 </div>
 
 @endif
