@@ -398,6 +398,21 @@ class Event extends Model
         return explode(' ', $this->code_of_conduct_url);
     }
 
+    // Public, scheduled events: the ones Discord reminders and the server's event list are for
+    public function scopeAnnounceable($query) {
+        return $query->where('unlisted', 0)
+            ->where('is_template', 0)
+            ->where('is_proposed', 0)
+            ->whereNotIn('status', ['cancelled', 'postponed'])
+            ->whereNotNull('sort_date');
+    }
+
+    public function scopeWithAnyTag($query, array $tags) {
+        return $query->whereHas('tags', function($q) use($tags){
+            $q->whereIn('tag', $tags);
+        });
+    }
+
     public function sort_date() {
         if(!$this->start_date)
             return null;

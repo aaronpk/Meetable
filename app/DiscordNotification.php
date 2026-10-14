@@ -29,15 +29,7 @@ class DiscordNotification extends Model
 
     // Events with this tag that should be announced
     public function eventsQuery() {
-        $tag = $this->tag;
-        return Event::whereHas('tags', function($query) use($tag){
-                $query->where('tag', $tag);
-            })
-            ->where('unlisted', 0)
-            ->where('is_template', 0)
-            ->where('is_proposed', 0)
-            ->whereNotIn('status', ['cancelled', 'postponed'])
-            ->whereNotNull('sort_date');
+        return Event::withAnyTag([$this->tag])->announceable();
     }
 
     // Events that start within the notification window and haven't been announced yet at their current start time

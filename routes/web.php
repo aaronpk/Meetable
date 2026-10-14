@@ -141,6 +141,7 @@ Route::middleware(['auth', 'slashes:remove'])->group(function(){
     Route::get('/discord/install', 'DiscordNotificationController@install_callback')->name('discord-install-callback');
     Route::get('/discord/new', 'DiscordNotificationController@new_notification')->name('new-discord-notification');
     Route::post('/discord/save', 'DiscordNotificationController@save_notification')->name('save-discord-notification');
+    Route::post('/discord/events/save', 'DiscordNotificationController@save_server_events')->name('save-discord-server-events');
     Route::get('/discord/{notification}', 'DiscordNotificationController@edit_notification')->whereNumber('notification')->name('edit-discord-notification');
     Route::post('/discord/{notification}/delete', 'DiscordNotificationController@delete_notification')->whereNumber('notification')->name('delete-discord-notification');
     Route::post('/discord/{notification}/test', 'DiscordNotificationController@test_notification')->whereNumber('notification')->name('test-discord-notification');

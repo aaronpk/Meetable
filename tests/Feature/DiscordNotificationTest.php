@@ -433,14 +433,30 @@ class DiscordNotificationTest extends TestCase
         \App\Setting::$cached = [];
     }
 
-    public function testThePagesAreOnlyAvailableOnSitesUsingDiscordLogin()
+    public function testWithoutDiscordLoginThePagesAreForSiteManagers()
     {
         $this->get('/discord')->assertRedirect();
 
+        $this->fakeDiscord();
         $this->setEnv('AUTH_METHOD', 'session');
 
-        $this->actingAs($this->testUser())
-            ->get('/discord')
-            ->assertNotFound();
+        // Any login method will do once the bot is set up, but then only site managers see the page
+        $previous = $_SERVER['ALLOW_MANAGE_SITE'] ?? null;
+        $this->setEnv('ALLOW_MANAGE_SITE', 'admins');
+        try {
+            $this->actingAs($this->testUser())->get('/discord')->assertForbidden();
+            $this->actingAs($this->testUser())->get('/')->assertOk()->assertDontSee('href="'.route('discord-notifications').'"', false);
+
+            $this->testUser()->is_admin = true;
+            $this->testUser()->save();
+            $this->actingAs($this->testUser())->get('/discord')->assertOk();
+            $this->actingAs($this->testUser())->get('/')->assertOk()->assertSee('href="'.route('discord-notifications').'"', false);
+        } finally {
+            $this->setEnv('ALLOW_MANAGE_SITE', $previous);
+        }
+
+        // Without a bot token or Discord login there is nothing to set up
+        $this->setEnv('DISCORD_BOT_TOKEN', null);
+        $this->actingAs($this->testUser())->get('/discord')->assertNotFound();
     }
 }

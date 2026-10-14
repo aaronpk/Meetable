@@ -44,6 +44,34 @@
 </div>
 
 @if($bot_configured && $guild)
+    <div class="box">
+        <h3 class="subtitle">{{ __('discord.server_events.title') }}</h3>
+        <p>{{ __('discord.server_events.intro') }}</p>
+        @if($sync_events_error)
+            <div class="notification is-warning">{{ __('discord.server_events.last_error', ['error' => $sync_events_error]) }}</div>
+        @endif
+        <form action="{{ route('save-discord-server-events') }}" method="post">
+            <div class="field">
+                <label class="checkbox">
+                    <input type="checkbox" name="enabled" value="1" {{ $sync_events ? 'checked' : '' }}>
+                    {{ __('discord.server_events.enabled') }}
+                </label>
+            </div>
+            <div class="field">
+                <label class="label" for="server-events-tags">{{ __('discord.server_events.tags') }}</label>
+                <div class="control">
+                    <input class="input" type="text" name="tags" id="server-events-tags" autocomplete="off" value="{{ $sync_events_tags }}">
+                </div>
+                <p class="help">{{ __('discord.server_events.tags_help') }}</p>
+            </div>
+            <p class="help">{{ __('discord.server_events.permission_help') }}
+                {!! __('discord.setup.reinstall', ['add_it_again' => '<a href="'.e(route('discord-install')).'">'.e(__('discord.setup.add_it_again')).'</a>']) !!}</p>
+            <button type="submit" class="button is-primary">{{ __('common.save') }}</button>
+            {{ csrf_field() }}
+        </form>
+    </div>
+
+    <h3 class="subtitle">{{ __('discord.channel_notifications') }}</h3>
     <p><a href="{{ route('new-discord-notification') }}" class="button is-primary">{{ __('discord.add_notification') }}</a></p>
 @endif
 

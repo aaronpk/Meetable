@@ -135,7 +135,7 @@ php artisan queue:work --stop-when-empty
 
 #### Scheduled Tasks
 
-Some things happen on a schedule rather than in response to a request: reminders are sent before events with a meeting link start, Discord channels are notified about upcoming events, and the upcoming copies of recurring events are created. These all run from Laravel's scheduler, so set up a cron job that runs every minute, as the same user the web server runs the app as:
+Some things happen on a schedule rather than in response to a request: reminders are sent before events with a meeting link start, Discord channels are notified about upcoming events and the Discord server's event list is kept in sync, and the upcoming copies of recurring events are created. These all run from Laravel's scheduler, so set up a cron job that runs every minute, as the same user the web server runs the app as:
 
 ```
 * * * * * cd /path/to/meetable && php artisan schedule:run >> /dev/null 2>&1
@@ -204,6 +204,10 @@ You can choose whether or not you want a "log in/out" link to appear in the top 
 AUTH_SHOW_LOGIN=true
 AUTH_SHOW_LOGOUT=false
 ```
+
+#### Discord
+
+A Discord bot can post a message to a channel before events with a particular tag start, and can add upcoming events to the server's event list, where they appear in the sidebar and go live at their start time. Set `DISCORD_CLIENT_ID` and `DISCORD_BOT_TOKEN` as described in `.env.example`, then add the bot to the server from the "Discord" page in the menu. This works with any login method: when the site logs in with Discord, every user can set up the bot, otherwise it is only available to people who can manage the site. If the bot was added before the server event list option existed, add it again so it gets the "Manage Events" permission.
 
 #### Passkey Authentication
 
