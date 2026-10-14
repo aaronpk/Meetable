@@ -386,8 +386,8 @@ ul.photo-album li {
 
 
 /* proposed events: a card per candidate date. The date, tags and schedule button share a
-   line at the top, then the three answers use the full width with the viewer's own
-   buttons lined up under them */
+   line at the top, then one row per answer: label, count, the people, and the viewer's
+   own button for that answer */
 .date-poll .poll-option {
     border: 1px solid var(--bulma-border, #dbdbdb);
     border-radius: 6px;
@@ -421,28 +421,25 @@ ul.photo-album li {
 .date-poll .finalize-form {
     margin-left: auto;
 }
-.date-poll .counts, .date-poll .my-vote {
+.date-poll .answer {
     display: flex;
+    align-items: center;
     gap: 0.75em;
-}
-.date-poll .count {
-    flex: 1 1 0;
-    min-width: 0;
-    text-align: center;
-    padding: 0.4em 0.5em 0.5em;
-    border-radius: 6px;
-    background-color: var(--bulma-background, #f5f5f5);
+    padding: 0.3em 0;
+    border-top: 1px solid var(--bulma-border-weak, #ededed);
 }
 .date-poll .count-label {
-    font-size: 0.8em;
+    flex: 0 0 5.5em;
     color: var(--bulma-text-weak, #7a7a7a);
 }
-.date-poll .count .number {
-    font-size: 1.2em;
+.date-poll .number {
+    flex: 0 0 1.5em;
+    text-align: right;
+    font-size: 1.1em;
     font-weight: bold;
 }
 .date-poll .voters {
-    margin-top: 0.3em;
+    flex: 1 1 auto;
     line-height: 0;
 }
 .date-poll .vote-avatar-link {
@@ -455,15 +452,11 @@ ul.photo-album li {
     width: 22px;
     height: 22px;
     border-radius: 4px;
-    margin: 3px;
+    margin: 2px 3px;
     object-fit: cover;
 }
-.date-poll .my-vote {
-    margin-top: 0.75em;
-}
-.date-poll .my-vote .vote-button {
-    flex: 1 1 0;
-    min-width: 0;
+.date-poll .vote-button {
+    margin-left: auto;
 }
 .date-poll .vote-button.is-pressed.is-yes {
     background-color: #48c78e;
@@ -477,25 +470,16 @@ ul.photo-album li {
     background-color: #f14668;
     color: #fff;
 }
-/* on phones, tighter spacing so three avatars fit on a row in each answer box */
 @media screen and (max-width: 768px) {
     .date-poll .poll-option {
         padding: 0.75em 0.5em;
     }
-    .date-poll .counts, .date-poll .my-vote {
+    .date-poll .answer {
         gap: 0.5em;
     }
-    .date-poll .count {
-        padding: 0.4em 0.25em 0.5em;
-    }
-    .date-poll .vote-avatar {
-        width: 20px;
-        height: 20px;
-        margin: 2px;
-    }
-    .date-poll .my-vote .vote-button {
-        padding-left: 0.5em;
-        padding-right: 0.5em;
+    .date-poll .count-label {
+        flex-basis: 4.5em;
+        font-size: 0.9em;
     }
 }
 

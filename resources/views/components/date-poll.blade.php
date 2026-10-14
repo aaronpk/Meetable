@@ -37,33 +37,27 @@ $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
                 @endcan
             @endif
         </div>
-        <div class="option-votes">
-            {{-- The three answers side by side, and below them the viewer's own buttons, one under each --}}
-            <div class="counts">
-                @foreach($vote_labels as $vote => $label)
-                    <div class="count count-{{ $vote }}">
-                        <div class="count-label">{{ $label }}</div>
-                        <span class="number">{{ $option->vote_counts()[$vote] }}</span>
-                        <div class="voters">
-                            @foreach($option->voters($vote) as $voter)
-                                @include('components/vote-avatar', ['user' => $voter])
-                            @endforeach
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-            @if(!$readonly)
-                @can('can-vote')
-                <div class="my-vote">
-                    @foreach($vote_labels as $vote => $label)
+        {{-- One row per answer: its label, count, the people who gave it, and the viewer's button for it --}}
+        <div class="answers">
+            @foreach($vote_labels as $vote => $label)
+                <div class="answer count-{{ $vote }}">
+                    <span class="count-label">{{ $label }}</span>
+                    <span class="number">{{ $option->vote_counts()[$vote] }}</span>
+                    <span class="voters">
+                        @foreach($option->voters($vote) as $voter)
+                            @include('components/vote-avatar', ['user' => $voter])
+                        @endforeach
+                    </span>
+                    @if(!$readonly)
+                        @can('can-vote')
                         <button class="button is-small vote-button is-{{ $vote }} {{ ($user_votes[$option->id] ?? null) == $vote ? 'is-pressed' : '' }}" data-vote="{{ $vote }}" title="{{ $label }}" aria-label="{{ $label }}">
                             <span class="icon"><svg class="svg-icon"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#{{ $vote_icons[$vote] }}"></use></svg></span>
-                            <span>{{ $label }}</span>
+                            <span class="is-hidden-mobile">{{ $label }}</span>
                         </button>
-                    @endforeach
+                        @endcan
+                    @endif
                 </div>
-                @endcan
-            @endif
+            @endforeach
         </div>
     </div>
 @endforeach
