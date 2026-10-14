@@ -88,17 +88,22 @@ class Controller extends BaseController
     }
 
     // The proposed events that are still looking for a date
-    private function proposed_query() {
-        return Event::where('is_proposed', 1)
-            ->where('unlisted', 0)
+    private function proposed_query($include_unlisted=false) {
+        $events = Event::where('is_proposed', 1)
             ->where('is_template', 0);
+
+        if(!$include_unlisted)
+            $events = $events->where('unlisted', 0);
+
+        return $events;
     }
 
     public function proposed() {
         if(!Setting::value('enable_proposed_events'))
             abort(404);
 
-        $events = $this->proposed_query()
+        // Unlisted proposals are shown to the people who could have created them
+        $events = $this->proposed_query(\Gate::allows('create-event'))
             ->withMin('date_options', 'date')
             ->with('date_options', 'tags')
             ->orderBy('date_options_min_date')
@@ -126,8 +131,12 @@ class Controller extends BaseController
             abort(404);
         }
 
-        // Once a date is chosen the event lives at its dated URL for good
+        // Once a date is chosen the event lives at its dated URL for good. An event that
+        // is neither proposed nor dated has no page, and redirecting it would loop.
         if(!$event->is_proposed) {
+            if(!$event->start_date) {
+                abort(404);
+            }
             return redirect($event->permalink(), 301);
         }
 

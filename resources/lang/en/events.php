@@ -63,6 +63,8 @@ return [
         'zoom_will_be_scheduled' => 'A Zoom meeting will be scheduled for this date.',
         'chosen_from' => 'The date was chosen from :count proposed date|The date was chosen from :count proposed dates',
         'none' => 'There are no proposed events right now.',
+        // Marks an unlisted proposal in the list, which only people who can create events see
+        'unlisted' => 'Unlisted',
         'option_count' => ':count possible date|:count possible dates',
         'voter_count' => ':count voter|:count voters',
         // The home page banner. :link is a link with the text banner_link

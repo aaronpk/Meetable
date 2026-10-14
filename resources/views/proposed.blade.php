@@ -11,7 +11,12 @@
     <ul class="event-list proposed-list h-feed">
     @foreach($events as $event)
         <li class="event h-event">
-            <h3><a href="{{ $event->permalink() }}" class="u-url p-name">{!! $event->status_tag() !!}{{ $event->name }}</a></h3>
+            <h3>
+                <a href="{{ $event->permalink() }}" class="u-url p-name">{!! $event->status_tag() !!}{{ $event->name }}</a>
+                @if($event->unlisted)
+                    <span class="tag is-light">{{ __('events.proposed.unlisted') }}</span>
+                @endif
+            </h3>
 
             <p>{{ $event->date_options->map(function($option){ return $option->display_date(false); })->join(', ') }}</p>
 

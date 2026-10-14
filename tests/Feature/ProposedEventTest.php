@@ -499,7 +499,7 @@ class ProposedEventTest extends TestCase
         $this->get('/')->assertOk()->assertSee($event->name);
     }
 
-    public function testAnUnlistedProposalStaysOffTheUnlistedPage()
+    public function testAnUnlistedProposalIsOnlyListedForPeopleWhoCanCreateEvents()
     {
         $event = $this->createProposal(['unlisted' => 1]);
 
@@ -507,7 +507,52 @@ class ProposedEventTest extends TestCase
             ->assertOk()
             ->assertDontSee($event->name);
 
+        $this->actingAs($this->testUser())->get('/proposed')
+            ->assertOk()
+            ->assertSee($event->name)
+            ->assertSee('Unlisted');
+
+        $this->app['auth']->forgetGuards();
         $this->get('/proposed')->assertOk()->assertDontSee($event->name);
+        $this->get('/')->assertOk()->assertDontSee('looking for a date');
+    }
+
+    /**
+     * Nothing normally leaves an event with neither a date nor the proposed flag, but
+     * if one turned up its two URLs would otherwise redirect to each other forever.
+     */
+    public function testAnEventWithNoDateThatIsNotProposedIsNotFound()
+    {
+        $event = $this->createProposal();
+        DB::table('events')->where('id', $event->id)->update(['is_proposed' => 0]);
+
+        $this->get('/proposed/'.$event->slug.'-'.$event->key)->assertNotFound();
+    }
+
+    public function testTheSortDateBackfillSkipsProposals()
+    {
+        $event = $this->createProposal();
+
+        $this->artisan('migrate:event_sort_date')->assertExitCode(0);
+
+        $this->assertNull($event->fresh()->sort_date);
+    }
+
+    public function testTheMcpToolsDescribeAProposalAsOne()
+    {
+        $event = $this->createProposal();
+        $this->vote($this->testUser(), $event, $event->date_options[1], 'yes');
+
+        $result = (new \App\MCP\Tools\GetEventTool)->call(['key' => $event->key]);
+        $data = json_decode($result['content'][0]['text'], true);
+
+        $this->assertEquals('proposed', $data['status']);
+        $this->assertTrue($data['is_proposed']);
+        $this->assertNull($data['start_date']);
+        $this->assertCount(2, $data['date_options']);
+        $this->assertEquals('2032-10-08', $data['date_options'][1]['date']);
+        $this->assertEquals(1, $data['date_options'][1]['votes']['yes']);
+        $this->assertStringContainsString('/proposed/', $data['url']);
     }
 
     public function testTheProposedListNeedsTheSettingTurnedOn()

@@ -14,7 +14,9 @@ class MigrateEventSortDate extends Command {
 
         $events = Event::withTrashed()->get();
         foreach($events as $event) {
-            $event->sort_date = $event->sort_date()->format('Y-m-d H:i:s');
+            // A proposed event has no date yet, so nothing to sort it by
+            $sort_date = $event->sort_date();
+            $event->sort_date = $sort_date ? $sort_date->format('Y-m-d H:i:s') : null;
             $event->save();
         }
 
