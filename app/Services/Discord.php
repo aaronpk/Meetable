@@ -12,10 +12,12 @@ class Discord {
 
     // View Channel + Send Messages + Embed Links: what the bot needs in a channel to post there
     const CHANNEL_PERMISSIONS = 1024 | 2048 | 16384;
-    // Manage Events, to add events to the server's event list
+    // Create Events to add events to the server's event list, and Manage Events to change
+    // or remove them whoever made them
     const PERMISSION_MANAGE_EVENTS = 8589934592;
+    const PERMISSION_CREATE_EVENTS = 17592186044416;
     // What the bot is installed with
-    const BOT_PERMISSIONS = self::CHANNEL_PERMISSIONS | self::PERMISSION_MANAGE_EVENTS;
+    const BOT_PERMISSIONS = self::CHANNEL_PERMISSIONS | self::PERMISSION_CREATE_EVENTS | self::PERMISSION_MANAGE_EVENTS;
 
     const CHANNEL_TYPE_TEXT = 0;
     const CHANNEL_TYPE_CATEGORY = 4;

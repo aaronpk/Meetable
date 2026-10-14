@@ -374,7 +374,7 @@ class DiscordScheduledEventTest extends TestCase
         $this->assertEquals('', $event->fresh()->discord_scheduled_event_id);
         Setting::$cached = [];
         $this->assertStringContainsString('Missing Permissions', Setting::value('discord_scheduled_events_error'));
-        $this->assertStringContainsString('Manage Events', Setting::value('discord_scheduled_events_error'));
+        $this->assertStringContainsString('Create Events and Manage Events', Setting::value('discord_scheduled_events_error'));
 
         $this->actingAs($this->testUser())->get('/discord')
             ->assertOk()

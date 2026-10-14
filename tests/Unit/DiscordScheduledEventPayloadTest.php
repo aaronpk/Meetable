@@ -138,5 +138,9 @@ class DiscordScheduledEventPayloadTest extends TestCase
         $this->assertTrue(Discord::canPost(1024 | 2048 | 16384));
         $this->assertFalse(Discord::canPost(1024 | 2048));
         $this->assertTrue((Discord::BOT_PERMISSIONS & Discord::PERMISSION_MANAGE_EVENTS) > 0);
+        $this->assertTrue((Discord::BOT_PERMISSIONS & Discord::PERMISSION_CREATE_EVENTS) > 0);
+        // Discord's permission bits: Manage Events is bit 33, Create Events bit 44
+        $this->assertEquals(1 << 33, Discord::PERMISSION_MANAGE_EVENTS);
+        $this->assertEquals(1 << 44, Discord::PERMISSION_CREATE_EVENTS);
     }
 }

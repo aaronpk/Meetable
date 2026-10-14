@@ -15,7 +15,7 @@ return [
         'enabled' => 'Add upcoming events to the server\'s event list',
         'tags' => 'Only events with these tags',
         'tags_help' => 'Separate tags with spaces. Leave blank to add every public event.',
-        'permission_help' => 'The bot needs the "Manage Events" permission for this. A bot added to the server before this option existed won\'t have it yet.',
+        'permission_help' => 'The bot needs the "Create Events" and "Manage Events" permissions for this. A bot added to the server before this option existed won\'t have them yet.',
         // :error is a Discord API error message
         'last_error' => 'The last attempt to update the server\'s events failed: :error',
     ],
@@ -126,7 +126,7 @@ return [
     ],
 
     'api_error' => 'Discord API error (:status): :message',
-    'events_permission_help' => 'Allow the bot to Manage Events in the server, or add the bot to the server again from the Discord page so it gets that permission',
+    'events_permission_help' => 'Allow the bot to Create Events and Manage Events in the server, or add the bot to the server again from the Discord page so it gets those permissions',
     'token_not_configured' => 'The Discord bot token is not configured',
     'the_bot' => 'the bot',
     // :bot is the bot's name
