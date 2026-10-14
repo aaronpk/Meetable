@@ -95,6 +95,31 @@ $(function(){
     });
   });
 
+  // Choosing a date closes the vote, so the schedule buttons ask first in a dialog
+  var pendingFinalizeForm = null;
+
+  $("#date-poll").on("submit", ".finalize-form", function(evt){
+    evt.preventDefault();
+    pendingFinalizeForm = this;
+    $("#finalize-modal .finalize-date").text($(this).attr("data-date"));
+    $("#finalize-modal .finalize-confirm").prop("disabled", false);
+    $("#finalize-modal").addClass("is-active");
+  });
+
+  $("#finalize-modal .finalize-confirm").click(function(){
+    if(!pendingFinalizeForm) {
+      return;
+    }
+    $(this).prop("disabled", true);
+    // The form's own submit handler is what opened this dialog, so submit it directly
+    pendingFinalizeForm.submit();
+  });
+
+  $("#finalize-modal .finalize-cancel").click(function(){
+    pendingFinalizeForm = null;
+    $("#finalize-modal").removeClass("is-active");
+  });
+
   // Fills in the counts, voters and leading date from the vote endpoint's response
   function update_poll($poll, response) {
     $.each(response.options, function(id, option){

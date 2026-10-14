@@ -57,6 +57,7 @@ return [
         'log_in_to_vote' => 'Log in to vote on a date',
         'voting_closed' => 'Voting is closed',
         'schedule_this_date' => 'Schedule this date',
+        'schedule_confirm_title' => 'Schedule this date?',
         // :date is the date about to be chosen
         'schedule_confirm' => 'Schedule this event for :date? Voting will close and the event will get its permanent date.',
         'chosen_from' => 'The date was chosen from :count proposed date|The date was chosen from :count proposed dates',

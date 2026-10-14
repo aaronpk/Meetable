@@ -477,6 +477,7 @@ class ProposedEventTest extends TestCase
             ->assertSee('data-vote="yes"', false)
             ->assertSee('vote-button is-ifneedbe is-pressed', false)
             ->assertSee('Schedule this date')
+            ->assertSee('id="finalize-modal"', false)
             ->assertDontSee('Add to Calendar')
             ->assertDontSee('id="rsvps"', false);
 
@@ -485,7 +486,8 @@ class ProposedEventTest extends TestCase
             ->assertOk()
             ->assertSee('Log in to vote')
             ->assertDontSee('data-vote=', false)
-            ->assertDontSee('Schedule this date');
+            ->assertDontSee('Schedule this date')
+            ->assertDontSee('id="finalize-modal"', false);
     }
 
     public function testAScheduledEventShowsHowItsDateWasChosen()

@@ -40,7 +40,7 @@ $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
                 @endif
                 @if(!$readonly)
                     @can('manage-event', $event)
-                    <form method="post" action="{{ route('finalize-event', $event->id) }}" class="finalize-form" onsubmit="return confirm({{ \Illuminate\Support\Js::from(__('events.proposed.schedule_confirm', ['date' => $option->display_date()])) }})">
+                    <form method="post" action="{{ route('finalize-event', $event->id) }}" class="finalize-form" data-date="{{ $option->display_date() }}{{ $option->start_time ? ', '.$option->display_time() : '' }}">
                         {{ csrf_field() }}
                         <input type="hidden" name="option_id" value="{{ $option->id }}">
                         <button class="button is-small is-primary is-light">
@@ -82,6 +82,31 @@ $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
 </div>
 
 @if(!$readonly)
+    @can('manage-event', $event)
+    {{-- Asks before a date is chosen, since that closes the vote. Opened by the schedule buttons above. --}}
+    <div class="modal" id="finalize-modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">{{ __('events.proposed.schedule_confirm_title') }}</p>
+                <button class="delete finalize-cancel" aria-label="{{ __('common.close') }}"></button>
+            </header>
+            <section class="modal-card-body">
+                <p>{!! __('events.proposed.schedule_confirm', ['date' => '<b class="finalize-date"></b>']) !!}</p>
+            </section>
+            <footer class="modal-card-foot">
+                <div class="buttons">
+                    <button class="button is-primary finalize-confirm">
+                        <span class="icon">@icon(calendar-check)</span>
+                        <span>{{ __('events.proposed.schedule_this_date') }}</span>
+                    </button>
+                    <button class="button finalize-cancel">{{ __('common.cancel') }}</button>
+                </div>
+            </footer>
+        </div>
+    </div>
+    @endcan
+
     @guest
         @if(!\App\Setting::value('auth_hide_login'))
             <p class="help"><a href="{{ route('login') }}">{{ __('events.proposed.log_in_to_vote') }}</a></p>
