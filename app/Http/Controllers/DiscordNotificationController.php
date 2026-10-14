@@ -14,12 +14,16 @@ class DiscordNotificationController extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    // Any logged-in user can manage Discord notifications, but only on sites that use Discord login
+    // The pages exist once the bot is set up or the site logs in with Discord. Who may use
+    // them depends on the login method, see Discord::canManage().
     private function authorizeDiscord() {
         Gate::authorize('logged-in');
 
         if(!Discord::enabled())
             abort(404);
+
+        if(!Discord::canManage(Auth::user()))
+            abort(403);
     }
 
     public function index() {

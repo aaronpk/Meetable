@@ -317,6 +317,17 @@ class DiscordScheduledEventTest extends TestCase
         Tag::where('tag', $other)->delete();
     }
 
+    public function testTheSyncWorksWithoutDiscordLogin()
+    {
+        $this->fakeDiscord();
+        $this->setEnv('AUTH_METHOD', 'session');
+        $this->upcomingEvent();
+
+        $this->sync();
+
+        $this->assertCount(1, $this->requests('POST'));
+    }
+
     public function testAChannelNotificationAloneAddsNothing()
     {
         $this->fakeDiscord();

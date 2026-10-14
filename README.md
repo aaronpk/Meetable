@@ -207,7 +207,7 @@ AUTH_SHOW_LOGOUT=false
 
 #### Discord
 
-When using Discord login, the "Discord" page in the menu can also connect a bot to your server. The bot can post a message to a channel before events with a particular tag start, and can add upcoming events to the server's event list, where they appear in the sidebar and go live at their start time. Set `DISCORD_BOT_TOKEN` as described in `.env.example`, then add the bot to the server from that page. If the bot was added before the server event list option existed, add it again so it gets the "Manage Events" permission.
+A Discord bot can post a message to a channel before events with a particular tag start, and can add upcoming events to the server's event list, where they appear in the sidebar and go live at their start time. Set `DISCORD_CLIENT_ID` and `DISCORD_BOT_TOKEN` as described in `.env.example`, then add the bot to the server from the "Discord" page in the menu. This works with any login method: when the site logs in with Discord, every user can set up the bot, otherwise it is only available to people who can manage the site. If the bot was added before the server event list option existed, add it again so it gets the "Manage Events" permission.
 
 #### Passkey Authentication
 

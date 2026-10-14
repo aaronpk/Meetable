@@ -37,8 +37,22 @@ class Discord {
     const PERMISSION_SEND_MESSAGES = 2048;
     const PERMISSION_EMBED_LINKS = 16384;
 
+    // The bot can be used with any login method once its token is set. A site that
+    // logs in with Discord gets the setup page before that, to see how to set it up.
     public static function enabled() {
-        return env('AUTH_METHOD') == 'discord';
+        return env('AUTH_METHOD') == 'discord' || self::botConfigured();
+    }
+
+    // On a site that logs in with Discord every user is a member of the server, so any of
+    // them can set up the bot. Elsewhere that is for whoever can manage the site.
+    public static function canManage($user) {
+        if(!$user || !self::enabled())
+            return false;
+
+        if(env('AUTH_METHOD') == 'discord')
+            return true;
+
+        return \Gate::forUser($user)->allows('manage-site');
     }
 
     public static function botConfigured() {
