@@ -517,3 +517,22 @@ details.poll-results summary {
 .proposed-list .event {
     margin-left: 2em;
 }
+
+/* the meeting link segment shows different text depending on whether the meeting has started */
+.meeting-segment .meeting-live-text,
+.meeting-segment .meeting-soon-text,
+.meeting-segment .meeting-soon-note,
+.meeting-segment .meeting-hidden-note,
+.meeting-segment[data-state="hidden"] .meeting-link {
+    display: none;
+}
+.meeting-segment[data-state="hidden"] .meeting-hidden-note,
+.meeting-segment[data-state="soon"] .meeting-soon-text,
+.meeting-segment[data-state="soon"] .meeting-soon-note,
+.meeting-segment[data-state="live"] .meeting-live-text {
+    display: inline;
+}
+.meeting-segment[data-state="over"],
+.meeting-segment[data-state="none"] {
+    display: none;
+}

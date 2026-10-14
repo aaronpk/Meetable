@@ -88,7 +88,11 @@ return [
     ],
 
     'code_of_conduct' => 'Code of Conduct',
+    // The meeting link once the meeting has started
     'join_meeting' => 'Join the Online Meeting',
+    // The meeting link before the meeting has started, and the note shown after it
+    'meeting_link' => 'Meeting Link',
+    'meeting_not_started' => '(the meeting hasn\'t started yet)',
     'meeting_link_shown_soon' => 'The meeting link will be shown 15 minutes before the event',
     'notes' => 'Notes',
     'sessions' => 'Sessions',

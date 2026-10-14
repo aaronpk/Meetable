@@ -345,18 +345,18 @@ use App\Setting;
             </div>
         @endif
     @else
-        @if($event->status == 'confirmed' && $event->meeting_url && !$event->is_proposed && !$event->is_past())
-            <div class="website segment with-icon">
+        @php $meeting_state = $event->meeting_state(); @endphp
+        @if(!in_array($meeting_state, ['none', 'over']))
+            {{-- Which of these is shown depends on data-state, which the script below keeps up to date --}}
+            <div class="website segment with-icon meeting-segment" id="meeting-segment" data-state="{{ $meeting_state }}">
                 <span class="icon">@icon(video)</span>
                 <span>
-                    @if($event->is_starting_soon() || $event->is_ongoing())
-                        <a href="{{ \App\Helpers\Uri::safe_href($event->meeting_url) }}" title="{{ $event->meeting_url }}" class="pulsing-yellow" target="_blank">
-                            {{ __('events.join_meeting') }}
-                        </a>
-                    @else
-                        <a href="" class="pulsing-yellow hidden" target="_blank" id="event-meeting-url">{{ __('events.join_meeting') }}</a>
-                        <span id="event-meeting-url-msg">{{ __('events.meeting_link_shown_soon') }}</span>
-                    @endif
+                    <a href="{{ $meeting_state != 'hidden' ? \App\Helpers\Uri::safe_href($event->meeting_url) : '' }}" target="_blank" id="event-meeting-url" class="meeting-link">
+                        <span class="meeting-live-text pulsing-yellow">{{ __('events.join_meeting') }}</span>
+                        <span class="meeting-soon-text">{{ __('events.meeting_link') }}</span>
+                    </a>
+                    <span class="meeting-soon-note">{{ __('events.meeting_not_started') }}</span>
+                    <span class="meeting-hidden-note" id="event-meeting-url-msg">{{ __('events.meeting_link_shown_soon') }}</span>
                 </span>
             </div>
         @endif
@@ -642,19 +642,23 @@ use App\Setting;
     </script>
     @endcan
 
-    @if($event->meeting_url && !$event->is_proposed && !$event->is_past())
+    @if($mode != 'archive' && in_array($meeting_state, ['hidden', 'soon']))
     <script>
+        // Keeps the meeting link up to date: it appears 15 minutes before the start, and
+        // changes to "join" once the meeting has started
         var meetingURLTimer;
         $(function(){
             meetingURLTimer = setInterval(function(){
                 $.getJSON("/event/{{ $event->key }}.json", function(data){
                     if(data.meeting_url) {
-                        $("#event-meeting-url-msg").addClass("hidden");
-                        $("#event-meeting-url").attr("href", data.meeting_url).removeClass("hidden");
+                        $("#event-meeting-url").attr("href", data.meeting_url);
+                    }
+                    $("#meeting-segment").attr("data-state", data.meeting_state);
+                    if(data.meeting_state == "live" || data.meeting_state == "over") {
                         clearInterval(meetingURLTimer);
                     }
                 });
-            }, 2000);
+            }, 5000);
         });
     </script>
     @endif
