@@ -385,52 +385,85 @@ ul.photo-album li {
 
 
 
-/* proposed events: the table of candidate dates and votes */
-.date-poll td.count, .date-poll th.count {
-    text-align: center;
-    white-space: nowrap;
-    width: 5em;
+/* proposed events: a card per candidate date. The date, tags and schedule button share a
+   line at the top, then the three answers use the full width with the viewer's own
+   buttons lined up under them */
+.date-poll .poll-option {
+    border: 1px solid var(--bulma-border, #dbdbdb);
+    border-radius: 6px;
+    padding: 0.75em 1em;
+    margin-bottom: 0.75em;
 }
-.date-poll td.count .number {
+.date-poll .poll-option.is-leading {
+    border-color: #ffe08a;
+    box-shadow: inset 0 0 0 1px #ffe08a;
+}
+.date-poll .poll-option.is-chosen {
+    border-color: #48c78e;
+    box-shadow: inset 0 0 0 1px #48c78e;
+}
+.date-poll .option-date {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25em 0.75em;
+    margin-bottom: 0.75em;
+}
+.date-poll .option-date .time {
+    font-weight: 300;
+}
+.date-poll .leading-tag {
+    display: none;
+}
+.date-poll .is-leading .leading-tag {
+    display: inline-flex;
+}
+.date-poll .finalize-form {
+    margin-left: auto;
+}
+.date-poll .counts, .date-poll .my-vote {
+    display: flex;
+    gap: 0.75em;
+}
+.date-poll .count {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    padding: 0.4em 0.5em 0.5em;
+    border-radius: 6px;
+    background-color: var(--bulma-background, #f5f5f5);
+}
+.date-poll .count-label {
+    font-size: 0.8em;
+    color: var(--bulma-text-weak, #7a7a7a);
+}
+.date-poll .count .number {
     font-size: 1.2em;
     font-weight: bold;
 }
 .date-poll .voters {
-    margin-top: 2px;
+    margin-top: 0.3em;
     line-height: 0;
 }
 .date-poll .vote-avatar-link {
     display: inline-block;
     line-height: 0;
+    /* the tooltip stylesheet underlines spans with a tooltip, which a picture doesn't need */
+    border-bottom: none;
 }
 .date-poll .vote-avatar {
-    width: 20px;
-    height: 20px;
-    border-radius: 3px;
-    margin: 1px;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    margin: 3px;
     object-fit: cover;
 }
-.date-poll .leading-tag {
-    display: none;
-    margin-left: .5em;
+.date-poll .my-vote {
+    margin-top: 0.75em;
 }
-.date-poll tr.is-leading .leading-tag {
-    display: inline-flex;
-}
-.date-poll tr.is-leading td {
-    background-color: #fffbeb;
-}
-.date-poll tr.is-chosen td {
-    background-color: #effaf3;
-}
-.date-poll .option-date .time {
-    font-weight: 300;
-}
-.date-poll .finalize-form {
-    margin-top: .4em;
-}
-.date-poll .my-vote .buttons {
-    flex-wrap: nowrap;
+.date-poll .my-vote .vote-button {
+    flex: 1 1 0;
+    min-width: 0;
 }
 .date-poll .vote-button.is-pressed.is-yes {
     background-color: #48c78e;
@@ -444,48 +477,25 @@ ul.photo-album li {
     background-color: #f14668;
     color: #fff;
 }
-/* on phones each candidate date becomes a card: the date, the three counts in a row, then the vote buttons */
+/* on phones, tighter spacing so three avatars fit on a row in each answer box */
 @media screen and (max-width: 768px) {
-    .date-poll table, .date-poll tbody, .date-poll tr, .date-poll td {
-        display: block;
-        width: auto;
+    .date-poll .poll-option {
+        padding: 0.75em 0.5em;
     }
-    .date-poll thead {
-        display: none;
+    .date-poll .counts, .date-poll .my-vote {
+        gap: 0.5em;
     }
-    .date-poll tr.poll-option {
-        border: 1px solid var(--bulma-border, #dbdbdb);
-        border-radius: 6px;
-        padding: 0.75em;
-        margin-bottom: 0.75em;
+    .date-poll .count {
+        padding: 0.4em 0.25em 0.5em;
     }
-    .date-poll tr.is-leading, .date-poll tr.is-leading td {
-        background-color: #fffbeb;
+    .date-poll .vote-avatar {
+        width: 20px;
+        height: 20px;
+        margin: 2px;
     }
-    .date-poll tr.is-chosen, .date-poll tr.is-chosen td {
-        background-color: #effaf3;
-    }
-    .date-poll td {
-        border: none;
-        padding: 0.25em 0;
-    }
-    .date-poll td.count {
-        display: inline-block;
-        width: 32%;
-        white-space: normal;
-    }
-    .date-poll td.count::before {
-        content: attr(data-label);
-        display: block;
-        font-size: 0.8em;
-        color: #7a7a7a;
-    }
-    .date-poll td.my-vote .buttons {
-        flex-wrap: wrap;
-        margin-top: 0.5em;
-    }
-    .date-poll td.my-vote .buttons .button {
-        flex-grow: 1;
+    .date-poll .my-vote .vote-button {
+        padding-left: 0.5em;
+        padding-right: 0.5em;
     }
 }
 

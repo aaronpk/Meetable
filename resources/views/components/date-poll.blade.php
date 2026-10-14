@@ -13,73 +13,60 @@ $vote_labels = [
 $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
 @endphp
 <div class="date-poll" id="date-poll" data-action="{{ route('event-date-vote', $event->id) }}">
-<div class="table-container">
-<table class="table is-fullwidth">
-    <thead>
-        <tr>
-            <th>{{ __('events.proposed.date_column') }}</th>
-            @foreach($vote_labels as $vote => $label)
-                <th class="count">{{ $label }}</th>
-            @endforeach
-            @if(!$readonly)
-                <th></th>
+@foreach($options as $option)
+    <div class="poll-option {{ $option->id == $leading_id ? 'is-leading' : '' }} {{ $option->id == $chosen_id ? 'is-chosen' : '' }}" data-option-id="{{ $option->id }}">
+        <div class="option-date">
+            <b>{{ $option->display_date() }}</b>
+            @if($option->start_time)
+                <div class="time">{{ $option->display_time() }}</div>
             @endif
-        </tr>
-    </thead>
-    <tbody>
-    @foreach($options as $option)
-        <tr class="poll-option {{ $option->id == $leading_id ? 'is-leading' : '' }} {{ $option->id == $chosen_id ? 'is-chosen' : '' }}" data-option-id="{{ $option->id }}">
-            <td class="option-date">
-                <b>{{ $option->display_date() }}</b>
-                @if($option->start_time)
-                    <div class="time">{{ $option->display_time() }}</div>
-                @endif
-                <span class="tag is-warning is-light leading-tag">{{ __('events.proposed.leading') }}</span>
-                @if($option->id == $chosen_id)
-                    <span class="tag is-success">{{ __('events.proposed.chosen') }}</span>
-                @endif
-                @if(!$readonly)
-                    @can('manage-event', $event)
-                    <form method="post" action="{{ route('finalize-event', $event->id) }}" class="finalize-form" data-date="{{ $option->display_date() }}{{ $option->start_time ? ', '.$option->display_time() : '' }}">
-                        {{ csrf_field() }}
-                        <input type="hidden" name="option_id" value="{{ $option->id }}">
-                        <button class="button is-small is-primary is-light">
-                            <span class="icon">@icon(calendar-check)</span>
-                            <span>{{ __('events.proposed.schedule_this_date') }}</span>
+            <span class="tag is-warning is-light leading-tag">{{ __('events.proposed.leading') }}</span>
+            @if($option->id == $chosen_id)
+                <span class="tag is-success">{{ __('events.proposed.chosen') }}</span>
+            @endif
+            @if(!$readonly)
+                @can('manage-event', $event)
+                <form method="post" action="{{ route('finalize-event', $event->id) }}" class="finalize-form" data-date="{{ $option->display_date() }}{{ $option->start_time ? ', '.$option->display_time() : '' }}">
+                    {{ csrf_field() }}
+                    <input type="hidden" name="option_id" value="{{ $option->id }}">
+                    <button class="button is-small is-primary is-light">
+                        <span class="icon">@icon(calendar-check)</span>
+                        <span>{{ __('events.proposed.schedule_this_date') }}</span>
+                    </button>
+                </form>
+                @endcan
+            @endif
+        </div>
+        <div class="option-votes">
+            {{-- The three answers side by side, and below them the viewer's own buttons, one under each --}}
+            <div class="counts">
+                @foreach($vote_labels as $vote => $label)
+                    <div class="count count-{{ $vote }}">
+                        <div class="count-label">{{ $label }}</div>
+                        <span class="number">{{ $option->vote_counts()[$vote] }}</span>
+                        <div class="voters">
+                            @foreach($option->voters($vote) as $voter)
+                                @include('components/vote-avatar', ['user' => $voter])
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            @if(!$readonly)
+                @can('can-vote')
+                <div class="my-vote">
+                    @foreach($vote_labels as $vote => $label)
+                        <button class="button is-small vote-button is-{{ $vote }} {{ ($user_votes[$option->id] ?? null) == $vote ? 'is-pressed' : '' }}" data-vote="{{ $vote }}" title="{{ $label }}" aria-label="{{ $label }}">
+                            <span class="icon"><svg class="svg-icon"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#{{ $vote_icons[$vote] }}"></use></svg></span>
+                            <span>{{ $label }}</span>
                         </button>
-                    </form>
-                    @endcan
-                @endif
-            </td>
-            @foreach($vote_labels as $vote => $label)
-                <td class="count count-{{ $vote }}" data-label="{{ $label }}">
-                    <span class="number">{{ $option->vote_counts()[$vote] }}</span>
-                    <div class="voters">
-                        @foreach($option->voters($vote) as $voter)
-                            @include('components/vote-avatar', ['user' => $voter])
-                        @endforeach
-                    </div>
-                </td>
-            @endforeach
-            @if(!$readonly)
-                <td class="my-vote">
-                    @can('can-vote')
-                    <div class="buttons has-addons">
-                        @foreach($vote_labels as $vote => $label)
-                            <button class="button is-small vote-button is-{{ $vote }} {{ ($user_votes[$option->id] ?? null) == $vote ? 'is-pressed' : '' }}" data-vote="{{ $vote }}" title="{{ $label }}" aria-label="{{ $label }}">
-                                <span class="icon"><svg class="svg-icon"><use xlink:href="/font-awesome-5.11.2/sprites/solid.svg#{{ $vote_icons[$vote] }}"></use></svg></span>
-                                <span class="is-hidden-tablet">{{ $label }}</span>
-                            </button>
-                        @endforeach
-                    </div>
-                    @endcan
-                </td>
+                    @endforeach
+                </div>
+                @endcan
             @endif
-        </tr>
-    @endforeach
-    </tbody>
-</table>
-</div>
+        </div>
+    </div>
+@endforeach
 
 @if(!$readonly)
     @can('manage-event', $event)
