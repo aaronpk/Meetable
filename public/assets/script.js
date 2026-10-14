@@ -108,15 +108,18 @@ $(function(){
             "class": "vote-avatar",
             src: voter.photo || "/images/placeholder.png",
             alt: voter.name,
-            title: voter.name,
             width: 20,
             height: 20
           });
+          // The name shows in a tooltip on a wrapper, since images can't carry one
+          var $wrapper = $(voter.url ? "<a>" : "<span>", {
+            "class": "vote-avatar-link has-tooltip-bottom",
+            "data-tooltip": voter.name
+          });
           if(voter.url) {
-            $voters.append($("<a>", {href: voter.url}).append($img));
-          } else {
-            $voters.append($img);
+            $wrapper.attr("href", voter.url);
           }
+          $voters.append($wrapper.append($img));
         });
       });
       $row.find(".vote-button").removeClass("is-pressed");

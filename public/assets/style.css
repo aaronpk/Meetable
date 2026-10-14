@@ -399,6 +399,10 @@ ul.photo-album li {
     margin-top: 2px;
     line-height: 0;
 }
+.date-poll .vote-avatar-link {
+    display: inline-block;
+    line-height: 0;
+}
 .date-poll .vote-avatar {
     width: 20px;
     height: 20px;

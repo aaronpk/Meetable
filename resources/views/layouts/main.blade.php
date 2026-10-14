@@ -25,7 +25,7 @@ use App\Response;
     <link href="/bulma-1.0.4/bulma.css" rel="stylesheet">
     <link href="/assets/bulma-tooltip-1.2.0.min.css" rel="stylesheet">
 
-    <link href="/assets/style.css?v=20260922" rel="stylesheet">
+    <link href="/assets/style.css?v=20261014" rel="stylesheet">
 
     <link rel="manifest" href="/manifest.json">
 
@@ -149,7 +149,7 @@ use App\Response;
 
     </main>
 
-    <script src="/assets/script.js?v=20260920"></script>
+    <script src="/assets/script.js?v=20261014"></script>
     @yield('scripts')
 
 </body>
