@@ -26,6 +26,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('event:notify')->everyMinute();
         $schedule->command('discord:notify')->everyMinute()->withoutOverlapping();
+        // Creates the upcoming copies of recurring events
+        $schedule->command('recurring:schedule')->daily();
     }
 
     /**

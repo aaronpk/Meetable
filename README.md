@@ -133,6 +133,16 @@ Alternatively, you can set up a cron job to run every minute which will process 
 php artisan queue:work --stop-when-empty
 ```
 
+#### Scheduled Tasks
+
+Some things happen on a schedule rather than in response to a request: reminders are sent before events with a meeting link start, Discord channels are notified about upcoming events, and the upcoming copies of recurring events are created. These all run from Laravel's scheduler, so set up a cron job that runs every minute, as the same user the web server runs the app as:
+
+```
+* * * * * cd /path/to/meetable && php artisan schedule:run >> /dev/null 2>&1
+```
+
+You can see what the scheduler will run with `php artisan schedule:list`.
+
 
 #### Web Server
 
