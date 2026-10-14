@@ -15,7 +15,7 @@ services:
   app:
     <<: *app-config
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80/tcp"
     depends_on:
       - db
       - redis
@@ -32,9 +32,12 @@ services:
       - meetable_storage:/var/www/html/storage/app
 
   db:
-    image: mariadb:10.11
+    # A long-term support release. Upgrading from an older release brings the existing
+    # data directory up to date on the first start.
+    image: mariadb:11.8
     restart: unless-stopped
     environment:
+      MARIADB_AUTO_UPGRADE: 1
       MYSQL_DATABASE: ${DB_DATABASE:-laravel}
       MYSQL_USER: ${DB_USERNAME:-meetable}
       MYSQL_PASSWORD: ${DB_PASSWORD}
@@ -43,7 +46,7 @@ services:
       - meetable_db:/var/lib/mysql
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
     restart: unless-stopped
     volumes:
       - meetable_redis:/data
