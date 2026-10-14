@@ -6,7 +6,21 @@
 
 return [
     'title' => 'Discord Notifications',
-    'intro' => 'Post a message to a Discord channel before events with a particular tag start.',
+    'intro' => 'Add upcoming events to the Discord server\'s event list, and post a message to a channel before events with a particular tag start.',
+
+    // Adding events to the server's event list, shown in Discord's sidebar
+    'server_events' => [
+        'title' => 'Server Events',
+        'intro' => 'Upcoming public events can be added to the Discord server\'s event list, and are kept up to date when they change or are cancelled.',
+        'enabled' => 'Add upcoming events to the server\'s event list',
+        'tags' => 'Only events with these tags',
+        'tags_help' => 'Separate tags with spaces. Leave blank to add every public event.',
+        'permission_help' => 'The bot needs the "Manage Events" permission for this. A bot added to the server before this option existed won\'t have it yet.',
+        // :error is a Discord API error message
+        'last_error' => 'The last attempt to update the server\'s events failed: :error',
+    ],
+
+    'channel_notifications' => 'Channel Notifications',
 
     'setup' => [
         'not_configured' => 'The Discord bot is not configured yet.',
@@ -88,6 +102,7 @@ return [
         'message_too_long' => 'The message can be at most 2000 characters',
         'choose_channel' => 'Choose a channel',
         'saved' => 'The notification was saved',
+        'server_events_saved' => 'The server event settings were saved',
         'deleted' => 'The notification was deleted',
         // :description is test_using_event or test_with_example
         'test_posted' => 'A test message was posted to #:channel :description',
@@ -111,6 +126,7 @@ return [
     ],
 
     'api_error' => 'Discord API error (:status): :message',
+    'events_permission_help' => 'Allow the bot to Manage Events in the server, or add the bot to the server again from the Discord page so it gets that permission',
     'token_not_configured' => 'The Discord bot token is not configured',
     'the_bot' => 'the bot',
     // :bot is the bot's name

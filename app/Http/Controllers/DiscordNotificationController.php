@@ -42,7 +42,25 @@ class DiscordNotificationController extends BaseController
             'channels' => $channels,
             'error' => $error,
             'notifications' => DiscordNotification::orderBy('tag')->orderBy('minutes_before', 'desc')->get(),
+            'sync_events' => (bool)Setting::value('discord_sync_events'),
+            'sync_events_tags' => (string)Setting::value('discord_sync_events_tags'),
+            'sync_events_error' => (string)Setting::value('discord_scheduled_events_error'),
         ]);
+    }
+
+    // Whether upcoming events are added to the server's event list, and which ones
+    public function save_server_events() {
+        $this->authorizeDiscord();
+
+        $tags = array_map([Tag::class, 'normalize'], preg_split('/[\s,]+/', (string)request('tags')));
+        $tags = array_values(array_unique(array_filter($tags)));
+
+        Setting::set('discord_sync_events', request('enabled') ? 1 : 0);
+        Setting::set('discord_sync_events_tags', implode(' ', $tags));
+        Setting::$cached = [];
+
+        session()->flash('discord-success', __('discord.messages.server_events_saved'));
+        return redirect(route('discord-notifications'));
     }
 
     public function install() {

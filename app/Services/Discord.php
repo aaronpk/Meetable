@@ -10,16 +10,27 @@ class Discord {
 
     const API = 'https://discord.com/api/v10';
 
-    // View Channel + Send Messages + Embed Links
-    const BOT_PERMISSIONS = 1024 | 2048 | 16384;
+    // View Channel + Send Messages + Embed Links: what the bot needs in a channel to post there
+    const CHANNEL_PERMISSIONS = 1024 | 2048 | 16384;
+    // Manage Events, to add events to the server's event list
+    const PERMISSION_MANAGE_EVENTS = 8589934592;
+    // What the bot is installed with
+    const BOT_PERMISSIONS = self::CHANNEL_PERMISSIONS | self::PERMISSION_MANAGE_EVENTS;
 
     const CHANNEL_TYPE_TEXT = 0;
     const CHANNEL_TYPE_CATEGORY = 4;
     const CHANNEL_TYPE_ANNOUNCEMENT = 5;
 
     const ERROR_UNKNOWN_GUILD = 10004;
+    const ERROR_UNKNOWN_SCHEDULED_EVENT = 10070;
     const ERROR_MISSING_ACCESS = 50001;
     const ERROR_MISSING_PERMISSIONS = 50013;
+
+    // Scheduled events held somewhere other than a voice or stage channel
+    const SCHEDULED_EVENT_EXTERNAL = 3;
+    const SCHEDULED_EVENT_PRIVACY_GUILD_ONLY = 2;
+    const SCHEDULED_EVENT_STATUS_CANCELED = 4;
+    const SCHEDULED_EVENT_MAX_IMAGE_BYTES = 2097152;
 
     const PERMISSION_ADMINISTRATOR = 8;
     const PERMISSION_VIEW_CHANNEL = 1024;
@@ -154,7 +165,7 @@ class Discord {
     }
 
     public static function canPost($permissions) {
-        $required = self::BOT_PERMISSIONS;
+        $required = self::CHANNEL_PERMISSIONS;
         return ($permissions & $required) == $required;
     }
 
@@ -215,20 +226,35 @@ class Discord {
         Cache::forget('discord-channels-'.self::guildId());
     }
 
-    // Posts a message and returns the Discord message ID
-    public static function sendMessage($channel_id, array $payload) {
+    // Sends a request to Discord, waiting once if it was rate limited, and returns the response
+    private static function send($method, $path, array $payload=[], $reason=null) {
         if(!self::botConfigured())
             throw new DiscordException(__('discord.token_not_configured'));
 
-        $url = self::API.'/channels/'.$channel_id.'/messages';
+        $url = self::API.$path;
 
-        $response = self::request()->post($url, $payload);
+        $attempt = function() use($method, $url, $payload, $reason) {
+            $request = self::request();
+            // Shown in the server's audit log next to the change
+            if($reason)
+                $request = $request->withHeaders(['X-Audit-Log-Reason' => rawurlencode(Str::limit($reason, 500, ''))]);
+            return $method == 'delete' ? $request->delete($url) : $request->{$method}($url, $payload);
+        };
+
+        $response = $attempt();
 
         if($response->status() == 429) {
             $retry_after = (float)($response->json('retry_after') ?? 1);
             usleep((int)(min($retry_after, 10) * 1000000));
-            $response = self::request()->post($url, $payload);
+            $response = $attempt();
         }
+
+        return $response;
+    }
+
+    // Posts a message and returns the Discord message ID
+    public static function sendMessage($channel_id, array $payload) {
+        $response = self::send('post', '/channels/'.$channel_id.'/messages', $payload);
 
         if(!$response->successful()) {
             $message = self::errorMessage($response);
@@ -293,6 +319,157 @@ class Discord {
                 'parse' => ['users', 'roles'],
             ],
         ];
+    }
+
+    /*
+     * Scheduled events: the server's event list.
+     * https://docs.discord.com/developers/resources/guild-scheduled-event
+     */
+
+    // Creates a scheduled event in the server and returns its ID
+    public static function createScheduledEvent(array $payload, $reason=null) {
+        $response = self::send('post', '/guilds/'.self::guildId().'/scheduled-events', $payload, $reason);
+        return self::scheduledEventResponse($response)['id'];
+    }
+
+    public static function updateScheduledEvent($id, array $payload, $reason=null) {
+        $response = self::send('patch', '/guilds/'.self::guildId().'/scheduled-events/'.$id, $payload, $reason);
+        return self::scheduledEventResponse($response);
+    }
+
+    // A cancelled scheduled event stays in the list, marked cancelled, and can't be changed again
+    public static function cancelScheduledEvent($id, $reason=null) {
+        return self::updateScheduledEvent($id, ['status' => self::SCHEDULED_EVENT_STATUS_CANCELED], $reason);
+    }
+
+    public static function deleteScheduledEvent($id, $reason=null) {
+        $response = self::send('delete', '/guilds/'.self::guildId().'/scheduled-events/'.$id, [], $reason);
+        self::scheduledEventResponse($response);
+    }
+
+    // Returns the response body, or throws a DiscordException whose code is Discord's error code
+    private static function scheduledEventResponse($response) {
+        if($response->successful())
+            return $response->json() ?: [];
+
+        $code = (int)$response->json('code');
+        // A plain 404 means the event is gone, the same as Discord's own code for that
+        if($response->status() == 404 && !$code)
+            $code = self::ERROR_UNKNOWN_SCHEDULED_EVENT;
+
+        $message = self::errorMessage($response);
+        if(in_array($code, [self::ERROR_MISSING_ACCESS, self::ERROR_MISSING_PERMISSIONS]))
+            $message .= '. '.__('discord.events_permission_help');
+
+        throw new DiscordException($message, $code);
+    }
+
+    public static function isPermissionError(DiscordException $e) {
+        return in_array($e->getCode(), [self::ERROR_MISSING_ACCESS, self::ERROR_MISSING_PERMISSIONS]);
+    }
+
+    /**
+     * The scheduled event for a website event, without its image.
+     *
+     * The meeting link is left out on purpose: the website only shares it shortly
+     * before the event starts, and the server's event list is visible to everyone.
+     */
+    public static function scheduledEventPayload(Event $event) {
+        list($start, $end) = self::scheduledEventTimes($event);
+        $url = $event->absolute_permalink();
+
+        // The summary if there is one, otherwise the description. Discord shows markdown but not HTML.
+        $text = trim(strip_tags((string)($event->summary ?: $event->description)));
+        $text = self::limitText($text, 1000 - mb_strlen($url) - 2);
+        $description = $text ? $text."\n\n".$url : $url;
+
+        $location = $event->has_physical_location() ? trim((string)$event->location_summary_with_name(), ', ') : '';
+        if($location)
+            $location = self::limitText($location, 100);
+        else
+            $location = mb_strlen($url) <= 100 ? $url : $event->absolute_shortlink();
+
+        return [
+            'name' => self::limitText($event->name, 100),
+            'description' => $description,
+            'scheduled_start_time' => $start,
+            'scheduled_end_time' => $end,
+            'privacy_level' => self::SCHEDULED_EVENT_PRIVACY_GUILD_ONLY,
+            'entity_type' => self::SCHEDULED_EVENT_EXTERNAL,
+            'channel_id' => null,
+            'entity_metadata' => ['location' => $location],
+        ];
+    }
+
+    /**
+     * When the scheduled event starts and ends, as ISO 8601 times in UTC.
+     *
+     * Discord needs an end time. An event with a start time but no end time is taken to
+     * last an hour. Events without times run from midnight at the start of their first
+     * day to the end of their last day.
+     */
+    public static function scheduledEventTimes(Event $event) {
+        $tz = new \DateTimeZone($event->timezone ?: 'UTC');
+        $last_day = $event->is_multiday() ? $event->end_date : $event->start_date;
+
+        if($event->start_time) {
+            $start = new \DateTime($event->start_date.' '.$event->start_time, $tz);
+            if($event->end_time) {
+                $end = new \DateTime($last_day.' '.$event->end_time, $tz);
+                // An end time earlier than the start time means the event runs past midnight
+                if($end <= $start)
+                    $end->modify('+1 day');
+            } elseif($event->is_multiday()) {
+                $end = new \DateTime($last_day.' 23:59:59', $tz);
+            } else {
+                $end = (clone $start)->modify('+1 hour');
+            }
+        } else {
+            $start = new \DateTime($event->start_date.' 00:00:00', $tz);
+            $end = new \DateTime($last_day.' 23:59:59', $tz);
+        }
+
+        $utc = new \DateTimeZone('UTC');
+        return [
+            $start->setTimezone($utc)->format('Y-m-d\TH:i:s\Z'),
+            $end->setTimezone($utc)->format('Y-m-d\TH:i:s\Z'),
+        ];
+    }
+
+    // Cuts text to a maximum length, ending it with an ellipsis that counts towards the length
+    private static function limitText($text, $max) {
+        $text = trim((string)$text);
+        if(mb_strlen($text) <= $max)
+            return $text;
+        return rtrim(mb_substr($text, 0, $max - 1)).'…';
+    }
+
+    // A fingerprint of everything that would be sent, with the cover image's URL standing in for its bytes
+    public static function scheduledEventHash(Event $event, array $payload) {
+        return hash('sha256', json_encode($payload + ['cover_image' => (string)$event->cover_image]));
+    }
+
+    // The event's cover image as a data URI for Discord, or null if there isn't a usable one
+    public static function scheduledEventImage(Event $event) {
+        if(!$event->cover_image)
+            return null;
+
+        if(preg_match('~^https?://~', $event->cover_image)) {
+            $bytes = \App\Helpers\SafeHTTP::fetch_image($event->cover_image);
+        } elseif(preg_match('~^/storage/(.+)$~', $event->cover_image, $match) && \Storage::exists('public/'.$match[1])) {
+            $bytes = \Storage::get('public/'.$match[1]);
+        } else {
+            return null;
+        }
+
+        if(!$bytes || strlen($bytes) > self::SCHEDULED_EVENT_MAX_IMAGE_BYTES)
+            return null;
+
+        $info = @getimagesizefromstring($bytes);
+        if(!$info || !in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF]))
+            return null;
+
+        return 'data:'.$info['mime'].';base64,'.base64_encode($bytes);
     }
 
 }
