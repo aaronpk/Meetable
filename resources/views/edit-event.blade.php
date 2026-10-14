@@ -269,8 +269,8 @@ form h2.subtitle {
     </div>
     </div>
 
-    @if($can_propose)
-    <div id="proposed-date-fields" class="{{ $is_proposed ? '' : 'hidden' }}">
+    @if($show_propose_checkbox || $editing_proposal)
+    <div id="proposed-date-fields" class="{{ $is_proposed ? '' : 'hidden' }}" data-proposed="{{ $editing_proposal ? 1 : 0 }}">
         @if($editing_proposal)
             <div class="message is-info">
                 <div class="message-body">{{ __('event_form.proposed_edit_notice') }}</div>
@@ -557,7 +557,11 @@ $(function(){
     var nextOptionIndex = $("#proposed-options .proposed-option").length;
 
     function is_proposed() {
-        return $("#is_proposed").length ? $("#is_proposed").is(":checked") : $("#proposed-date-fields").length > 0;
+        if($("#is_proposed").length) {
+            return $("#is_proposed").is(":checked");
+        }
+        // No checkbox when editing: an existing proposal stays one until a date is chosen
+        return $("#proposed-date-fields").attr("data-proposed") == "1";
     }
 
     function toggle_proposed() {

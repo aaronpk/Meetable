@@ -183,6 +183,18 @@ class ProposedEventTest extends TestCase
             ->assertSee('data-votes="0"', false);
     }
 
+    public function testEditingAScheduledEventShowsItsDateAndNoProposedDates()
+    {
+        $event = $this->createEvent(['start_date' => '2032-03-04']);
+
+        $this->actingAs($this->testUser())->get('/event/'.$event->id)
+            ->assertOk()
+            ->assertSee('name="start_date" autocomplete="off" value="2032-03-04"', false)
+            ->assertDontSee('name="is_proposed"', false)
+            ->assertDontSee('id="proposed-date-fields"', false)
+            ->assertDontSee('name="options[0][date]"', false);
+    }
+
     public function testTheRevisionHistoryShowsARevisionFromBeforeTheDateWasChosen()
     {
         $event = $this->createProposal();
