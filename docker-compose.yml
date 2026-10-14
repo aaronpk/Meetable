@@ -20,7 +20,7 @@ services:
       - db
       - redis
     volumes:
-      - ./storage:/var/www/html/storage/app
+      - meetable_storage:/var/www/html/storage/app
 
   worker:
     <<: *app-config
@@ -29,12 +29,15 @@ services:
       - db
       - redis
     volumes:
-      - ./storage:/var/www/html/storage/app
+      - meetable_storage:/var/www/html/storage/app
 
   db:
-    image: mariadb:12
+    # A long-term support release. Upgrading from an older release brings the existing
+    # data directory up to date on the first start.
+    image: mariadb:11.8
     restart: unless-stopped
     environment:
+      MARIADB_AUTO_UPGRADE: 1
       MYSQL_DATABASE: ${DB_DATABASE:-laravel}
       MYSQL_USER: ${DB_USERNAME:-meetable}
       MYSQL_PASSWORD: ${DB_PASSWORD}
