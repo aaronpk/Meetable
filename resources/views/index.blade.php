@@ -46,6 +46,17 @@ use App\Setting;
     </div>
     @endif
 
+    @if(!empty($home) && !empty($proposed_count))
+        <article class="message is-info proposed-banner">
+            <div class="message-body">
+                {!! trans_choice('events.proposed.banner', $proposed_count, [
+                    'count' => $proposed_count,
+                    'link' => '<a href="'.route('proposed').'">'.e(__('events.proposed.banner_link')).'</a>',
+                ]) !!}
+            </div>
+        </article>
+    @endif
+
     @if(count($data))
         @include('components/event-list', ['data' => $data])
     @else

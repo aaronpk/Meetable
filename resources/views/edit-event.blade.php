@@ -194,6 +194,51 @@ form h2.subtitle {
     <h2 class="subtitle">{{ __('event_form.when_question') }}</h2>
     @endif
 
+    @php
+    // A new event can offer several dates to vote on instead of a date. An event that
+    // is already proposed keeps its list of dates until one is chosen on the event page.
+    $can_propose = Setting::value('enable_proposed_events') && \Gate::allows('propose-event')
+        && $mode != 'recurring' && !$event->recurrence_interval && !$event->is_template;
+    $show_propose_checkbox = $can_propose && in_array($mode, ['create', 'clone']);
+    $editing_proposal = $mode == 'edit' && $event->is_proposed;
+    if($editing_proposal)
+        $is_proposed = true;
+    elseif($show_propose_checkbox)
+        $is_proposed = old('name') !== null ? (bool)old('is_proposed') : (bool)$event->is_proposed;
+    else
+        $is_proposed = false;
+
+    $option_rows = old('options');
+    if(!is_array($option_rows)) {
+        $option_rows = [];
+        if($event->id && $event->is_proposed) {
+            foreach($event->date_options as $option) {
+                $option_rows[] = [
+                    'id' => $mode == 'edit' ? $option->id : '',
+                    'date' => $option->date,
+                    'end_date' => $option->end_date,
+                    'start_time' => $option->start_time,
+                    'end_time' => $option->end_time,
+                    'votes' => $mode == 'edit' ? $option->votes()->count() : 0,
+                ];
+            }
+        }
+    }
+    while(count($option_rows) < 2)
+        $option_rows[] = [];
+    @endphp
+
+    @if($show_propose_checkbox)
+    <div class="field">
+        <label class="checkbox">
+            <input type="checkbox" name="is_proposed" value="1" id="is_proposed" {{ $is_proposed ? 'checked' : '' }}>
+            {{ __('event_form.propose_dates') }}
+        </label>
+        <div class="help">{{ __('event_form.propose_dates_help') }}</div>
+    </div>
+    @endif
+
+    <div id="fixed-date-fields" class="{{ $is_proposed ? 'hidden' : '' }}">
     <div class="field is-grouped is-grouped-multiline">
         <div class="control is-expanded">
             <label class="label">{{ __('event_form.start_date') }}</label>
@@ -222,6 +267,35 @@ form h2.subtitle {
             <div class="help">{{ __('event_form.end_time_help') }}</div>
         </div>
     </div>
+    </div>
+
+    @if($show_propose_checkbox || $editing_proposal)
+    <div id="proposed-date-fields" class="{{ $is_proposed ? '' : 'hidden' }}" data-proposed="{{ $editing_proposal ? 1 : 0 }}">
+        @if($editing_proposal)
+            <div class="message is-info">
+                <div class="message-body">{{ __('event_form.proposed_edit_notice') }}</div>
+            </div>
+        @endif
+        <div class="help">{{ __('event_form.proposed_dates_help') }}</div>
+
+        <div id="proposed-options">
+            @foreach($option_rows as $i => $row)
+                @include('components/proposed-option-row', ['i' => $i, 'row' => $row])
+            @endforeach
+        </div>
+
+        <div class="field">
+            <button type="button" class="button is-small" id="add-proposed-option">
+                <span class="icon">@icon(plus)</span>
+                <span>{{ __('event_form.add_another_date') }}</span>
+            </button>
+        </div>
+
+        <template id="proposed-option-template">
+            @include('components/proposed-option-row', ['i' => '__INDEX__', 'row' => []])
+        </template>
+    </div>
+    @endif
 
     <div class="field">
         <div class="control is-expanded">
@@ -317,12 +391,14 @@ form h2.subtitle {
     </div>
 
     @if(Setting::value('zoom_client_id'))
-    <div class="field">
+    <div class="field" id="zoom-field">
         <label class="checkbox">
-            <input type="checkbox" name="create_zoom_meeting" value="1">
+            {{-- A proposal remembers the request until a date is chosen, so the box stays checked when editing one --}}
+            <input type="checkbox" name="create_zoom_meeting" value="1" {{ (old('name') !== null ? old('create_zoom_meeting') : $event->zoom_meeting_requested) ? 'checked' : '' }}>
             {{ __('event_form.schedule_zoom') }}
         </label>
         <div class="help">{{ __('event_form.schedule_zoom_help', ['email' => Setting::value('zoom_email')]) }}</div>
+        <div class="help zoom-proposed-help hidden">{{ __('event_form.schedule_zoom_proposed_help') }}</div>
     </div>
     @endif
 
@@ -362,7 +438,7 @@ form h2.subtitle {
         <div class="help">{{ __('event_form.video_url_help') }}</div>
     </div>
 
-    <div class="field">
+    <div class="field" id="status-field">
         <div class="control is-expanded">
             <label class="label">{{ __('event_form.status') }}</label>
             <div class="select is-fullwidth">
@@ -461,18 +537,82 @@ $(function(){
 
     $("input[name=end_date]").change();
 
-    $("input[name=create_zoom_meeting]").click(function(){
-        if($(this).is(":checked")) {
-            $("#meeting-url-field").addClass('hidden');
-            // Require time fields
-            $("input[name=start_time]").attr("required","required");
-            $("select[name=timezone]").attr("required","required");
-            $("#start-time-optional, #timezone-optional").addClass("hidden");
-        } else {
-            $("#meeting-url-field").removeClass('hidden');
-            $("input[name=start_time]").removeAttr("required");
-            $("select[name=timezone]").removeAttr("required");
-            $("#start-time-optional, #timezone-optional").removeClass("hidden");
+    // A Zoom meeting needs a time and a timezone. For a proposal that means a start time
+    // on each proposed date, since the meeting is scheduled once one of them is chosen.
+    function update_zoom_fields() {
+        var zoom = $("input[name=create_zoom_meeting]").is(":checked");
+        $("#meeting-url-field").toggleClass("hidden", zoom);
+        $("input[name=start_time]").prop("required", zoom);
+        $("select[name=timezone]").prop("required", zoom);
+        $("#proposed-options .option-time input[name$='[start_time]']").prop("required", zoom);
+        $("#start-time-optional, #timezone-optional").toggleClass("hidden", zoom);
+    }
+
+    $("input[name=create_zoom_meeting]").click(update_zoom_fields);
+
+    // Proposing dates instead of setting one. The fields of the block that isn't in use
+    // are disabled so they are neither validated by the browser nor submitted.
+    var nextOptionIndex = $("#proposed-options .proposed-option").length;
+
+    function is_proposed() {
+        if($("#is_proposed").length) {
+            return $("#is_proposed").is(":checked");
+        }
+        // No checkbox when editing: an existing proposal stays one until a date is chosen
+        return $("#proposed-date-fields").attr("data-proposed") == "1";
+    }
+
+    function toggle_proposed() {
+        var proposed = is_proposed();
+        $("#fixed-date-fields").toggleClass("hidden", proposed).find(":input").prop("disabled", proposed);
+        $("#proposed-date-fields").toggleClass("hidden", !proposed).find(":input").prop("disabled", !proposed);
+        $("#status-field").toggleClass("hidden", proposed).find(":input").prop("disabled", proposed);
+        $("#zoom-field .zoom-proposed-help").toggleClass("hidden", !proposed);
+        if(proposed) {
+            update_option_times();
+        }
+        update_zoom_fields();
+    }
+
+    // A proposed date with an end date is a multi-day event, which has no times. Its time
+    // fields are disabled as well as hidden so they are neither validated nor submitted.
+    function update_option_times() {
+        $("#proposed-options .proposed-option").each(function(){
+            var multiday = !!$(this).find(".option-end-date").val();
+            $(this).find(".option-time").toggleClass("hidden", multiday).find(":input").prop("disabled", multiday);
+        });
+    }
+
+    $("#is_proposed").on("change", toggle_proposed);
+    if($("#proposed-date-fields").length) {
+        toggle_proposed();
+    }
+
+    $("#add-proposed-option").click(function(){
+        var html = $("#proposed-option-template").html().replace(/__INDEX__/g, nextOptionIndex++);
+        $("#proposed-options").append(html);
+        update_zoom_fields();
+    });
+
+    $("#proposed-options").on("change", ".option-end-date", update_option_times);
+
+    $("#proposed-options").on("click", ".remove-proposed-option", function(){
+        var $row = $(this).closest(".proposed-option");
+        var votes = parseInt($row.attr("data-votes") || 0, 10);
+        if(votes > 0 && !confirm(lang("remove_option_with_votes", {count: votes}))) {
+            return;
+        }
+        $row.remove();
+    });
+
+    $("form.event-form").on("submit", function(evt){
+        if(!is_proposed()) {
+            return;
+        }
+        var filled = $("#proposed-options input[type=date]").filter(function(){ return $(this).val(); }).length;
+        if(filled < 2) {
+            alert(lang("proposed_needs_two_dates"));
+            evt.preventDefault();
         }
     });
 

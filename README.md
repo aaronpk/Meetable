@@ -32,6 +32,8 @@ Events have a permalink that contains
 
 When logged in, you can add photos directly to an event page. Event pages also accept [webmentions](https://webmention.net) so that people can add photos and notes to the page from their own websites.
 
+With "Proposed Events" enabled in the site settings, an event can be created without a date, offering several possible dates instead. Logged-in users vote yes, if need be, or no on each date, and whoever can edit the event then chooses one, turning it into a regular scheduled event.
+
 ## Setup
 
 You can run Meetable using Docker Compose or install it manually.

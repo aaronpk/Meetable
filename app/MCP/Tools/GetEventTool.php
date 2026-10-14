@@ -66,6 +66,19 @@ class GetEventTool implements MCPTool
             'remote' => $event->rsvps_remote()->count(),
         ];
 
+        // The candidate dates of a proposed event and how the voting stands
+        if ($event->is_proposed) {
+            $data['date_options'] = $event->date_options_with_tallies()->map(function ($option) {
+                return [
+                    'date'       => $option->date,
+                    'end_date'   => $option->end_date,
+                    'start_time' => $option->start_time,
+                    'end_time'   => $option->end_time,
+                    'votes'      => $option->vote_counts(),
+                ];
+            })->values()->all();
+        }
+
         return [
             'content' => [[
                 'type' => 'text',

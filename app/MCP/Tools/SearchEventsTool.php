@@ -52,6 +52,7 @@ class SearchEventsTool implements MCPTool
 
         $events = Event::where('unlisted', 0)
             ->where('is_template', 0)
+            ->where('is_proposed', 0)
             ->where(function ($q) use ($like) {
                 $q->where('name', 'like', $like)
                   ->orWhere('summary', 'like', $like)

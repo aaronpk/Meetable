@@ -71,6 +71,14 @@ use App\Setting;
 
         <div class="field">
             <label class="label">
+                <input type="checkbox" name="enable_proposed_events" value="1" {{ Setting::value('enable_proposed_events') ? 'checked="checked"' : ''}}>
+                {{ __('settings.enable_proposed_events') }}
+            </label>
+            <p class="help">{{ __('settings.enable_proposed_events_help') }}</p>
+        </div>
+
+        <div class="field">
+            <label class="label">
                 <input type="checkbox" name="show_meeting_url_in_ics" value="1" {{ Setting::value('show_meeting_url_in_ics') ? 'checked="checked"' : ''}}>
                 {{ __('settings.show_meeting_url_in_ics') }}
             </label>

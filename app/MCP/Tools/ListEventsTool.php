@@ -58,6 +58,7 @@ class ListEventsTool implements MCPTool
             ->where('unlisted', 0)
             ->where('hide_from_main_feed', 0)
             ->where('is_template', 0)
+            ->where('is_proposed', 0)
             ->orderBy('sort_date');
 
         if (!empty($args['end_date'])) {
@@ -88,7 +89,9 @@ class ListEventsTool implements MCPTool
         return [
             'key'               => $event->key,
             'name'              => $event->name,
-            'status'            => $event->status,
+            // A proposed event has no date yet: people are voting on its candidate dates
+            'status'            => $event->is_proposed ? 'proposed' : $event->status,
+            'is_proposed'       => (bool)$event->is_proposed,
             'start_date'        => $event->start_date,
             'start_time'        => $event->start_time,
             'end_date'          => $event->end_date,

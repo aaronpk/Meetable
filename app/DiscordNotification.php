@@ -35,6 +35,7 @@ class DiscordNotification extends Model
             })
             ->where('unlisted', 0)
             ->where('is_template', 0)
+            ->where('is_proposed', 0)
             ->whereNotIn('status', ['cancelled', 'postponed'])
             ->whereNotNull('sort_date');
     }

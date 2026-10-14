@@ -105,6 +105,22 @@ class AuthServiceProvider extends ServiceProvider
             return false;
         });
 
+        // Any logged-in user can vote on the dates of a proposed event
+        Gate::define('can-vote', function($user) {
+            if(!$user)
+                return false;
+
+            return Setting::value('enable_proposed_events') ? true : false;
+        });
+
+        // Proposing an event needs the same permission as creating one
+        Gate::define('propose-event', function($user) {
+            if(!$user || !Setting::value('enable_proposed_events'))
+                return false;
+
+            return Gate::forUser($user)->allows('create-event');
+        });
+
         Gate::define('logged-in', function($user) {
             return $user ? true : false;
         });

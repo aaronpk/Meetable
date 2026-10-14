@@ -13,6 +13,17 @@ class EventSubscriber implements ShouldQueue
 
 	public function handleEventCreated(EventCreated $event) {
 		Log::info('Event created: '.$event->event->id);
+
+		if($event->event->is_proposed) {
+			$summary = '[Proposed Event] '
+				. $event->event->createdBy->display_url() . ' proposed'
+				. ' "' . $event->event->name . '"'
+				. ' with ' . $event->event->date_options()->count() . ' possible dates, vote at'
+				. ' ' . $event->event->absolute_shortlink();
+			Notification::sendMeta($summary);
+			return;
+		}
+
 		$summary = '[New Event] '
 			. $event->event->createdBy->display_url() . ' created'
 			. ' "' . $event->event->date_summary_text() . ' ' . $event->event->name . '"'
@@ -32,6 +43,17 @@ class EventSubscriber implements ShouldQueue
         if(!$previous) {
         	Log::error('Could not find previous revision of event '.$event->event->id);
         	return;
+        }
+
+        // A proposed event that just got its date chosen
+        if($previous->is_proposed && !$event->revision->is_proposed) {
+			$summary = '[Event Scheduled] '
+				. $event->revision->lastModifiedBy->display_url() . ' scheduled'
+				. ' "' . $event->event->name . '"'
+				. ' for ' . $event->event->date_summary_text()
+				. ' ' . $event->event->absolute_shortlink();
+	        Notification::sendMeta($summary);
+	        return;
         }
 
 		$summary = '[Event Updated] '
