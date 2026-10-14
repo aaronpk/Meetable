@@ -13,6 +13,9 @@ return [
         'title' => 'Server Events',
         'intro' => 'Upcoming public events can be added to the Discord server\'s event list, and are kept up to date when they change or are cancelled.',
         'enabled' => 'Add upcoming events to the server\'s event list',
+        'days' => 'Add events starting in the next (days)',
+        // :count is how many events are added at most
+        'days_help' => 'At most the :count soonest events are added, however far ahead this looks.',
         'tags' => 'Only events with these tags',
         'tags_help' => 'Separate tags with spaces. Leave blank to add every public event.',
         'permission_help' => 'The bot needs the "Create Events" and "Manage Events" permissions for this. A bot added to the server before this option existed won\'t have them yet.',
@@ -103,6 +106,8 @@ return [
         'choose_channel' => 'Choose a channel',
         'saved' => 'The notification was saved',
         'server_events_saved' => 'The server event settings were saved',
+        // :max is the largest number of days allowed
+        'days_range' => 'The number of days must be between 1 and :max',
         'deleted' => 'The notification was deleted',
         // :description is test_using_event or test_with_example
         'test_posted' => 'A test message was posted to #:channel :description',

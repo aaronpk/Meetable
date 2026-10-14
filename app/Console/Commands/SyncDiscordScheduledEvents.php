@@ -22,14 +22,29 @@ class SyncDiscordScheduledEvents extends Command {
     // Discord won't create an event that starts in the past, so leave a little room
     const START_BUFFER_MINUTES = 2;
 
-    // Discord allows 100 scheduled events per server. Leave room for ones made by hand.
-    const MAX_EVENTS = 90;
+    // How far ahead events are added unless the site chooses otherwise
+    const DEFAULT_DAYS_AHEAD = 60;
+    const MAX_DAYS_AHEAD = 365;
+
+    // Only this many of the soonest events are added, however far ahead the site looks, so a
+    // busy calendar doesn't fill the server's event list (Discord allows 100) or hit rate limits
+    const MAX_EVENTS = 25;
+
+    // Discord rate limits writes, so a run only makes this many and the rest wait for the next minute
+    const MAX_WRITES_PER_RUN = 10;
 
     private $errors = [];
+    private $writes = 0;
 
     // Whether this site can talk to a Discord server at all
     public static function available() {
         return Discord::enabled() && Discord::botConfigured() && Discord::guildId();
+    }
+
+    // How many days ahead to look for events to add
+    public static function daysAhead() {
+        $days = (int)Setting::value('discord_sync_events_days');
+        return ($days >= 1 && $days <= self::MAX_DAYS_AHEAD) ? $days : self::DEFAULT_DAYS_AHEAD;
     }
 
     // The tags an event needs one of to be added, or an empty list for every public event
@@ -40,18 +55,22 @@ class SyncDiscordScheduledEvents extends Command {
     public function handle() {
         // The same command instance can be run more than once in one process
         $this->errors = [];
+        $this->writes = 0;
 
         if(!self::available())
             return;
 
-        $cutoff = (new DateTime('now', new DateTimeZone('UTC')))
-            ->modify('+'.self::START_BUFFER_MINUTES.' minutes')
-            ->format('Y-m-d H:i:s');
+        $now = new DateTime('now', new DateTimeZone('UTC'));
+        $cutoff = (clone $now)->modify('+'.self::START_BUFFER_MINUTES.' minutes')->format('Y-m-d H:i:s');
+        $horizon = (clone $now)->modify('+'.self::daysAhead().' days')->format('Y-m-d H:i:s');
 
         // Everything that belongs in Discord, soonest first. When the option is turned off
         // nothing belongs there, so anything added earlier is removed below.
         if(Setting::value('discord_sync_events')) {
-            $query = Event::announceable()->where('sort_date', '>', $cutoff)->orderBy('sort_date');
+            $query = Event::announceable()
+                ->where('sort_date', '>', $cutoff)
+                ->where('sort_date', '<=', $horizon)
+                ->orderBy('sort_date');
             if($tags = self::tags())
                 $query->withAnyTag($tags);
             $eligible = $query->get();
@@ -59,8 +78,8 @@ class SyncDiscordScheduledEvents extends Command {
             $eligible = collect();
         }
 
-        // What this run will create or update. Events past the cap are left alone, not removed,
-        // and get their turn as sooner events finish.
+        // What this run will create or update: the soonest few. The rest are left alone, not
+        // removed, and get their turn as sooner events finish.
         $wanted = $eligible->take(self::MAX_EVENTS);
 
         // First remove what no longer belongs, so the server's count goes down before it goes up
@@ -76,6 +95,10 @@ class SyncDiscordScheduledEvents extends Command {
                 $this->forget($event);
                 continue;
             }
+
+            if($this->writes >= self::MAX_WRITES_PER_RUN)
+                break;
+            $this->writes++;
 
             try {
                 if(!$event->trashed() && in_array($event->status, ['cancelled', 'postponed'])) {
@@ -103,6 +126,10 @@ class SyncDiscordScheduledEvents extends Command {
 
             if($event->discord_scheduled_event_id && $hash === $event->discord_scheduled_event_hash)
                 continue;
+
+            if($this->writes >= self::MAX_WRITES_PER_RUN)
+                break;
+            $this->writes++;
 
             if($image = Discord::scheduledEventImage($event))
                 $payload['image'] = $image;

@@ -22,7 +22,7 @@ class DiscordScheduledEventTest extends TestCase
     use CreatesEvents;
 
     const ENV = ['AUTH_METHOD', 'DISCORD_BOT_TOKEN', 'DISCORD_SERVER_ID'];
-    const SETTINGS = ['discord_sync_events', 'discord_sync_events_tags', 'discord_scheduled_events_error'];
+    const SETTINGS = ['discord_sync_events', 'discord_sync_events_tags', 'discord_sync_events_days', 'discord_scheduled_events_error'];
 
     private $previous_env = [];
     private $previous_settings = [];
@@ -91,6 +91,7 @@ class DiscordScheduledEventTest extends TestCase
     {
         Setting::set('discord_sync_events', $enabled ? 1 : 0);
         Setting::set('discord_sync_events_tags', $tags);
+        Setting::set('discord_sync_events_days', '');
         Setting::set('discord_scheduled_events_error', '');
         Setting::$cached = [];
     }
@@ -301,6 +302,73 @@ class DiscordScheduledEventTest extends TestCase
         Tag::where('tag', 'like', 'some-other-tag-%')->delete();
     }
 
+    public function testOnlyEventsWithinTheChosenNumberOfDaysAreAdded()
+    {
+        $this->fakeDiscord();
+        $soon = $this->eventStartingIn(59 * 24 * 60);
+        $later = $this->eventStartingIn(61 * 24 * 60);
+
+        $this->sync();
+
+        $names = $this->requests('POST')->map(fn($pair) => $pair[0]['name'])->all();
+        $this->assertEquals([$soon->name], $names);
+        $this->assertEquals('', $later->fresh()->discord_scheduled_event_id);
+
+        // An event moved out of the window leaves Discord, and comes back when it is in range again
+        $start = (new DateTime('now', new DateTimeZone('UTC')))->modify('+70 days');
+        $soon->start_date = $start->format('Y-m-d');
+        $soon->sort_date = $soon->sort_date();
+        $soon->save();
+        $this->sync();
+
+        $this->assertCount(1, $this->requests('DELETE'));
+        $this->assertEquals('', $soon->fresh()->discord_scheduled_event_id);
+    }
+
+    public function testTheNumberOfDaysCanBeChanged()
+    {
+        $this->fakeDiscord();
+        Setting::set('discord_sync_events_days', 7);
+        Setting::$cached = [];
+
+        $soon = $this->eventStartingIn(6 * 24 * 60);
+        $this->eventStartingIn(8 * 24 * 60);
+
+        $this->sync();
+
+        $names = $this->requests('POST')->map(fn($pair) => $pair[0]['name'])->all();
+        $this->assertEquals([$soon->name], $names);
+    }
+
+    public function testOnlyTheSoonestFewEventsAreAdded()
+    {
+        $this->fakeDiscord();
+        for($i = 0; $i < 27; $i++)
+            $this->eventStartingIn(120 + $i);
+
+        for($run = 0; $run < 4; $run++)
+            $this->sync();
+
+        $this->assertCount(25, $this->requests('POST'));
+    }
+
+    public function testOnlyAFewChangesAreMadePerRun()
+    {
+        $this->fakeDiscord();
+        $events = [];
+        for($i = 0; $i < 12; $i++)
+            $events[] = $this->upcomingEvent();
+
+        $this->sync();
+        $this->assertCount(10, $this->requests('POST'));
+
+        $this->sync();
+        $this->assertCount(12, $this->requests('POST'));
+
+        $this->sync();
+        $this->assertCount(12, $this->requests('POST'));
+    }
+
     public function testEveryPublicEventIsAddedWhenThereIsNoTagFilter()
     {
         $this->fakeDiscord();
@@ -432,24 +500,36 @@ class DiscordScheduledEventTest extends TestCase
         $this->fakeDiscord();
 
         $this->actingAs($this->testUser())
-            ->post('/discord/events/save', ['enabled' => 1, 'tags' => 'Foo, BAR baz'])
+            ->post('/discord/events/save', ['enabled' => 1, 'tags' => 'Foo, BAR baz', 'days' => 30])
             ->assertRedirect('/discord');
 
         Setting::$cached = [];
         $this->assertEquals(1, Setting::value('discord_sync_events'));
         $this->assertEquals('foo bar baz', Setting::value('discord_sync_events_tags'));
+        $this->assertEquals(30, Setting::value('discord_sync_events_days'));
 
         $this->actingAs($this->testUser())->get('/discord')
             ->assertOk()
             ->assertSee('name="enabled" value="1" checked', false)
-            ->assertSee('value="foo bar baz"', false);
+            ->assertSee('value="foo bar baz"', false)
+            ->assertSee('name="days" id="server-events-days" min="1" max="365" step="1" required value="30"', false);
 
         $this->actingAs($this->testUser())
-            ->post('/discord/events/save', ['tags' => ''])
+            ->post('/discord/events/save', ['tags' => '', 'days' => 60])
             ->assertRedirect('/discord');
 
         Setting::$cached = [];
         $this->assertEquals(0, Setting::value('discord_sync_events'));
         $this->assertEquals('', Setting::value('discord_sync_events_tags'));
+
+        // An impossible number of days is refused and nothing changes
+        $this->actingAs($this->testUser())
+            ->post('/discord/events/save', ['enabled' => 1, 'days' => 0])
+            ->assertRedirect('/discord')
+            ->assertSessionHas('discord-errors');
+
+        Setting::$cached = [];
+        $this->assertEquals(0, Setting::value('discord_sync_events'));
+        $this->assertEquals(60, Setting::value('discord_sync_events_days'));
     }
 }

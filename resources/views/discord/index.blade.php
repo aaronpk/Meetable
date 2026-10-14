@@ -50,6 +50,13 @@
         @if($sync_events_error)
             <div class="notification is-warning">{{ __('discord.server_events.last_error', ['error' => $sync_events_error]) }}</div>
         @endif
+        @if($form_errors = session('discord-errors'))
+            <div class="notification is-danger">
+                @foreach($form_errors as $e)
+                    {{ $e }}<br>
+                @endforeach
+            </div>
+        @endif
         <form action="{{ route('save-discord-server-events') }}" method="post">
             <div class="field">
                 <label class="checkbox">
@@ -58,9 +65,16 @@
                 </label>
             </div>
             <div class="field">
+                <label class="label" for="server-events-days">{{ __('discord.server_events.days') }}</label>
+                <div class="control">
+                    <input class="input" type="number" name="days" id="server-events-days" min="1" max="{{ App\Console\Commands\SyncDiscordScheduledEvents::MAX_DAYS_AHEAD }}" step="1" required value="{{ old('days', $sync_events_days) }}" style="width: 8em;">
+                </div>
+                <p class="help">{{ __('discord.server_events.days_help', ['count' => App\Console\Commands\SyncDiscordScheduledEvents::MAX_EVENTS]) }}</p>
+            </div>
+            <div class="field">
                 <label class="label" for="server-events-tags">{{ __('discord.server_events.tags') }}</label>
                 <div class="control">
-                    <input class="input" type="text" name="tags" id="server-events-tags" autocomplete="off" value="{{ $sync_events_tags }}">
+                    <input class="input" type="text" name="tags" id="server-events-tags" autocomplete="off" value="{{ old('tags', $sync_events_tags) }}">
                 </div>
                 <p class="help">{{ __('discord.server_events.tags_help') }}</p>
             </div>

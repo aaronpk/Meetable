@@ -207,7 +207,7 @@ AUTH_SHOW_LOGOUT=false
 
 #### Discord
 
-A Discord bot can post a message to a channel before events with a particular tag start, and can add upcoming events to the server's event list, where they appear in the sidebar and go live at their start time. Set `DISCORD_CLIENT_ID` and `DISCORD_BOT_TOKEN` as described in `.env.example`, then add the bot to the server from the "Discord" page in the menu. This works with any login method: when the site logs in with Discord, every user can set up the bot, otherwise it is only available to people who can manage the site. If the bot was added before the server event list option existed, add it again so it gets the "Create Events" and "Manage Events" permissions.
+A Discord bot can post a message to a channel before events with a particular tag start, and can add upcoming events to the server's event list, where they appear in the sidebar and go live at their start time. The Discord page sets how far ahead events are added, and at most the 25 soonest are added so a busy calendar doesn't overwhelm the list. Set `DISCORD_CLIENT_ID` and `DISCORD_BOT_TOKEN` as described in `.env.example`, then add the bot to the server from the "Discord" page in the menu. This works with any login method: when the site logs in with Discord, every user can set up the bot, otherwise it is only available to people who can manage the site. If the bot was added before the server event list option existed, add it again so it gets the "Create Events" and "Manage Events" permissions.
 
 #### Passkey Authentication
 

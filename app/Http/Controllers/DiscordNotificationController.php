@@ -48,6 +48,7 @@ class DiscordNotificationController extends BaseController
             'notifications' => DiscordNotification::orderBy('tag')->orderBy('minutes_before', 'desc')->get(),
             'sync_events' => (bool)Setting::value('discord_sync_events'),
             'sync_events_tags' => (string)Setting::value('discord_sync_events_tags'),
+            'sync_events_days' => \App\Console\Commands\SyncDiscordScheduledEvents::daysAhead(),
             'sync_events_error' => (string)Setting::value('discord_scheduled_events_error'),
         ]);
     }
@@ -59,8 +60,15 @@ class DiscordNotificationController extends BaseController
         $tags = array_map([Tag::class, 'normalize'], preg_split('/[\s,]+/', (string)request('tags')));
         $tags = array_values(array_unique(array_filter($tags)));
 
+        $days = (int)request('days');
+        if($days < 1 || $days > \App\Console\Commands\SyncDiscordScheduledEvents::MAX_DAYS_AHEAD) {
+            session()->flash('discord-errors', [__('discord.messages.days_range', ['max' => \App\Console\Commands\SyncDiscordScheduledEvents::MAX_DAYS_AHEAD])]);
+            return redirect(route('discord-notifications'))->withInput();
+        }
+
         Setting::set('discord_sync_events', request('enabled') ? 1 : 0);
         Setting::set('discord_sync_events_tags', implode(' ', $tags));
+        Setting::set('discord_sync_events_days', $days);
         Setting::$cached = [];
 
         session()->flash('discord-success', __('discord.messages.server_events_saved'));
