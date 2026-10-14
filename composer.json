@@ -28,8 +28,7 @@
         "p3k/html-sanitizer": "^0.1",
         "p3k/timezone": "^0.1.0",
         "p3k/utils": "^1.2",
-        "p3k/xray": "^1.12",
-        "zbateson/mail-mime-parser": "^2.0"
+        "p3k/xray": "^1.12"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
