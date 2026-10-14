@@ -414,6 +414,48 @@ class ProposedEventTest extends TestCase
         $this->assertNull(Event::where('name', $name)->first());
     }
 
+    /**
+     * Zoom isn't configured in the test environment, so scheduling is a no-op there,
+     * but the request is still remembered and only acted on once a date is chosen.
+     */
+    public function testAZoomMeetingRequestedForAProposalWaitsUntilADateIsChosen()
+    {
+        $event = $this->createProposal(['create_zoom_meeting' => 1]);
+
+        $this->assertEquals(1, $event->zoom_meeting_requested);
+        $this->assertEmpty($event->zoom_meeting_id);
+
+        // The checkbox is only on the form when Zoom is configured, so configure it just
+        // for this look at the form, and clear it again before anything would call Zoom
+        $previous_zoom = Setting::value('zoom_client_id');
+        Setting::set('zoom_client_id', 'test-client');
+        Setting::$cached = [];
+        try {
+            $this->actingAs($this->testUser())->get('/event/'.$event->id)
+                ->assertOk()
+                ->assertSee('name="create_zoom_meeting" value="1" checked', false);
+        } finally {
+            Setting::set('zoom_client_id', $previous_zoom);
+            Setting::$cached = [];
+        }
+
+        $this->get($event->permalink())->assertSee('A Zoom meeting will be scheduled');
+
+        // A date with no start time can't have a meeting
+        $this->actingAs($this->testUser())
+            ->post('/event/'.$event->id.'/finalize', ['option_id' => $event->date_options[0]->id])
+            ->assertSessionHasErrors();
+        $this->assertEquals(1, $event->fresh()->is_proposed);
+
+        $this->actingAs($this->testUser())
+            ->post('/event/'.$event->id.'/finalize', ['option_id' => $event->date_options[1]->id])
+            ->assertRedirect();
+
+        $event = $event->fresh();
+        $this->assertEquals(0, $event->is_proposed);
+        $this->assertEquals(0, $event->zoom_meeting_requested);
+    }
+
     public function testChoosingADateNeedsOneOfTheProposedDates()
     {
         $event = $this->createProposal();

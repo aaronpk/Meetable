@@ -393,10 +393,12 @@ form h2.subtitle {
     @if(Setting::value('zoom_client_id'))
     <div class="field" id="zoom-field">
         <label class="checkbox">
-            <input type="checkbox" name="create_zoom_meeting" value="1">
+            {{-- A proposal remembers the request until a date is chosen, so the box stays checked when editing one --}}
+            <input type="checkbox" name="create_zoom_meeting" value="1" {{ (old('name') !== null ? old('create_zoom_meeting') : $event->zoom_meeting_requested) ? 'checked' : '' }}>
             {{ __('event_form.schedule_zoom') }}
         </label>
         <div class="help">{{ __('event_form.schedule_zoom_help', ['email' => Setting::value('zoom_email')]) }}</div>
+        <div class="help zoom-proposed-help hidden">{{ __('event_form.schedule_zoom_proposed_help') }}</div>
     </div>
     @endif
 
@@ -535,19 +537,15 @@ $(function(){
 
     $("input[name=end_date]").change();
 
+    // A Zoom meeting needs a time and a timezone. For a proposal that means a start time
+    // on each proposed date, since the meeting is scheduled once one of them is chosen.
     function update_zoom_fields() {
-        if($("input[name=create_zoom_meeting]").is(":checked")) {
-            $("#meeting-url-field").addClass('hidden');
-            // Require time fields
-            $("input[name=start_time]").attr("required","required");
-            $("select[name=timezone]").attr("required","required");
-            $("#start-time-optional, #timezone-optional").addClass("hidden");
-        } else {
-            $("#meeting-url-field").removeClass('hidden');
-            $("input[name=start_time]").removeAttr("required");
-            $("select[name=timezone]").removeAttr("required");
-            $("#start-time-optional, #timezone-optional").removeClass("hidden");
-        }
+        var zoom = $("input[name=create_zoom_meeting]").is(":checked");
+        $("#meeting-url-field").toggleClass("hidden", zoom);
+        $("input[name=start_time]").prop("required", zoom);
+        $("select[name=timezone]").prop("required", zoom);
+        $("#proposed-options .option-time input[name$='[start_time]']").prop("required", zoom);
+        $("#start-time-optional, #timezone-optional").toggleClass("hidden", zoom);
     }
 
     $("input[name=create_zoom_meeting]").click(update_zoom_fields);
@@ -569,11 +567,20 @@ $(function(){
         $("#fixed-date-fields").toggleClass("hidden", proposed).find(":input").prop("disabled", proposed);
         $("#proposed-date-fields").toggleClass("hidden", !proposed).find(":input").prop("disabled", !proposed);
         $("#status-field").toggleClass("hidden", proposed).find(":input").prop("disabled", proposed);
-        $("#zoom-field").toggleClass("hidden", proposed);
+        $("#zoom-field .zoom-proposed-help").toggleClass("hidden", !proposed);
         if(proposed) {
-            $("input[name=create_zoom_meeting]").prop("checked", false);
-            update_zoom_fields();
+            update_option_times();
         }
+        update_zoom_fields();
+    }
+
+    // A proposed date with an end date is a multi-day event, which has no times. Its time
+    // fields are disabled as well as hidden so they are neither validated nor submitted.
+    function update_option_times() {
+        $("#proposed-options .proposed-option").each(function(){
+            var multiday = !!$(this).find(".option-end-date").val();
+            $(this).find(".option-time").toggleClass("hidden", multiday).find(":input").prop("disabled", multiday);
+        });
     }
 
     $("#is_proposed").on("change", toggle_proposed);
@@ -584,13 +591,10 @@ $(function(){
     $("#add-proposed-option").click(function(){
         var html = $("#proposed-option-template").html().replace(/__INDEX__/g, nextOptionIndex++);
         $("#proposed-options").append(html);
+        update_zoom_fields();
     });
 
-    // A candidate date with an end date is a multi-day event, which has no times
-    $("#proposed-options").on("change", ".option-end-date", function(){
-        var $row = $(this).closest(".proposed-option");
-        $row.find(".option-time").toggleClass("hidden", !!$(this).val());
-    });
+    $("#proposed-options").on("change", ".option-end-date", update_option_times);
 
     $("#proposed-options").on("click", ".remove-proposed-option", function(){
         var $row = $(this).closest(".proposed-option");

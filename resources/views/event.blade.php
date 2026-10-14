@@ -247,6 +247,13 @@ use App\Setting;
 
     @if($event->is_proposed && $mode != 'archive')
         <div class="segment">
+            @if($errors->any())
+                <div class="notification is-danger">
+                    @foreach($errors->all() as $error)
+                        <p>{{ $error }}</p>
+                    @endforeach
+                </div>
+            @endif
             @if($event->timezone && $date_options->contains(function($option){ return $option->start_time; }))
                 <p class="help">{{ __('events.proposed.times_in_timezone', ['timezone' => $event->timezone]) }}</p>
             @endif

@@ -60,6 +60,7 @@ return [
         'schedule_confirm_title' => 'Schedule this date?',
         // :date is the date about to be chosen
         'schedule_confirm' => 'Schedule this event for :date? Voting will close and the event will get its permanent date.',
+        'zoom_will_be_scheduled' => 'A Zoom meeting will be scheduled for this date.',
         'chosen_from' => 'The date was chosen from :count proposed date|The date was chosen from :count proposed dates',
         'none' => 'There are no proposed events right now.',
         'option_count' => ':count possible date|:count possible dates',

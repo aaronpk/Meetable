@@ -93,6 +93,9 @@ $vote_icons = ['yes' => 'check', 'ifneedbe' => 'question', 'no' => 'times'];
             </header>
             <section class="modal-card-body">
                 <p>{!! __('events.proposed.schedule_confirm', ['date' => '<b class="finalize-date"></b>']) !!}</p>
+                @if($event->zoom_meeting_requested)
+                    <p>{{ __('events.proposed.zoom_will_be_scheduled') }}</p>
+                @endif
             </section>
             <footer class="modal-card-foot">
                 <div class="buttons">

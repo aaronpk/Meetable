@@ -77,8 +77,10 @@ return [
     'remove_date' => 'Remove this date',
     'option_votes' => ':count vote|:count votes',
     'proposed_needs_two_dates' => 'Add at least two dates to vote on.',
+    'schedule_zoom_proposed_help' => 'the meeting is scheduled once a date is chosen, so each proposed date needs a start time',
     'proposed' => [
         'choose_an_option' => 'Choose one of the proposed dates to schedule the event.',
+        'zoom_needs_time' => 'A Zoom meeting was requested, but this date has no start time. Add a start time to the date, or edit the event and turn off the Zoom meeting, then try again.',
         // The edit summary written when a date is chosen. :date is the chosen date
         'finalized' => 'Scheduled for :date',
     ],

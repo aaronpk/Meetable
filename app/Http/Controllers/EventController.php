@@ -110,8 +110,10 @@ class EventController extends BaseController
         $event->timezone = request('timezone') ?: '';
 
         if($is_proposed) {
-            // The date is filled in when one of the candidate dates is chosen
+            // The date is filled in when one of the candidate dates is chosen, and a
+            // Zoom meeting can only be scheduled then, so the request is kept until then
             $event->is_proposed = true;
+            $event->zoom_meeting_requested = request('create_zoom_meeting') ? 1 : 0;
         } else {
             $event->start_date = date('Y-m-d', strtotime(request('start_date')));
             if(request('end_date'))
@@ -215,6 +217,18 @@ class EventController extends BaseController
         $event->sort_date = $event->sort_date();
         $event->slug = Event::slug_from_name($event->name);
         $event->last_modified_by = Auth::user()->id;
+
+        // A Zoom meeting asked for when the event was proposed is scheduled now that there is a time
+        if($event->zoom_meeting_requested) {
+            if(!$event->start_time) {
+                return back()->withErrors([__('event_form.proposed.zoom_needs_time')]);
+            }
+            if(!$event->schedule_zoom_meeting()) {
+                return back()->withErrors([__('event_form.zoom_failed')]);
+            }
+            $event->zoom_meeting_requested = false;
+        }
+
         $event->save();
 
         $revision = EventRevision::createFromEvent($event);
@@ -395,6 +409,7 @@ class EventController extends BaseController
             $event->start_time = null;
             $event->end_time = null;
             $event->status = 'confirmed';
+            $event->zoom_meeting_requested = request('create_zoom_meeting') ? 1 : 0;
         }
 
         if(!$event->unlisted)
