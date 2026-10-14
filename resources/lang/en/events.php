@@ -23,6 +23,13 @@ return [
         'revision_history' => 'Revision History',
         'moderate_responses' => 'Moderate Responses',
         'copy_export_url' => 'Copy Export URL',
+        'delete' => 'Delete Event',
+    ],
+
+    // The dialog that asks before an event is deleted. :name is the event's name
+    'delete' => [
+        'title' => 'Delete this event?',
+        'confirm' => 'Delete :name? It will no longer be shown anywhere on the site.',
     ],
 
     'meeting_url_needs_timezone' => 'The meeting URL for this event will not be shown because there is no timezone set for this event. Please edit this event to include a timezone.',

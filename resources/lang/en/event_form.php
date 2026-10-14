@@ -6,7 +6,6 @@
 
 return [
     'actions' => 'Actions',
-    'delete_event' => 'Delete Event',
 
     // :name is the event's name
     'heading' => [

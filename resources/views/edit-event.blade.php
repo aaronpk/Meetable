@@ -17,33 +17,6 @@ use App\Setting, App\Event;
 
 <section class="section">
 
-@if($event->id)
-<div class="level">
-  <div class="level-left"></div>
-  <div class="level-right">
-
-    <div class="dropdown is-right">
-        <div class="dropdown-trigger">
-            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-                <span>{{ __('event_form.actions') }}</span>
-                <span class="icon is-small">@icon(angle-down)</span>
-            </button>
-        </div>
-
-        <div class="dropdown-menu" id="dropdown-menu" role="menu">
-            <div class="dropdown-content">
-                <a class="dropdown-item delete-event" href="{{ route('delete-event', $event) }}">
-                    <span class="icon">@icon(trash)</span>
-                    <span>{{ __('event_form.delete_event') }}</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
-  </div>
-</div>
-@endif
-
 <div class="content">
     <h1>{{ $event->id ? $action_heading : __('event_form.heading.add') }}</h1>
 
