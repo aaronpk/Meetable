@@ -477,6 +477,7 @@ class Controller extends BaseController
 
         return response()->json([
             'meeting_url' => $meeting_url,
+            'meeting_state' => $event->meeting_state(),
         ]);
     }
 

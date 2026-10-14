@@ -58,6 +58,7 @@ class GetEventTool implements MCPTool
         $data['website']         = $event->website;
         $data['tickets_url']     = $event->tickets_url;
         $data['meeting_url']     = $event->meeting_url_is_visible() ? $event->meeting_url : null;
+        $data['meeting_state']   = $event->meeting_state();
         $data['video_url']       = $event->video_url;
         $data['rsvp_counts']     = [
             'yes'    => $event->rsvps_yes()->count(),

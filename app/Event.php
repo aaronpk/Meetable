@@ -1000,6 +1000,33 @@ class Event extends Model
         return $this->meeting_url && !$this->is_past() && ($this->is_starting_soon() || $this->is_ongoing());
     }
 
+    /**
+     * Whether Zoom tells this site when the meeting starts and ends. That needs the
+     * meeting to have been scheduled from here and the Zoom webhook to be set up.
+     * Other meeting platforms give no such signal, so their start time is all there is.
+     */
+    public function has_meeting_status_updates() {
+        return $this->zoom_meeting_id && Setting::value('zoom_webhook_secret') ? true : false;
+    }
+
+    /**
+     * What to show for the meeting link: 'none' when there is nothing to show, 'hidden'
+     * until 15 minutes before the start, 'soon' while the link is shared but the meeting
+     * hasn't started, 'live' once it has, and 'over' afterwards.
+     */
+    public function meeting_state() {
+        if(!$this->meeting_url || $this->status != 'confirmed' || $this->is_proposed)
+            return 'none';
+
+        if($this->is_past())
+            return 'over';
+
+        if(!$this->is_starting_soon())
+            return 'hidden';
+
+        return $this->is_ongoing() ? 'live' : 'soon';
+    }
+
     public function is_starting_soon() {
         if(!$this->start_date || $this->is_past() || $this->status != 'confirmed')
             return false;
@@ -1028,6 +1055,11 @@ class Event extends Model
         // If Zoom has sent the meeting started notification early, return true now
         if($this->zoom_meeting_status == 'started')
             return true;
+
+        // Zoom reports when its meetings start, so until it has the meeting isn't live,
+        // even once the start time has passed
+        if($this->has_meeting_status_updates())
+            return false;
 
         // Return true if it is past the start time of the event
         if($this->timezone) {
