@@ -35,6 +35,7 @@ return [
     'pending_responses' => 'Pending Responses',
     'delete_warning' => 'Deleting a response will prevent that webmention URL from ever appearing again even if it is re-sent.',
     'view_details' => 'View Details',
+    'remove_photos' => 'Remove Photos',
     'approve' => 'Approve',
 
     // The details of a response

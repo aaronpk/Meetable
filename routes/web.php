@@ -118,6 +118,7 @@ Route::middleware(['auth', 'slashes:remove'])->group(function(){
 
     Route::get('/event/{event}/responses', 'ResponseController@edit_responses')->name('edit-responses');
     Route::post('/event/{event}/responses/{response}/delete', 'ResponseController@delete_response')->name('delete-response');
+    Route::post('/event/{event}/responses/{response}/remove-photos', 'ResponseController@remove_photos')->name('remove-response-photos');
     Route::get('/event/{event}/responses/{response}.json', 'ResponseController@get_response_details')->name('get-response-details');
     Route::post('/event/{event}/responses/save_alt_text', 'ResponseController@save_alt_text')->name('save-alt-text');
 

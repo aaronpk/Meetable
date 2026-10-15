@@ -11,6 +11,18 @@ $(function(){
         });
     });
 
+    $(".remove-response-photos").click(function(evt){
+        evt.preventDefault();
+        var $item = $(evt.currentTarget);
+        $item.parents(".dropdown").removeClass("is-active");
+        $.post($item.attr("href"), {
+            _token: csrf_token()
+        }, function(response){
+            $("#response-"+response.response_id+" .photos").remove();
+            $item.remove();
+        });
+    });
+
     $(".approve-response").click(function(evt){
         evt.preventDefault();
         $.post($(evt.currentTarget).attr("href"), {

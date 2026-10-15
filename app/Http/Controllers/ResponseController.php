@@ -88,6 +88,29 @@ class ResponseController extends BaseController
         ]);
     }
 
+    // Keeps the response but drops its photos, for a useful comment that came with an unwanted image
+    public function remove_photos(Event $event, Response $response) {
+        Gate::authorize('manage-event', $event);
+        abort_if($response->event_id != $event->id, 404);
+
+        foreach(ResponsePhoto::where('response_id', $response->id)->get() as $photo) {
+            // The resized copies live in this site's storage; the original stays wherever it came from
+            foreach(['full_url', 'large_url', 'square_url'] as $size) {
+                if($photo->{$size} && str_starts_with($photo->{$size}, '/storage/'))
+                    Storage::delete('public/'.substr($photo->{$size}, strlen('/storage/')));
+            }
+            $photo->delete();
+        }
+
+        $response->photos_removed = true;
+        $response->save();
+
+        return response()->json([
+            'result' => 'ok',
+            'response_id' => $response->id,
+        ]);
+    }
+
     public function approve_response(Event $event, Response $response) {
         Gate::authorize('manage-event', $event);
         abort_if($response->event_id != $event->id, 404);
