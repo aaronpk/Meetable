@@ -53,7 +53,7 @@ Route::middleware('slashes:remove')->group(function(){
     Route::get('/{year}/{month}', 'Controller@index')->name('month');
     Route::get('/{year}', 'Controller@index')->name('year');
 
-    Route::get('/{year}/{tag}', 'Controller@year_tag');
+    Route::get('/{year}/{tag}', 'Controller@year_tag')->name('year-tag');
 
     Route::get('/{year}/{month}/{partial_slug}', 'Controller@find_matching_events');
 

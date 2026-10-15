@@ -3,7 +3,7 @@
             @foreach($months as $m => $events)
                 <li>
                     @if(empty($month))
-                        <span class="subtitle month">{{ \App\Helpers\Dates::format(mktime(0,0,0, $m, 1, $y), isset($tag) ? 'month_year' : 'month') }}</span>
+                        <span class="subtitle month">{{ \App\Helpers\Dates::format(mktime(0,0,0, $m, 1, $y), $month_format ?? 'month') }}</span>
                     @endif
                     <ul>
                     @foreach($events as $event)

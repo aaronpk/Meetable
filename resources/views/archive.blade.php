@@ -1,5 +1,9 @@
 @extends('layouts/main')
 
+@section('headtags')
+@include('components/pagination-head')
+@endsection
+
 @section('content')
 <section class="section">
 
@@ -19,6 +23,11 @@ a.title:hover, a.subtitle:hover {
 }
 </style>
 
+<h1 class="title">{{ $page_title }}</h1>
+
+@include('components/year-index', ['years' => $years])
+
+@if(count($data))
 <ul class="year h-feed">
     <data class="p-name" value="{{ __('events.past_events') }}"></data>
 @foreach($data as $year => $months)
@@ -32,30 +41,25 @@ a.title:hover, a.subtitle:hover {
                     <a href="{{ route('month', [$year, sprintf('%02d', $month)]) }}" class="subtitle">
                         {{ \App\Helpers\Dates::format(mktime(0,0,0, $month, 1, $year), 'month') }}
                     </a>
-                    {{-- only show count of events for dates older than 18 months ago --}}
-                    @if( count($events) > 2 && mktime(0,0,0, $month, 1, $year) < strtotime('18 months ago') )
-                        &bull; <a href="{{ route('month', [$year, sprintf('%02d', $month)]) }}">{{ trans_choice('events.event_count', count($events), ['count' => count($events)]) }}</a>
-                    @else
-                        <ul>
-                        @foreach($events as $event)
-                            <li class="event h-event">
-                                {{ \App\Helpers\Dates::format($event->start_date, 'month_day') }}
-                                &bull;
-                                <a href="{{ $event->permalink() }}" class="u-url p-name">
-                                    {{ $event->status_text() }}{{ $event->name }}
-                                </a>
+                    <ul>
+                    @foreach($events as $event)
+                        <li class="event h-event">
+                            {{ \App\Helpers\Dates::format($event->start_date, 'month_day') }}
+                            &bull;
+                            <a href="{{ $event->permalink() }}" class="u-url p-name">
+                                {{ $event->status_text() }}{{ $event->name }}
+                            </a>
 
-                                <data style="display: none;">
-                                    {!! $event->mf2_date_html() !!}
-                                </data>
+                            <data style="display: none;">
+                                {!! $event->mf2_date_html() !!}
+                            </data>
 
-                                @if($event->parent)
-                                    <a class="u-x-parent-event" href="{{ $event->parent->permalink() }}"></a>
-                                @endif
-                            </li>
-                        @endforeach
-                        </ul>
-                    @endif
+                            @if($event->parent)
+                                <a class="u-x-parent-event" href="{{ $event->parent->permalink() }}"></a>
+                            @endif
+                        </li>
+                    @endforeach
+                    </ul>
                 </li>
             @endforeach
         </ul>
@@ -63,6 +67,11 @@ a.title:hover, a.subtitle:hover {
 
 @endforeach
 </ul>
+@else
+<div class="content"><p>{{ __('events.no_events') }}</p><div class="h-feed"></div></div>
+@endif
+
+@include('components/pagination', ['page' => $page])
 
 </section>
 @endsection

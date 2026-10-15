@@ -113,7 +113,8 @@ class EventOutputEscapingTest extends TestCase
 
     public function testAnUnknownStatusIsEscapedOnTheArchive()
     {
-        $event = $this->createEvent(['start_date' => '2020-01-01']);
+        // The archive shows the newest events first, so a recent date keeps it on the first page
+        $event = $this->createEvent(['start_date' => date('Y-m-d', strtotime('-1 day'))]);
         $event->status = '<svg onload=alert(1)>';
         $event->save();
 

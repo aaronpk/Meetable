@@ -212,14 +212,14 @@ class Controller extends BaseController
             $tags[] = Tag::lookup($t);
         }
 
-        $events = $this->events_query(false, false, false, false);
+        $query = Event::tagged($this->events_query(false, false, false, false), $tags)
+            ->orderBy('id', 'desc');
 
-        $events = Event::tagged($events, $tags);
+        $page = $this->cursor_page((clone $query)->with(['parent', 'tags']), self::TAG_ARCHIVE_PER_PAGE);
+        $events = $page['events'];
 
-        $events = $events->get();
-
-        if(count($events) == 0) {
-            // TODO: maybe show a page like "no events" instead
+        // A tag with no events at all has no archive
+        if($events->isEmpty()) {
             abort(404);
         }
 
@@ -228,6 +228,10 @@ class Controller extends BaseController
             'archive' => true,
             'page_title' => '',
             'page_type' => 'tag',
+            'page' => $page,
+            'years' => $this->year_index($query),
+            'month_format' => 'month_year',
+            'on_tag_archive' => true,
         ]);
     }
 
@@ -278,39 +282,133 @@ class Controller extends BaseController
         ]);
     }
 
-    private function show_events_from_query(&$events, $opts=[]) {
+    const ARCHIVE_PER_PAGE = 50;
+    // The tag archive shows each event in full, so its pages are shorter
+    const TAG_ARCHIVE_PER_PAGE = 20;
+
+    // Groups events into [year][month][] with integer keys, for the month-by-month lists
+    private function group_by_year_month($events) {
         $data = [];
-
         foreach($events as $event) {
-            $y = date('Y', strtotime($event->start_date));
-            $m = (int)date('m', strtotime($event->start_date));
+            $ts = strtotime($event->start_date);
+            $data[(int)date('Y', $ts)][(int)date('n', $ts)][] = $event;
+        }
+        return $data;
+    }
 
-            if(!isset($data[$y]))
-                $data[$y] = [];
+    // How many events each year has, newest year first, for the index at the top of an archive
+    private function year_index(Builder $query) {
+        return (clone $query)
+            ->reorder()
+            ->selectRaw('YEAR(start_date) AS year, COUNT(*) AS count')
+            ->groupByRaw('YEAR(start_date)')
+            ->orderByRaw('YEAR(start_date) DESC')
+            ->toBase()
+            ->pluck('count', 'year');
+    }
 
-            if(!isset($data[$y][$m]))
-                $data[$y][$m] = [];
+    /**
+     * A page of an archive: up to $limit events, newest first.
+     *
+     * Pages are addressed by cursors rather than numbers. ?before=<start>,<id> shows the events
+     * older than that event and ?after=<start>,<id> the ones newer, so a page's URL keeps
+     * showing the same events after new ones are added. The query must already be ordered by
+     * sort_date and then id, both descending.
+     *
+     * Returns ['events' => Collection, 'newer' => URL or null, 'older' => URL or null].
+     */
+    private function cursor_page(Builder $query, $limit = self::ARCHIVE_PER_PAGE) {
+        $before = $this->parse_cursor(request('before'));
+        $after = $this->parse_cursor(request('after'));
 
-            $data[$y][$m][] = $event;
+        if($after) {
+            // The events just after the cursor, found in the other direction and turned around
+            $rows = (clone $query)->reorder()
+                ->where(function($q) use($after){ $this->newer_than($q, $after); })
+                ->orderBy('sort_date')->orderBy('id')
+                ->limit($limit + 1)->get();
+            $events = $rows->take($limit)->reverse()->values();
+        } else {
+            $page_query = clone $query;
+            if($before)
+                $page_query->where(function($q) use($before){ $this->older_than($q, $before); });
+            $rows = $page_query->limit($limit + 1)->get();
+            $events = $rows->take($limit)->values();
         }
 
-        if(isset($opts['past_events'])) {
-            $past_events = [];
+        // A cursor that nothing comes before or after is a page that doesn't exist
+        if($events->isEmpty() && ($before || $after))
+            abort(404);
 
-            foreach($opts['past_events'] as $event) {
-                $y = date('Y', strtotime($event->start_date));
-                $m = (int)date('m', strtotime($event->start_date));
+        $older = null;
+        $newer = null;
 
-                if(!isset($past_events[$y]))
-                    $past_events[$y] = [];
+        if($events->isNotEmpty()) {
+            // Coming from a newer cursor there is always something older: the cursor event itself
+            if($after || $rows->count() > $limit)
+                $older = request()->url().'?before='.$this->event_cursor($events->last());
 
-                if(!isset($past_events[$y][$m]))
-                    $past_events[$y][$m] = [];
+            if($before || $after) {
+                $first = $events->first();
+                $newer_count = (clone $query)->reorder()
+                    ->where(function($q) use($first){ $this->newer_than($q, $this->cursor_of($first)); })
+                    ->limit($limit + 1)->pluck('id')->count();
 
-                $past_events[$y][$m][] = $event;
+                // The previous page is the first page unless more than a page's worth is newer
+                if($newer_count > $limit)
+                    $newer = request()->url().'?after='.$this->event_cursor($first);
+                elseif($newer_count > 0)
+                    $newer = request()->url();
             }
+        }
 
-            $opts['past_events'] = $past_events;
+        return ['events' => $events, 'newer' => $newer, 'older' => $older];
+    }
+
+    // The cursor naming an event: its start in UTC and its id, like 2025-11-20T18:00:00Z,1234
+    private function event_cursor(Event $event) {
+        $cursor = $this->cursor_of($event);
+        return (new DateTime($cursor['sort_date'], new DateTimeZone('UTC')))->format('Y-m-d\TH:i:s\Z').','.$cursor['id'];
+    }
+
+    private function cursor_of(Event $event) {
+        return ['sort_date' => \App\DiscordNotification::eventStart($event), 'id' => (int)$event->id];
+    }
+
+    // Reads a cursor from the query string. Anything that isn't one is a page that doesn't exist.
+    private function parse_cursor($value) {
+        if($value === null || $value === '')
+            return null;
+
+        if(!is_string($value) || !preg_match('/^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ),(\d+)$/', $value, $match))
+            abort(404);
+
+        $date = DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $match[1], new DateTimeZone('UTC'));
+        if(!$date)
+            abort(404);
+
+        return ['sort_date' => $date->format('Y-m-d H:i:s'), 'id' => (int)$match[2]];
+    }
+
+    private function older_than($q, array $cursor) {
+        $q->where('sort_date', '<', $cursor['sort_date'])
+          ->orWhere(function($q) use($cursor){
+              $q->where('sort_date', $cursor['sort_date'])->where('id', '<', $cursor['id']);
+          });
+    }
+
+    private function newer_than($q, array $cursor) {
+        $q->where('sort_date', '>', $cursor['sort_date'])
+          ->orWhere(function($q) use($cursor){
+              $q->where('sort_date', $cursor['sort_date'])->where('id', '>', $cursor['id']);
+          });
+    }
+
+    private function show_events_from_query(&$events, $opts=[]) {
+        $data = $this->group_by_year_month($events);
+
+        if(isset($opts['past_events'])) {
+            $opts['past_events'] = $this->group_by_year_month($opts['past_events']);
         }
 
         if(!isset($opts['page_title'])) {
@@ -336,28 +434,21 @@ class Controller extends BaseController
         // This will incorrectly show some current events that are in far negative timezones, but that's fine.
         $now = new DateTime('now', new DateTimeZone('+12:00'));
 
-        $events = Event::select(DB::raw('YEAR(start_date) as year'), DB::raw('MONTH(start_date) AS month'), 'start_date', 'end_date', 'start_time', 'end_time', 'slug', 'key', 'name', 'status', 'parent_id')
-            ->where('start_date', '<', $now->format('Y-m-d'))
+        $query = Event::where('start_date', '<', $now->format('Y-m-d'))
             ->where('unlisted', 0)
             ->where('is_template', 0)
             ->where('is_proposed', 0)
             ->orderBy('sort_date', 'desc')
-            ->get();
+            ->orderBy('id', 'desc');
 
-        $data = [];
-
-        foreach($events as $event) {
-            if(!isset($data[$event->year]))
-                $data[$event->year] = [];
-
-            if(!isset($data[$event->year][$event->month]))
-                $data[$event->year][$event->month] = [];
-
-            $data[$event->year][$event->month][] = $event;
-        }
+        $years = $this->year_index($query);
+        $page = $this->cursor_page($query->with('parent'));
 
         return view('archive', [
-            'data' => $data,
+            'page_title' => __('events.past_events'),
+            'data' => $this->group_by_year_month($page['events']),
+            'page' => $page,
+            'years' => $years,
         ]);
     }
 
