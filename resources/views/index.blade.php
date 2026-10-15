@@ -42,13 +42,26 @@ use App\Setting;
     @if(isset($tags) && count($tags))
     <div class="tags {{ isset($page_type) && $page_type == 'tag' ? 'are-large' : 'are-medium' }}">
         @foreach($tags as $t)
-          <a href="{{ route('tag', $t->tag) }}" class="tag is-hoverable is-rounded {{ isset($page_type) && $page_type == 'tag' ? 'is-dark' : '' }}">#{{ $t->tag }}</a>
+          {{-- On a year, month or day page the tags narrow that year rather than leaving it --}}
+          <a href="{{ (!empty($year) && (!isset($page_type) || $page_type != 'tag')) ? route('year-tag', [$year, $t->tag]) : route('tag', $t->tag) }}" class="tag is-hoverable is-rounded">#{{ $t->tag }}</a>
         @endforeach
     </div>
     @endif
 
+    {{-- On tag pages $tags are the chosen tags, which the year links keep. Elsewhere they are
+         the tag cloud, which the links must not carry. --}}
+    @php $year_link_tags = (isset($page_type) && $page_type == 'tag') ? ($tags ?? []) : []; @endphp
+
     @if(!empty($years))
-        @include('components/year-index', ['years' => $years, 'tags' => $tags ?? []])
+        @include('components/year-index', ['years' => $years, 'tags' => $year_link_tags])
+    @endif
+
+    @if(!empty($year_nav))
+        @include('components/year-nav', $year_nav + ['tags' => $year_link_tags])
+    @endif
+
+    @if(!empty($calendar))
+        @include('components/year-calendar', $calendar)
     @endif
 
     @if(!empty($home) && !empty($proposed_count))

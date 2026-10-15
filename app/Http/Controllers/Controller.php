@@ -51,6 +51,11 @@ class Controller extends BaseController
     public function index($year=false, $month=false, $day=false) {
         $events = $this->events_query($year, $month, $day);
         $event_ids = $events->pluck('id');
+
+        // A year page starts with a calendar of the whole year and links to the neighbouring years
+        $calendar = ($year && !$month && !$day) ? $this->year_calendar($year, $events) : null;
+        $year_nav = $calendar ? $this->year_nav($year, $this->events_query(false, false, false, false)) : null;
+
         $events = $events->get();
 
         $tags = [];
@@ -84,7 +89,35 @@ class Controller extends BaseController
             'tags' => $tags,
             'home' => $home,
             'proposed_count' => ($home && Setting::value('enable_proposed_events')) ? $this->proposed_query()->count() : 0,
+            'calendar' => $calendar,
+            'year_nav' => $year_nav,
         ]);
+    }
+
+    // The nearest years before and after this one that have events: ['previous' => 2024, 'next' => null]
+    private function year_nav($year, Builder $query) {
+        $years = $this->year_index($query)->keys()->map(fn($y) => (int)$y);
+
+        return [
+            'year' => (int)$year,
+            'previous' => $years->filter(fn($y) => $y < $year)->max(),
+            'next' => $years->filter(fn($y) => $y > $year)->min(),
+        ];
+    }
+
+    // How many events start on each day of a year, for the calendar at the top of a year page
+    private function year_calendar($year, Builder $query) {
+        $counts = (clone $query)
+            ->reorder()
+            ->selectRaw('start_date, COUNT(*) AS count')
+            ->groupBy('start_date')
+            ->toBase()
+            ->pluck('count', 'start_date');
+
+        return [
+            'year' => (int)$year,
+            'counts' => $counts->all(),
+        ];
     }
 
     // The proposed events that are still looking for a date
@@ -275,10 +308,12 @@ class Controller extends BaseController
             'year' => $year,
             'month' => false,
             'day' => false,
-            'home' => (!$year && !$month && !$day),
+            'home' => false,
             'page_title' => __('events.title.year', ['year' => $year]),
             'tags' => $tags,
             'page_type' => 'tag',
+            'calendar' => $this->year_calendar($year, Event::tagged($this->events_query($year), $tags)),
+            'year_nav' => $this->year_nav($year, Event::tagged($this->events_query(false, false, false, false), $tags)),
         ]);
     }
 

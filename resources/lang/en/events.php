@@ -106,6 +106,16 @@ return [
     'icalendar_feed' => 'iCalendar Feed',
     'event_count' => ':count event|:count events',
 
+    // The calendar at the top of a year page, shading each day by how many events start on it
+    'year_calendar' => 'Events by day',
+
+    // Links from a year page to the nearest years that have events
+    'year_nav' => [
+        'label' => 'Other years',
+        'previous' => 'Previous year',
+        'next' => 'Next year',
+    ],
+
     // The archive pages, which show events a page at a time, newest first
     'archive' => [
         'year_index' => 'Events by year',

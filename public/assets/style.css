@@ -540,3 +540,77 @@ details.poll-results summary {
     margin-left: 0.4em;
     opacity: 0.6;
 }
+
+/* the calendar at the top of a year page: twelve months, each day shaded by its number of events */
+.year-calendar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1em 0.6em;
+    margin-bottom: 2em;
+}
+@media screen and (max-width: 1023px) {
+    .year-calendar {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media screen and (max-width: 768px) {
+    .year-calendar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media screen and (max-width: 480px) {
+    .year-calendar {
+        grid-template-columns: 1fr;
+    }
+}
+.year-calendar .month-name {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+}
+.year-calendar table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 2px;
+    font-size: 0.8em;
+}
+/* Bulma's own table rules align cells to the start, so these are more specific */
+.year-calendar table th,
+.year-calendar table td,
+.year-calendar table td a {
+    text-align: center;
+    padding: 0;
+}
+.year-calendar table th {
+    font-weight: normal;
+    color: var(--bulma-text-weak, #7a7a7a);
+}
+.year-calendar table td {
+    border-radius: 3px;
+    line-height: 1.9;
+    color: var(--bulma-text-weak, #7a7a7a);
+}
+.year-calendar table td a {
+    display: block;
+    border-radius: 3px;
+    color: inherit;
+}
+.year-calendar table td.has-events {
+    color: var(--bulma-text, #363636);
+}
+.year-calendar table td.has-events-1 a { background-color: rgba(50, 115, 220, 0.2); }
+.year-calendar table td.has-events-2 a { background-color: rgba(50, 115, 220, 0.4); }
+.year-calendar table td.has-events-3 a { background-color: rgba(50, 115, 220, 0.65); color: #fff; }
+.year-calendar table td.has-events-4 a { background-color: rgba(50, 115, 220, 1); color: #fff; }
+.year-calendar table td.has-events a:hover {
+    outline: 2px solid rgba(50, 115, 220, 1);
+}
+.year-calendar table td.is-today {
+    box-shadow: inset 0 0 0 2px #ffdd57;
+}
+
+/* links to the neighbouring years above a year page's calendar */
+.year-nav {
+    margin-bottom: 1em;
+}
