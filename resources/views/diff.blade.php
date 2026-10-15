@@ -58,13 +58,26 @@ td.diff-container td {
 	<h1>{{ __('revisions.differences', ['name' => $current->name]) }}</h1>
 
 	<div class="meta">
-		{!! trans_choice('revisions.made_changes', $current->num_changed_fields($previous), [
-			'author' => '<a href="'.e($current->lastModifiedBy->url).'" class="author">'.e($current->lastModifiedBy->display_name()).'</a>',
-			'date' => '<span title="'.e($current->updated_at->format('c')).'">'.e(__('revisions.date_at_time_utc', [
-				'date' => \App\Helpers\Dates::format($current->updated_at, 'date_long'),
-				'time' => \App\Helpers\Dates::format($current->updated_at, 'time'),
-			])).'</span>',
-		]) !!}
+		@if(!empty($range))
+			{!! trans_choice('revisions.changes_between', $current->num_changed_fields($previous), [
+				'from' => '<span title="'.e($previous->updated_at->format('c')).'">'.e(__('revisions.date_at_time_utc', [
+					'date' => \App\Helpers\Dates::format($previous->updated_at, 'date_long'),
+					'time' => \App\Helpers\Dates::format($previous->updated_at, 'time'),
+				])).'</span>',
+				'to' => '<span title="'.e($current->updated_at->format('c')).'">'.e(__('revisions.date_at_time_utc', [
+					'date' => \App\Helpers\Dates::format($current->updated_at, 'date_long'),
+					'time' => \App\Helpers\Dates::format($current->updated_at, 'time'),
+				])).'</span>',
+			]) !!}
+		@else
+			{!! trans_choice('revisions.made_changes', $current->num_changed_fields($previous), [
+				'author' => '<a href="'.e($current->lastModifiedBy->url).'" class="author">'.e($current->lastModifiedBy->display_name()).'</a>',
+				'date' => '<span title="'.e($current->updated_at->format('c')).'">'.e(__('revisions.date_at_time_utc', [
+					'date' => \App\Helpers\Dates::format($current->updated_at, 'date_long'),
+					'time' => \App\Helpers\Dates::format($current->updated_at, 'time'),
+				])).'</span>',
+			]) !!}
+		@endif
 	</div>
 
 	<div class="narrow">

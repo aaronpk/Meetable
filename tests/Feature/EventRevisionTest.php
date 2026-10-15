@@ -85,4 +85,70 @@ class EventRevisionTest extends TestCase
         $response->assertSee('After', false);
         $response->assertSee('gamma');
     }
+
+    /**
+     * Any two revisions can be compared, like a page history on a wiki, so a run of small
+     * edits can be seen as one change.
+     */
+    public function testAnyTwoRevisionsCanBeCompared()
+    {
+        $event = $this->createEvent(['description' => 'First', 'tags' => 'alpha']);
+        EventRevision::where('event_id', $event->id)->update(['created_at' => now()->subMinutes(10)]);
+
+        $this->actingAs($this->testUser())->post('/event/'.$event->id.'/save', [
+            'name' => $event->name, 'start_date' => '2032-01-01', 'description' => 'Second', 'tags' => 'alpha', 'status' => 'confirmed',
+        ])->assertRedirect();
+        EventRevision::where('event_id', $event->id)->where('created_at', '>', now()->subMinute())->update(['created_at' => now()->subMinutes(5)]);
+
+        $this->actingAs($this->testUser())->post('/event/'.$event->id.'/save', [
+            'name' => $event->name.' renamed', 'start_date' => '2032-01-01', 'description' => 'Second', 'tags' => 'alpha gamma', 'status' => 'confirmed',
+        ])->assertRedirect();
+
+        $revisions = EventRevision::where('event_id', $event->id)->orderBy('created_at')->get();
+        $this->assertCount(3, $revisions);
+        list($oldest, $middle, $newest) = $revisions;
+
+        // Across the whole range every field that changed anywhere shows up
+        $page = $this->actingAs($this->testUser())
+            ->get('/event/'.$event->id.'/history/compare?from='.$oldest->id.'&to='.$newest->id)
+            ->assertOk();
+        $page->assertSee('First', false)->assertSee('Second', false)->assertSee('renamed')->assertSee('gamma');
+        $page->assertSee('3 changes between the revisions of');
+
+        // Picked the other way round, the older one is still the starting point
+        $this->actingAs($this->testUser())
+            ->get('/event/'.$event->id.'/history/compare?from='.$newest->id.'&to='.$oldest->id)
+            ->assertOk()
+            ->assertSee('3 changes between the revisions of');
+
+        // A narrower range leaves out what changed before it
+        $this->actingAs($this->testUser())
+            ->get('/event/'.$event->id.'/history/compare?from='.$middle->id.'&to='.$newest->id)
+            ->assertOk()
+            ->assertSee('2 changes between the revisions of')
+            ->assertDontSee('First', false);
+
+        $other = $this->createEvent();
+        $this->actingAs($this->testUser())
+            ->get('/event/'.$other->id.'/history/compare?from='.$oldest->id.'&to='.$newest->id)
+            ->assertNotFound();
+    }
+
+    public function testTheHistoryPageLetsTwoRevisionsBePicked()
+    {
+        $event = $this->createEvent();
+        EventRevision::where('event_id', $event->id)->update(['created_at' => now()->subMinutes(5)]);
+        $this->actingAs($this->testUser())->post('/event/'.$event->id.'/save', [
+            'name' => $event->name, 'start_date' => '2032-01-02', 'status' => 'confirmed',
+        ])->assertRedirect();
+
+        list($older, $newer) = EventRevision::where('event_id', $event->id)->orderBy('created_at')->get();
+
+        $this->actingAs($this->testUser())->get('/event/'.$event->id.'/history')
+            ->assertOk()
+            ->assertSee('action="'.route('compare-revisions', $event).'"', false)
+            ->assertSee('Compare selected revisions')
+            ->assertSee('name="to" value="'.$newer->id.'" checked', false)
+            ->assertSee('name="from" value="'.$older->id.'" checked', false);
+    }
 }

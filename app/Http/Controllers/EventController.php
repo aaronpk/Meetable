@@ -507,6 +507,26 @@ class EventController extends BaseController
         ]);
     }
 
+    // The differences between any two of an event's revisions, chosen on the history page
+    public function compare_revisions(Event $event) {
+        Gate::authorize('manage-event', $event);
+
+        $from = EventRevision::where('event_id', $event->id)->where('id', (int)request('from'))->first();
+        $to = EventRevision::where('event_id', $event->id)->where('id', (int)request('to'))->first();
+        abort_if(!$from || !$to, 404);
+
+        // Whichever order they were picked in, the older one is the starting point
+        if($from->created_at > $to->created_at || ($from->created_at == $to->created_at && $from->id > $to->id))
+            list($from, $to) = [$to, $from];
+
+        return view('diff', [
+            'current' => $to,
+            'previous' => $from,
+            'event_id' => $event->id,
+            'range' => true,
+        ]);
+    }
+
     public function view_revision_diff(Event $event, EventRevision $revision) {
         Gate::authorize('manage-event', $event);
         abort_if($revision->event_id != $event->id, 404);

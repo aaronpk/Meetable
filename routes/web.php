@@ -101,6 +101,7 @@ Route::middleware(['auth', 'slashes:remove'])->group(function(){
     Route::get('/event/{event}', 'EventController@edit_event')->name('edit-event');
     Route::post('/event/{event}/save', 'EventController@save_event')->name('save-event');
     Route::get('/event/{event}/history', 'EventController@revision_history')->name('revision-history');
+    Route::get('/event/{event}/history/compare', 'EventController@compare_revisions')->name('compare-revisions');
     Route::get('/event/{event}/history/{revision}', 'EventController@view_revision')->name('view-revision');
     Route::get('/event/{event}/history/{revision}/diff', 'EventController@view_revision_diff')->name('view-revision-diff');
     Route::get('/event/{event}/clone', 'EventController@clone_event')->name('clone-event');
