@@ -38,6 +38,12 @@
                                         <span class="icon">@icon(info-circle)</span>
                                         <span>{{ __('responses.view_details') }}</span>
                                     </a>
+                                    @if($response->photos->count())
+                                    <a class="dropdown-item remove-response-photos" href="{{ route('remove-response-photos', [$event, $response]) }}">
+                                        <span class="icon">@icon(image)</span>
+                                        <span>{{ __('responses.remove_photos') }}</span>
+                                    </a>
+                                    @endif
                                     <a class="dropdown-item delete-response" href="{{ route('delete-response', [$event, $response]) }}">
                                         <span class="icon">@icon(trash)</span>
                                         <span>{{ __('common.delete') }}</span>

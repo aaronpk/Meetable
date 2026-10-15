@@ -85,6 +85,10 @@ class ExternalResponse {
 
     public static function setPhotoRecords(&$response, $photos) {
 
+        // Photos someone removed from the response stay removed, however often the post is re-sent
+        if($response->photos_removed)
+            $photos = false;
+
         if(!$photos) {
             // Delete all existing photos
             ResponsePhoto::where('response_id', $response->id)->delete();
