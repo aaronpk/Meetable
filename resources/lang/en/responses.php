@@ -8,6 +8,14 @@ return [
     'rsvps' => 'RSVPs',
     'rsvp_going' => 'I\'m Going!',
     'rsvp_went' => 'I Went',
+
+    // The dialog that asks for agreement to the event's code of conduct before an RSVP
+    'coc' => [
+        'title' => 'Code of Conduct',
+        'intro' => 'This event has a code of conduct. Please read it and confirm that you agree to it.|This event has codes of conduct. Please read them and confirm that you agree to each.',
+        // :link is a link to the code of conduct
+        'agree' => 'I have read and agree to the code of conduct at :link',
+    ],
     'remote_attendees' => 'Remote Attendees',
     'maybe' => 'Maybe',
     'cant_go' => 'Can\'t Go',
