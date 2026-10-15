@@ -524,6 +524,38 @@ use App\Setting;
             @endif
 
         </div>
+
+        @can('can-rsvp')
+            @if($event->status == 'confirmed' && $event->code_of_conduct_urls() && $event->rsvp_string_for_user(Auth::user()) != 'yes')
+            {{-- Going to an event with a code of conduct means agreeing to it first. Opened by the RSVP button. --}}
+            <div class="modal" id="coc-modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                    <header class="modal-card-head">
+                        <p class="modal-card-title">{{ __('responses.coc.title') }}</p>
+                        <button class="delete coc-cancel" aria-label="{{ __('common.close') }}"></button>
+                    </header>
+                    <section class="modal-card-body">
+                        <p>{{ trans_choice('responses.coc.intro', count($event->code_of_conduct_urls())) }}</p>
+                        @foreach($event->code_of_conduct_urls() as $url)
+                            <div class="field">
+                                <label class="checkbox">
+                                    <input type="checkbox" class="coc-agree">
+                                    {!! __('responses.coc.agree', ['link' => '<a href="'.e(\App\Helpers\Uri::safe_href($url)).'" target="_blank">'.e(\p3k\url\display_url($url)).'</a>']) !!}
+                                </label>
+                            </div>
+                        @endforeach
+                    </section>
+                    <footer class="modal-card-foot">
+                        <div class="buttons">
+                            <button class="button is-primary coc-confirm" disabled>{{ $event->is_past() ? __('responses.rsvp_went') : __('responses.rsvp_going') }}</button>
+                            <button class="button coc-cancel">{{ __('common.cancel') }}</button>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+            @endif
+        @endcan
     @endif
 
     @if($event->has_photos())

@@ -64,14 +64,38 @@ $(function(){
     $("#delete-modal").removeClass("is-active");
   });
 
-  $("#rsvp-button").click(function(evt){
-    evt.preventDefault();
-    $.post($(this).data('action'), {
+  function send_rsvp(going) {
+    $.post($("#rsvp-button").data('action'), {
         _token: $("input[name=_token]").val(),
-        rsvp: $(this).hasClass('is-pressed') ? 0 : 1
+        rsvp: going ? 1 : 0
     }, function(response){
         window.location = response.redirect;
     });
+  }
+
+  $("#rsvp-button").click(function(evt){
+    evt.preventDefault();
+    var going = !$(this).hasClass('is-pressed');
+    // An event with a code of conduct asks for agreement before the RSVP is sent
+    if(going && $("#coc-modal").length) {
+      $("#coc-modal").addClass("is-active");
+      return;
+    }
+    send_rsvp(going);
+  });
+
+  $("#coc-modal .coc-agree").on("change", function(){
+    var all = $("#coc-modal .coc-agree").length == $("#coc-modal .coc-agree:checked").length;
+    $("#coc-modal .coc-confirm").prop("disabled", !all);
+  });
+
+  $("#coc-modal .coc-confirm").click(function(){
+    $(this).prop("disabled", true);
+    send_rsvp(true);
+  });
+
+  $("#coc-modal .coc-cancel").click(function(){
+    $("#coc-modal").removeClass("is-active");
   });
 
   $("#rsvp-delete").click(function(evt){

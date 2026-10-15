@@ -149,7 +149,7 @@ use App\Response;
 
     </main>
 
-    <script src="/assets/script.js?v=20261016"></script>
+    <script src="/assets/script.js?v=20261017"></script>
     @yield('scripts')
 
 </body>
