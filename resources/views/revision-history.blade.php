@@ -11,12 +11,19 @@
 
 @php($currentRevision = null)
 
+{{-- Any two revisions can be compared: pick the older one in the first column and the newer in the second --}}
+<form method="get" action="{{ route('compare-revisions', $event) }}" class="compare-revisions">
+@if(count($revisions) > 1)
+<p><button type="submit" class="button is-small is-light">{{ __('revisions.compare') }}</button></p>
+@endif
+
 <ul class="changelog">
 @foreach($revisions as $previousRevision)
 	@if(!$currentRevision)
 		@php($currentRevision = $previousRevision)
 	@else
 		<li>
+			@include('components/revision-compare-radios', ['revision' => $currentRevision, 'position' => $loop->index - 1])
 			<div class="left">
 				<div class="change">
 					<a href="{{ route('view-revision-diff', [$event, $currentRevision]) }}">
@@ -50,6 +57,7 @@
 	
 @if($currentRevision)
 		<li>
+			@include('components/revision-compare-radios', ['revision' => $currentRevision, 'position' => count($revisions) - 1])
 			<div class="left">
 				<div class="meta">
 					<a href="{{ $currentRevision->lastModifiedBy->url }}" class="author">
@@ -71,8 +79,16 @@
 		</li>
 @endif
 </ul>
+</form>
 
 <style>
+ul.changelog .compare {
+	white-space: nowrap;
+	margin-right: 0.75em;
+}
+ul.changelog .compare input {
+	margin: 0 0.25em;
+}
 ul.changelog {
 	list-style-type: none;
 	margin: 0;
