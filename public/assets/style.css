@@ -530,3 +530,13 @@ details.poll-results summary {
 .meeting-segment[data-state="none"] {
     display: none;
 }
+
+/* the row of years at the top of an archive. The count is small so it doesn't read as a date. */
+.year-index {
+    margin-bottom: 1.5em;
+}
+.year-index .tag .count {
+    font-size: 0.7em;
+    margin-left: 0.4em;
+    opacity: 0.6;
+}

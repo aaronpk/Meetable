@@ -106,6 +106,14 @@ return [
     'icalendar_feed' => 'iCalendar Feed',
     'event_count' => ':count event|:count events',
 
+    // The archive pages, which show events a page at a time, newest first
+    'archive' => [
+        'year_index' => 'Events by year',
+        'pagination' => 'Pages',
+        'newer' => 'Newer events',
+        'older' => 'Older events',
+    ],
+
     // Page titles. :site is the name of the website
     'title' => [
         'year' => ':year Events',

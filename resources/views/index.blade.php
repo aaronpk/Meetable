@@ -5,6 +5,7 @@ use App\Setting;
 @endphp
 
 @section('headtags')
+@include('components/pagination-head')
 @if(isset($home) && $home)
 @if(Setting::value('home_social_image_url') || Setting::value('home_meta_description'))
 
@@ -46,6 +47,10 @@ use App\Setting;
     </div>
     @endif
 
+    @if(!empty($years))
+        @include('components/year-index', ['years' => $years, 'tags' => $tags ?? []])
+    @endif
+
     @if(!empty($home) && !empty($proposed_count))
         <article class="message is-info proposed-banner">
             <div class="message-body">
@@ -58,20 +63,26 @@ use App\Setting;
     @endif
 
     @if(count($data))
-        @include('components/event-list', ['data' => $data])
+        @include('components/event-list', ['data' => $data, 'month_format' => $month_format ?? 'month'])
     @else
         <div class="content"><p>{{ isset($tag) && !isset($archive) ? __('events.no_upcoming_events') : __('events.no_events') }}</p><div class="h-feed"></div></div>
     @endif
 
     @if(isset($past_events) && count($past_events))
         <h2 class="subtitle" style="margin-top: 2em; font-weight: bold;">{{ __('events.past_events') }}</h2>
-        @include('components/event-list', ['data' => $past_events])
+        @include('components/event-list', ['data' => $past_events, 'month_format' => $month_format ?? 'month'])
+    @endif
+
+    @if(isset($page))
+        @include('components/pagination', ['page' => $page])
     @endif
 
     @if(isset($page_type) && $page_type == 'tag')
+        @if(empty($on_tag_archive))
         <div class="">
             <a href="{{ route('tag-archive', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(archive) {{ __('events.tag_archive') }}</a>
         </div>
+        @endif
 
         <div class="subscribe-ics">
             <a href="{{ route('ics-tag-preview', implode(',',array_map(function($t){ return $t->tag; }, $tags))) }}">@icon(calendar-alt) {{ __('events.icalendar_feed') }}</a>
