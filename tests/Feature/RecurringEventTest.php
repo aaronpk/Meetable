@@ -116,6 +116,17 @@ class RecurringEventTest extends TestCase
             ->assertSessionHasErrors('recurrence_interval');
     }
 
+    public function testATemplateLinksToItsEditPageInsteadOfAPublicPage()
+    {
+        $template = $this->createTemplate(new DateTime('+1 day'), 'weekly_dow');
+
+        $this->assertEquals('/event/'.$template->id, $template->permalink());
+
+        $this->actingAs($this->testUser())->get('/event/'.$template->id.'/history')
+            ->assertOk()
+            ->assertSee('href="/event/'.$template->id.'"', false);
+    }
+
     public function testADeletedOccurrenceIsNotCreatedAgain()
     {
         $template = $this->createTemplate(new DateTime('+1 day'), 'weekly_dow');

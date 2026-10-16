@@ -363,6 +363,10 @@ class Event extends Model
     }
 
     public function permalink() {
+        // A recurring event template has no public page or key, only its edit page
+        if($this->is_template)
+            return '/event/' . $this->id;
+
         $slug = $this->slug ? rawurlencode($this->slug).'-' : '';
 
         // A proposed event has no date to build the usual URL from
