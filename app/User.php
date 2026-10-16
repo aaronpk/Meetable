@@ -66,6 +66,9 @@ class User extends Authenticatable implements PasskeyUser
     }
 
     public function downloadProfilePhoto($url) {
+        if(!$url)
+            return null;
+
         $original_image = \App\Helpers\SafeHTTP::fetch_image($url);
 
         if($original_image) {
@@ -75,7 +78,10 @@ class User extends Authenticatable implements PasskeyUser
                 $image->fit(150, 150);
 
                 $filename = 'public/users/'.$this->id.'-'.md5($url).'.jpg';
-                Storage::put($filename, $image->stream('jpg', 80));
+                if(!Storage::put($filename, $image->stream('jpg', 80))) {
+                    Log::error('Storing profile photo '.$filename.' failed');
+                    return null;
+                }
                 Storage::setVisibility($filename, 'public');
 
                 return Storage::url($filename);
@@ -96,8 +102,12 @@ class User extends Authenticatable implements PasskeyUser
         $data = $xray->parse($this->url);
 
         if(isset($data['data']['type']) && $data['data']['type'] == 'card') {
-            $this->name = $data['data']['name'];
-            $this->photo = $this->downloadProfilePhoto($data['data']['photo']);
+            // This runs again on later logins, so a card that has lost its name or photo,
+            // or a photo that can't be downloaded right now, keeps what was stored before
+            if(!empty($data['data']['name']))
+                $this->name = $data['data']['name'];
+            if($photo = $this->downloadProfilePhoto($data['data']['photo'] ?? null))
+                $this->photo = $photo;
             Log::info('  Found user details: '.$this->name.' '.$this->photo);
             $this->save();
         } else {

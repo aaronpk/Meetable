@@ -124,19 +124,10 @@ class DiscordController extends BaseController
             $photo_url = 'https://cdn.discordapp.com/avatars/'.$userdata['user']['id'].'/'.$userdata['user']['avatar'].'.jpg';
         }
 
-        // Create the user record if it doesn't yet exist
-        $user = User::where('identifier', $userdata['user']['id'])->first();
-        if(!$user) {
-            $user = new User;
-            $user->identifier = $userdata['user']['id'];
-            $user->url = '';
-            $user->photo = $user->downloadProfilePhoto($photo_url);
-            $user->api_token = Str::random(80);
-        }
-
-        $user->name = $guilddata ? $guilddata['nick'] : $userdata['user']['username'];
-
-        $user->save();
+        // Create the user record if it doesn't yet exist, and keep the profile up to date
+        $user = $this->syncUser($userdata['user']['id'], [
+            'name' => $guilddata ? $guilddata['nick'] : $userdata['user']['username'],
+        ], $photo_url, ['url' => '']);
 
         // Now make this user logged-in
         return $this->redirectAfterLogin('DISCORD_USER', $userdata['user']['id']);
