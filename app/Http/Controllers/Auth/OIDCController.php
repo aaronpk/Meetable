@@ -131,16 +131,11 @@ class OIDCController extends BaseController
 
         Log::info('User logged in: '.$userinfo['sub']);
 
-        // Create the user record if it doesn't yet exist
-        $user = User::where('identifier', $userinfo['sub'])->first();
-        if(!$user) {
-            $user = new User;
-            $user->identifier = $userinfo['sub'];
-            $user->email = $userinfo['email'] ?? '';
-            $user->api_token = Str::random(80);
-        }
-
-        $user->name = $userinfo['name'] ?? '';
+        // Create the user record if it doesn't yet exist, and keep the profile up to date
+        $user = $this->syncUser($userinfo['sub'], [
+            'name' => $userinfo['name'] ?? '',
+            'email' => $userinfo['email'] ?? '',
+        ], $userinfo['picture'] ?? null);
 
         if(env('OIDC_ADMIN_USERS')) {
             $adminUsers = explode(' ', env('OIDC_ADMIN_USERS'));

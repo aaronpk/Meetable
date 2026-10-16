@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\User;
 use Illuminate\Support\Str;
 use App\Events\UserCreated;
+use App\Jobs\FetchProfileInfo;
 
 class VouchGuard extends CustomGuard {
 
@@ -68,8 +69,14 @@ class VouchGuard extends CustomGuard {
 
         list($user, $created) = $this->getUserFromUsername($username);
 
-        if($created)
+        if($created) {
             event(new UserCreated($user));
+        } elseif($this->request->hasSession() && !$this->request->session()->get('VOUCH_PROFILE_REFRESHED')) {
+            // Vouch has no login step of its own, so the first request of each browser
+            // session re-reads the user's h-card in case their name or photo changed
+            $this->request->session()->put('VOUCH_PROFILE_REFRESHED', true);
+            FetchProfileInfo::dispatch($user);
+        }
 
         $cached = $user;
         return $user;

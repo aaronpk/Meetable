@@ -205,6 +205,8 @@ AUTH_SHOW_LOGIN=true
 AUTH_SHOW_LOGOUT=false
 ```
 
+A user's name, email address and profile photo are stored when they first log in and refreshed from the login provider on every later login. Profile photos are downloaded on the queue, so if `QUEUE_CONNECTION` is not `sync` a queue worker needs to be running for them to appear. With Vouch there is no login step of its own, so the user's h-card is re-read at the start of each browser session instead.
+
 #### Discord
 
 A Discord bot can post a message to a channel before events with a particular tag start, and can add upcoming events to the server's event list, where they appear in the sidebar and go live at their start time. The Discord page sets how far ahead events are added, and at most the 25 soonest are added so a busy calendar doesn't overwhelm the list. Set `DISCORD_CLIENT_ID` and `DISCORD_BOT_TOKEN` as described in `.env.example`, then add the bot to the server from the "Discord" page in the menu. This works with any login method: when the site logs in with Discord, every user can set up the bot, otherwise it is only available to people who can manage the site. If the bot was added before the server event list option existed, add it again so it gets the "Create Events" and "Manage Events" permissions.

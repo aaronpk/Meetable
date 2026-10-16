@@ -97,17 +97,11 @@ class GitHubController extends BaseController
             }
         }
 
-        // Create the user record if it doesn't yet exist
-        $user = User::where('identifier', $userdata['html_url'])->first();
-        if(!$user) {
-            $user = new User;
-            $user->identifier = $userdata['html_url'];
-            $user->url = $userdata['html_url'];
-            $user->photo = $user->downloadProfilePhoto($userdata['avatar_url']);
-            $user->api_token = Str::random(80);
-        }
-
-        $user->name = $userdata['name'];
+        // Create the user record if it doesn't yet exist, and keep the profile up to date
+        $user = $this->syncUser($userdata['html_url'], [
+            'url' => $userdata['html_url'],
+            'name' => $userdata['name'],
+        ], $userdata['avatar_url'] ?? null);
 
         if(env('GITHUB_ADMIN_USERS')) {
             $adminUsers = explode(' ', env('GITHUB_ADMIN_USERS'));
