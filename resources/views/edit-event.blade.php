@@ -37,6 +37,11 @@ use App\Setting, App\Event;
 form h2.subtitle {
     margin-top: 3em;
 }
+.summary-help {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+}
 </style>
 
 @if($errors->any())
@@ -389,8 +394,11 @@ form h2.subtitle {
 
     <div class="field">
         <label class="label">{{ __('event_form.summary') }}</label>
-        <textarea class="input" name="summary" style="max-height: none; height: {{ $event->summary ? '15vh' : '15vh' }}">{{ old('summary') ?: $event->summary }}</textarea>
-        <div class="help">{{ __('event_form.markdown_supported') }}</div>
+        <textarea class="input" name="summary" rows="2" style="max-height: none; height: auto;" data-max-length="{{ Event::SUMMARY_LENGTH }}">{{ old('summary') ?: $event->summary }}</textarea>
+        <div class="help summary-help">
+            <span>{{ __('event_form.markdown_supported') }}</span>
+            <span class="summary-count" aria-live="polite"></span>
+        </div>
     </div>
 
     <div class="field">
@@ -588,6 +596,19 @@ $(function(){
             evt.preventDefault();
         }
     });
+
+    // The summary is meant to be short: count down the remaining characters and turn
+    // the count red when it goes negative or when paragraphs or headings are pasted
+    // in. Nothing stops the form from being submitted either way.
+    $("textarea[name=summary]").on("input", function(){
+        var max = parseInt($(this).data("max-length"), 10);
+        var text = $(this).val();
+        var remaining = max - text.length;
+        var blocks = /<(p|h[1-6])[\s>]/i.test(text);
+        $(".summary-count")
+            .text(blocks ? lang("summary_no_block_tags") : remaining)
+            .toggleClass("has-text-danger", remaining < 0 || blocks);
+    }).trigger("input");
 
     $("input[name=edit_summary]").on('keydown', function(evt){
         if(evt.keyCode == 13) {

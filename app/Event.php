@@ -61,6 +61,10 @@ class Event extends Model
         }
     }
 
+    // The summary is a short blurb shown above the description. The edit form counts
+    // down from this; longer summaries are allowed but flagged.
+    const SUMMARY_LENGTH = 300;
+
     public static $EDITABLE_PROPERTIES = [
         'name', 'start_date', 'end_date', 'start_time', 'end_time',
         'location_name', 'location_address', 'location_locality', 'location_region', 'location_country',

@@ -17,4 +17,7 @@ return [
     // :count is the number of people who voted on the date being removed from the form
     'remove_option_with_votes' => ':count people have already voted on this date. Remove it anyway?',
     'proposed_needs_two_dates' => 'Add at least two dates to vote on.',
+
+    // Shown in place of the summary's character count when it contains <p> or heading tags
+    'summary_no_block_tags' => 'keep the summary to a short paragraph without <p> or heading tags',
 ];
