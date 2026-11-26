@@ -29,7 +29,7 @@ class ProposedEventTest extends TestCase
     {
         parent::setUp();
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->previous_setting = Setting::value('enable_proposed_events');
         $this->enableProposedEvents(true);
     }
@@ -45,7 +45,7 @@ class ProposedEventTest extends TestCase
         $this->deleteTestData();
 
         Setting::set('enable_proposed_events', $this->previous_setting);
-        Setting::$cached = [];
+        Setting::clear_cache();
 
         parent::tearDown();
     }
@@ -53,7 +53,7 @@ class ProposedEventTest extends TestCase
     private function enableProposedEvents(bool $enabled): void
     {
         Setting::set('enable_proposed_events', $enabled ? 1 : 0);
-        Setting::$cached = [];
+        Setting::clear_cache();
     }
 
     private function createProposal(array $fields = []): Event
@@ -429,14 +429,14 @@ class ProposedEventTest extends TestCase
         // for this look at the form, and clear it again before anything would call Zoom
         $previous_zoom = Setting::value('zoom_client_id');
         Setting::set('zoom_client_id', 'test-client');
-        Setting::$cached = [];
+        Setting::clear_cache();
         try {
             $this->actingAs($this->testUser())->get('/event/'.$event->id)
                 ->assertOk()
                 ->assertSee('name="create_zoom_meeting" value="1" checked', false);
         } finally {
             Setting::set('zoom_client_id', $previous_zoom);
-            Setting::$cached = [];
+            Setting::clear_cache();
         }
 
         $this->get($event->permalink())->assertSee('A Zoom meeting will be scheduled');

@@ -42,7 +42,7 @@ class DiscordScheduledEventTest extends TestCase
         $this->setEnv('DISCORD_BOT_TOKEN', 'test-bot-token');
         $this->setEnv('DISCORD_SERVER_ID', '1000');
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         foreach(self::SETTINGS as $id)
             $this->previous_settings[$id] = Setting::value($id);
 
@@ -71,7 +71,7 @@ class DiscordScheduledEventTest extends TestCase
 
         foreach($this->previous_settings as $id => $value)
             Setting::set($id, $value);
-        Setting::$cached = [];
+        Setting::clear_cache();
 
         foreach($this->previous_env as $name => $value)
             $this->setEnv($name, $value);
@@ -93,7 +93,7 @@ class DiscordScheduledEventTest extends TestCase
         Setting::set('discord_sync_events_tags', $tags);
         Setting::set('discord_sync_events_days', '');
         Setting::set('discord_scheduled_events_error', '');
-        Setting::$cached = [];
+        Setting::clear_cache();
     }
 
     private function fakeDiscord()
@@ -329,7 +329,7 @@ class DiscordScheduledEventTest extends TestCase
     {
         $this->fakeDiscord();
         Setting::set('discord_sync_events_days', 7);
-        Setting::$cached = [];
+        Setting::clear_cache();
 
         $soon = $this->eventStartingIn(6 * 24 * 60);
         $this->eventStartingIn(8 * 24 * 60);
@@ -440,7 +440,7 @@ class DiscordScheduledEventTest extends TestCase
         $this->sync();
 
         $this->assertEquals('', $event->fresh()->discord_scheduled_event_id);
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->assertStringContainsString('Missing Permissions', Setting::value('discord_scheduled_events_error'));
         $this->assertStringContainsString('Create Events and Manage Events', Setting::value('discord_scheduled_events_error'));
 
@@ -452,7 +452,7 @@ class DiscordScheduledEventTest extends TestCase
         $this->sync();
 
         $this->assertEquals('7777', $event->fresh()->discord_scheduled_event_id);
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->assertEquals('', Setting::value('discord_scheduled_events_error'));
     }
 
@@ -503,7 +503,7 @@ class DiscordScheduledEventTest extends TestCase
             ->post('/discord/events/save', ['enabled' => 1, 'tags' => 'Foo, BAR baz', 'days' => 30])
             ->assertRedirect('/discord');
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->assertEquals(1, Setting::value('discord_sync_events'));
         $this->assertEquals('foo bar baz', Setting::value('discord_sync_events_tags'));
         $this->assertEquals(30, Setting::value('discord_sync_events_days'));
@@ -518,7 +518,7 @@ class DiscordScheduledEventTest extends TestCase
             ->post('/discord/events/save', ['tags' => '', 'days' => 60])
             ->assertRedirect('/discord');
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->assertEquals(0, Setting::value('discord_sync_events'));
         $this->assertEquals('', Setting::value('discord_sync_events_tags'));
 
@@ -528,7 +528,7 @@ class DiscordScheduledEventTest extends TestCase
             ->assertRedirect('/discord')
             ->assertSessionHas('discord-errors');
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->assertEquals(0, Setting::value('discord_sync_events'));
         $this->assertEquals(60, Setting::value('discord_sync_events_days'));
     }

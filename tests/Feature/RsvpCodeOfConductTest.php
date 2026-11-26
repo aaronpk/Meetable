@@ -20,10 +20,10 @@ class RsvpCodeOfConductTest extends TestCase
     {
         parent::setUp();
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->previous_setting = Setting::value('enable_rsvps');
         Setting::set('enable_rsvps', 1);
-        Setting::$cached = [];
+        Setting::clear_cache();
     }
 
     protected function tearDown(): void
@@ -31,7 +31,7 @@ class RsvpCodeOfConductTest extends TestCase
         $this->deleteTestData();
 
         Setting::set('enable_rsvps', $this->previous_setting);
-        Setting::$cached = [];
+        Setting::clear_cache();
 
         parent::tearDown();
     }

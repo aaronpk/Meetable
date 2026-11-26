@@ -23,7 +23,7 @@ class MeetingLinkTest extends TestCase
     {
         parent::setUp();
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->previous_webhook_secret = Setting::value('zoom_webhook_secret');
     }
 
@@ -32,7 +32,7 @@ class MeetingLinkTest extends TestCase
         $this->deleteTestData();
 
         Setting::set('zoom_webhook_secret', $this->previous_webhook_secret);
-        Setting::$cached = [];
+        Setting::clear_cache();
 
         parent::tearDown();
     }
@@ -40,7 +40,7 @@ class MeetingLinkTest extends TestCase
     private function zoomWebhookConfigured(bool $configured)
     {
         Setting::set('zoom_webhook_secret', $configured ? 'test-secret' : null);
-        Setting::$cached = [];
+        Setting::clear_cache();
     }
 
     private function eventStartingIn($minutes, $meeting_url)

@@ -405,7 +405,7 @@ class DiscordNotificationTest extends TestCase
     public function testTheInstallCallbackOnlySavesAServerTheBotIsIn()
     {
         $this->setEnv('DISCORD_SERVER_ID', null);
-        \App\Setting::$cached = [];
+        \App\Setting::clear_cache();
         $previous = \App\Setting::value('discord_guild_id');
 
         Http::fake([
@@ -418,7 +418,7 @@ class DiscordNotificationTest extends TestCase
             ->get('/discord/install?state=expected&guild_id=2000')
             ->assertSessionHas('discord-error');
 
-        \App\Setting::$cached = [];
+        \App\Setting::clear_cache();
         $this->assertEquals($previous, \App\Setting::value('discord_guild_id'));
 
         $this->actingAs($this->testUser())
@@ -426,11 +426,11 @@ class DiscordNotificationTest extends TestCase
             ->get('/discord/install?state=expected&guild_id=3000')
             ->assertSessionHas('discord-success', 'The bot was installed in Real Server');
 
-        \App\Setting::$cached = [];
+        \App\Setting::clear_cache();
         $this->assertEquals('3000', \App\Setting::value('discord_guild_id'));
 
         \App\Setting::set('discord_guild_id', $previous);
-        \App\Setting::$cached = [];
+        \App\Setting::clear_cache();
     }
 
     public function testWithoutDiscordLoginThePagesAreForSiteManagers()

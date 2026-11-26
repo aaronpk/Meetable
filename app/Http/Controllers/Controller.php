@@ -45,18 +45,19 @@ class Controller extends BaseController
         else
             $events = $events->orderBy('sort_date', 'desc');
 
-        return $events;
+        // Every event in a list shows its tags and links to its parent
+        return $events->with('tags', 'parent');
     }
 
     public function index($year=false, $month=false, $day=false) {
-        $events = $this->events_query($year, $month, $day);
-        $event_ids = $events->pluck('id');
+        $query = $this->events_query($year, $month, $day);
 
         // A year page starts with a calendar of the whole year and links to the neighbouring years
-        $calendar = ($year && !$month && !$day) ? $this->year_calendar($year, $events) : null;
+        $calendar = ($year && !$month && !$day) ? $this->year_calendar($year, $query) : null;
         $year_nav = $calendar ? $this->year_nav($year, $this->events_query(false, false, false, false)) : null;
 
-        $events = $events->get();
+        $events = $query->get();
+        $event_ids = $events->pluck('id');
 
         $tags = [];
         if(count($events) > 0) {
@@ -285,8 +286,8 @@ class Controller extends BaseController
 
         $upcoming_events = Event::tagged($upcoming_events, $tags);
 
-        $upcoming_event_ids = $upcoming_events->pluck('id');
         $upcoming_events = $upcoming_events->get();
+        $upcoming_event_ids = $upcoming_events->pluck('id');
 
         $past_events = $this->events_query($year, false, false, false);
         $past_events = $past_events->whereRaw('

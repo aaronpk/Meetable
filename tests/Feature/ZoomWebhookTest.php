@@ -19,7 +19,7 @@ class ZoomWebhookTest extends TestCase
     {
         parent::setUp();
 
-        Setting::$cached = [];
+        Setting::clear_cache();
         $this->previous_secret = Setting::value('zoom_webhook_secret');
         $this->setSecret(self::SECRET);
     }
@@ -35,7 +35,7 @@ class ZoomWebhookTest extends TestCase
     private function setSecret($secret)
     {
         Setting::set('zoom_webhook_secret', $secret);
-        Setting::$cached = [];
+        Setting::clear_cache();
     }
 
     private function send(array $body, $timestamp = null, $secret = self::SECRET)
