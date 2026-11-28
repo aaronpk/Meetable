@@ -1489,9 +1489,10 @@ class Event extends Model
         return null;
     }
 
+    // Accepts H:i:s from the database as well as the H:i an HTML time input submits
     public static function hms_to_sec($hms) {
         $parts = explode(':', $hms);
-        return $parts[2] + ($parts[1]*60) + ($parts[0]*60*60);
+        return ($parts[2] ?? 0) + (($parts[1] ?? 0)*60) + ($parts[0]*60*60);
     }
 
 }

@@ -396,6 +396,12 @@ class EventController extends BaseController
             $event->{$p} = (request($p) ?: null);
         }
 
+        // The form submits H:i, but everything that reads a time before the save expects H:i:s
+        if($event->start_time)
+            $event->start_time = date('H:i:00', strtotime($event->start_time));
+        if($event->end_time)
+            $event->end_time = date('H:i:00', strtotime($event->end_time));
+
         // If there is an end date, remove the start/end times
         if($event->end_date) {
             $event->start_time = null;

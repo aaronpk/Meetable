@@ -330,4 +330,23 @@ class EventTest extends TestCase
         $this->assertStringContainsString('P<span class="lower">ROPOSED</span>', $event->status_tag());
         $this->assertArrayNotHasKey('startDate', json_decode($event->toGoogleJSON(), true));
     }
+
+    /**
+     * The edit form submits H:i, and before the fix the Zoom duration lookup read a
+     * missing seconds component and took the whole save down.
+     */
+    public function testTimesWithoutSecondsStillGiveADuration()
+    {
+        $this->assertEquals(68400, Event::hms_to_sec('19:00'));
+        $this->assertEquals(68400, Event::hms_to_sec('19:00:00'));
+        $this->assertEquals(68430, Event::hms_to_sec('19:00:30'));
+
+        $event = new Event;
+        $event->start_date = '2024-01-01';
+        $event->start_time = '18:00';
+        $event->end_time   = '19:30';
+
+        $this->assertEquals('2024-01-01T19:30:00+00:00', $event->end_datetime()->format('c'));
+        $this->assertEquals(90, $event->duration_minutes());
+    }
 }
